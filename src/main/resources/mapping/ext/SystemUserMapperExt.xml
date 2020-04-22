@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.SystemUserMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.ext.SystemUserExt">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="country" jdbcType="VARCHAR" property="country" />
+    <result column="role" jdbcType="VARCHAR" property="role" />
+    <result column="del" jdbcType="VARCHAR" property="del" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_name, password, country, role, del, insert_time
+  </sql>
+
+  <select id="selectSystemUser" parameterType="com.lenovo.vro.pricing.entity.SystemUser" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from system_user
+    <where>
+      <if test="userName != null">
+        and user_name = #{userName,jdbcType=VARCHAR}
+      </if>
+      <if test="password != null">
+        and password = #{password,jdbcType=VARCHAR}
+      </if>
+      <if test="country != null">
+        and country = #{country,jdbcType=VARCHAR}
+      </if>
+      <if test="role != null">
+        and role = #{role,jdbcType=VARCHAR}
+      </if>
+      <if test="del != null">
+        and del = #{del,jdbcType=VARCHAR}
+      </if>
+      <if test="insertTime != null">
+        and insert_time = #{insertTime,jdbcType=TIMESTAMP}
+      </if>
+    </where>
+  </select>
+
+  <select id="checkUserName" parameterType="java.lang.String" resultType="java.lang.Integer">
+    select count(*) from system_user where user_name = #{userName,jdbcType=VARCHAR}
+  </select>
+</mapper>

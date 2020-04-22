@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.SystemMenuMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.SystemMenu">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+    <result column="auth_role" jdbcType="INTEGER" property="authRole" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    menu.id, menu.url, menu.name, menu.parent_id, auth_role
+  </sql>
+
+  <select id="getUserMenuList" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from system_menu menu
+    inner join system_role role on menu.auth_role = role.id
+    inner join system_user user on role.id = user.role
+    where user.user_name = #{userName,jdbcType=VARCHAR}
+    and user.del = '1'
+    and role.del = '1'
+  </select>
+
+</mapper>
