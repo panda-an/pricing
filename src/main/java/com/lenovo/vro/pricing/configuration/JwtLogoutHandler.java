@@ -25,7 +25,7 @@ public class JwtLogoutHandler implements LogoutHandler {
 
         UserDetails userDetails = (UserDetails) authentication.getCredentials();
         if(userDetails != null && !StringUtils.isEmpty(userDetails.getUsername())) {
-            webUserService.deleteUserInfo(userDetails.getUsername());
+            webUserService.deleteUserInfo();
         }
     }
 }

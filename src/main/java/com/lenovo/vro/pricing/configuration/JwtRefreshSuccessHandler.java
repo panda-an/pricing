@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Map;
 
 public class JwtRefreshSuccessHandler implements AuthenticationSuccessHandler {
 
@@ -30,8 +31,8 @@ public class JwtRefreshSuccessHandler implements AuthenticationSuccessHandler {
 
         DecodedJWT jwtToken = ((JwtAuthenticationToken) authentication).getToken();
         if(shouldTokenRefresh(jwtToken.getExpiresAt())) {
-            String token = webUserService.saveUserInfo((UserDetails) authentication.getPrincipal());
-            response.setHeader("Authorization", token);
+            Map<String, String> map = webUserService.saveUserInfo((UserDetails) authentication.getPrincipal());
+            response.setHeader("Authorization", map.get("token"));
         }
     }
 

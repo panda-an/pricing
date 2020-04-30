@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.CostTapeMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.ext.CostTapeExt">
+    <result column="part_number" jdbcType="VARCHAR" property="partNumber" />
+    <result column="cost_description" jdbcType="VARCHAR" property="costDescription" />
+    <result column="plant" jdbcType="VARCHAR" property="plant" />
+    <result column="country" jdbcType="VARCHAR" property="country" />
+    <result column="one" jdbcType="DECIMAL" property="bmc" />
+    <result column="product_family" jdbcType="VARCHAR" property="productFamily" />
+    <result column="priority" jdbcType="VARCHAR" property="priority" />
+    <result column="sub_geo" jdbcType="VARCHAR" property="subGeo" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    c.part_number, c.plant, c.country, c.one, c.description as cost_description, f.product_family, f.plant, f.priority, f.sub_geo
+  </sql>
+
+  <select id="getCostTapeData" resultMap="BaseResultMap" parameterType="com.lenovo.vro.pricing.entity.CostTape">
+    select <include refid="Base_Column_List" />
+    from margindb.cost_tape c
+    inner join cost_tape_family_mapping f on c.family = f.product_family and c.plant = f.plant and c.subgeo = f.sub_geo
+    left join cost_tape_country_mapping_region m on c.country = m.country
+    <where>
+      <if test="partNumber != null">
+        AND c.part_number = #{partNumber}
+      </if>
+      <if test="country != null">
+        AND c.country = #{country}
+      </if>
+      <if test="region != null">
+        AND m.region = #{region}
+      </if>
+    </where>
+  </select>
+</mapper>

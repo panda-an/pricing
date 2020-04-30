@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.WarrantyMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.Warranty">
+    <id column="warranty_code" jdbcType="VARCHAR" property="warrantyCode" />
+    <id column="country" jdbcType="VARCHAR" property="country" />
+    <result column="nbmc" jdbcType="DECIMAL" property="nbmc" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    warranty_code, country, nbmc
+  </sql>
+
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into warranty (warranty_code, country, nbmc)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+    (#{item.warrantyCode,jdbcType=VARCHAR},  #{item.country,jdbcType=VARCHAR}, #{item.nbmc,jdbcType=DECIMAL})
+    </foreach>
+  </insert>
+
+  <update id="deleteAll">
+    truncate warranty
+  </update>
+
+  <select id="getWarrantyCodeList"  parameterType="java.lang.String" resultType="java.lang.String">
+    select warranty_code from warranty where country = #{country}
+  </select>
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.WarrantyMapper">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.Warranty">
+    <id column="warranty_code" jdbcType="VARCHAR" property="warrantyCode" />
+    <id column="country" jdbcType="VARCHAR" property="country" />
+    <result column="nbmc" jdbcType="DECIMAL" property="nbmc" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    warranty_code, country, nbmc, insert_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.WarrantyKey" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from warranty
+    where warranty_code = #{warrantyCode,jdbcType=VARCHAR}
+      and country = #{country,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.WarrantyKey">
+    delete from warranty
+    where warranty_code = #{warrantyCode,jdbcType=VARCHAR}
+      and country = #{country,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.Warranty">
+    insert into warranty (warranty_code, country, nbmc, 
+      insert_time)
+    values (#{warrantyCode,jdbcType=VARCHAR}, #{country,jdbcType=VARCHAR}, #{nbmc,jdbcType=DECIMAL}, 
+      #{insertTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.Warranty">
+    insert into warranty
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="warrantyCode != null">
+        warranty_code,
+      </if>
+      <if test="country != null">
+        country,
+      </if>
+      <if test="nbmc != null">
+        nbmc,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="warrantyCode != null">
+        #{warrantyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="country != null">
+        #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="nbmc != null">
+        #{nbmc,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lenovo.vro.pricing.entity.Warranty">
+    update warranty
+    <set>
+      <if test="nbmc != null">
+        nbmc = #{nbmc,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where warranty_code = #{warrantyCode,jdbcType=VARCHAR}
+      and country = #{country,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.Warranty">
+    update warranty
+    set nbmc = #{nbmc,jdbcType=DECIMAL},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP}
+    where warranty_code = #{warrantyCode,jdbcType=VARCHAR}
+      and country = #{country,jdbcType=VARCHAR}
+  </update>
+</mapper>

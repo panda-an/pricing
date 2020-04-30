@@ -20,9 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -55,17 +53,21 @@ public class WebUserService implements UserDetailsService {
         return User.builder().username(user.getUsername()).password(salt).authorities(user.getAuthorities()).build();
     }
 
-    public String saveUserInfo(UserDetails user) {
+    public Map<String, String> saveUserInfo(UserDetails user) {
         String salt = generateUserSalt();
 
         Algorithm algorithm = Algorithm.HMAC256(salt);
         Date date = new Date(System.currentTimeMillis() + 3600 * 1000);
 
         String token = JWT.create().withSubject(user.getUsername()).withExpiresAt(date).withIssuedAt(new Date()).sign(algorithm);
-        stringRedisTemplate.opsForValue().set(token, salt);
-        stringRedisTemplate.expire(token, 3600, TimeUnit.SECONDS);
+        stringRedisTemplate.opsForValue().set(token, salt, 3600, TimeUnit.SECONDS);
 
-        return token;
+        SystemUserExt systemUserExt = getUserInfo(user.getUsername());
+        Map<String, String> map = new HashMap<>();
+        map.put("token", token);
+        map.put("region", systemUserExt.getCountry());
+        
+        return map;
     }
 
     private SystemUserExt getUserInfo(String userName) {
@@ -94,5 +96,5 @@ public class WebUserService implements UserDetailsService {
         return BCrypt.gensalt();
     }
 
-    public void deleteUserInfo(String userName) {}
+    public void deleteUserInfo() {}
 }

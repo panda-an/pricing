@@ -1,7 +1,7 @@
 package com.lenovo.vro.pricing.filter;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lenovo.vro.pricing.entity.SystemUser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,8 +26,7 @@ public class MyUsernamePasswordAuthenticationFilter extends AbstractAuthenticati
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws AuthenticationException, IOException, ServletException {
         String body = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
-        ObjectMapper objectMapper =new ObjectMapper();
-        SystemUser user = objectMapper.readValue(body, SystemUser.class);
+        SystemUser user = JSONObject.parseObject(body, SystemUser.class);
 
         return this.getAuthenticationManager().authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUserName()==null?"":user.getUserName().trim(), user.getPassword()));

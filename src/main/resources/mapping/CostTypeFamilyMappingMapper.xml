@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.CostTypeFamilyMappingMapper">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTypeFamilyMapping">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="brand" jdbcType="VARCHAR" property="brand" />
+    <result column="product_family" jdbcType="VARCHAR" property="productFamily" />
+    <result column="plant" jdbcType="VARCHAR" property="plant" />
+    <result column="priority" jdbcType="VARCHAR" property="priority" />
+    <result column="sub_geo" jdbcType="VARCHAR" property="subGeo" />
+    <result column="machine_type" jdbcType="VARCHAR" property="machineType" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, brand, product_family, plant, priority, sub_geo, machine_type, insert_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from cost_tape_family_mapping
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from cost_tape_family_mapping
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.CostTypeFamilyMapping">
+    insert into cost_tape_family_mapping (id, brand, product_family, 
+      plant, priority, sub_geo, 
+      machine_type, insert_time)
+    values (#{id,jdbcType=INTEGER}, #{brand,jdbcType=VARCHAR}, #{productFamily,jdbcType=VARCHAR}, 
+      #{plant,jdbcType=VARCHAR}, #{priority,jdbcType=VARCHAR}, #{subGeo,jdbcType=VARCHAR}, 
+      #{machineType,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.CostTypeFamilyMapping">
+    insert into cost_tape_family_mapping
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="brand != null">
+        brand,
+      </if>
+      <if test="productFamily != null">
+        product_family,
+      </if>
+      <if test="plant != null">
+        plant,
+      </if>
+      <if test="priority != null">
+        priority,
+      </if>
+      <if test="subGeo != null">
+        sub_geo,
+      </if>
+      <if test="machineType != null">
+        machine_type,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="brand != null">
+        #{brand,jdbcType=VARCHAR},
+      </if>
+      <if test="productFamily != null">
+        #{productFamily,jdbcType=VARCHAR},
+      </if>
+      <if test="plant != null">
+        #{plant,jdbcType=VARCHAR},
+      </if>
+      <if test="priority != null">
+        #{priority,jdbcType=VARCHAR},
+      </if>
+      <if test="subGeo != null">
+        #{subGeo,jdbcType=VARCHAR},
+      </if>
+      <if test="machineType != null">
+        #{machineType,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lenovo.vro.pricing.entity.CostTypeFamilyMapping">
+    update cost_tape_family_mapping
+    <set>
+      <if test="brand != null">
+        brand = #{brand,jdbcType=VARCHAR},
+      </if>
+      <if test="productFamily != null">
+        product_family = #{productFamily,jdbcType=VARCHAR},
+      </if>
+      <if test="plant != null">
+        plant = #{plant,jdbcType=VARCHAR},
+      </if>
+      <if test="priority != null">
+        priority = #{priority,jdbcType=VARCHAR},
+      </if>
+      <if test="subGeo != null">
+        sub_geo = #{subGeo,jdbcType=VARCHAR},
+      </if>
+      <if test="machineType != null">
+        machine_type = #{machineType,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTypeFamilyMapping">
+    update cost_tape_family_mapping
+    set brand = #{brand,jdbcType=VARCHAR},
+      product_family = #{productFamily,jdbcType=VARCHAR},
+      plant = #{plant,jdbcType=VARCHAR},
+      priority = #{priority,jdbcType=VARCHAR},
+      sub_geo = #{subGeo,jdbcType=VARCHAR},
+      machine_type = #{machineType,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

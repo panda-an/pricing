@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
@@ -21,7 +22,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
-        String token = webUserService.saveUserInfo((UserDetails) authentication.getPrincipal());
-        response.setHeader("Authorization", token);
+        Map<String, String> map = webUserService.saveUserInfo((UserDetails) authentication.getPrincipal());
+        response.setHeader("region", map.get("region"));
+        response.setHeader("Authorization", map.get("token"));
     }
 }
