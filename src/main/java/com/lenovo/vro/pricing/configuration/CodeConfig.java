@@ -17,4 +17,9 @@ public class CodeConfig {
 
     public static final String OPERATION_SUCCESS_MESSAGE = "上传成功!";
     public static final String OPERATION_FINAL_MESSAGE = "上传失败，请检查Log!";
+
+    // query cost tape - Cost tape
+    public static final String COST_TAPE = "0";
+    // query cost tape - Sbb type
+    public static final String SBB_TAPE = "1";
 }

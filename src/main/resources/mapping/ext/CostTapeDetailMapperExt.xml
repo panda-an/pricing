@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.CostTapeDetailMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeDetail">
+    <id column="cost_id" jdbcType="INTEGER" property="costId" />
+    <result column="category" jdbcType="VARCHAR" property="category" />
+    <result column="total_quantity" jdbcType="INTEGER" property="totalQuantity" />
+    <result column="total_gross_rev" jdbcType="DECIMAL" property="totalGrossRev" />
+    <result column="total_net_rev" jdbcType="DECIMAL" property="totalNetRev" />
+    <result column="total_bmc_gp_usd_wocc" jdbcType="DECIMAL" property="totalBmcGpUsdWocc" />
+    <result column="total_bmc_gp_percent_wocc" jdbcType="DECIMAL" property="totalBmcGpPercentWocc" />
+    <result column="total_tmc_gp_usd_wocc" jdbcType="DECIMAL" property="totalTmcGpUsdWocc" />
+    <result column="total_tmc_gp_percent_wocc" jdbcType="DECIMAL" property="totalTmcGpPercentWocc" />
+    <result column="total_tmc_gp_usd_cc" jdbcType="DECIMAL" property="totalTmcGpUsdCc" />
+    <result column="total_tmc_gp_percent_cc" jdbcType="DECIMAL" property="totalTmcGpPercentCc" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    cost_id, category, total_quantity, total_gross_rev, total_net_rev, total_bmc_gp_usd_wocc,
+    total_bmc_gp_percent_wocc, total_tmc_gp_usd_wocc, total_tmc_gp_percent_wocc, total_tmc_gp_usd_cc, 
+    total_tmc_gp_percent_cc
+  </sql>
+
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into cost_tape_detail (cost_id, category,
+      total_quantity, total_gross_rev, total_net_rev, 
+      total_bmc_gp_usd_wocc, total_bmc_gp_percent_wocc, 
+      total_tmc_gp_usd_wocc, total_tmc_gp_percent_wocc, 
+      total_tmc_gp_usd_cc, total_tmc_gp_percent_cc
+      )
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+    (#{item.costId,jdbcType=INTEGER}, #{item.category,jdbcType=VARCHAR},
+      #{item.totalQuantity,jdbcType=INTEGER}, #{item.totalGrossRev,jdbcType=DECIMAL}, #{item.totalNetRev,jdbcType=DECIMAL},
+      #{item.totalBmcGpUsdWocc,jdbcType=DECIMAL}, #{item.totalBmcGpPercentWocc,jdbcType=DECIMAL},
+      #{item.totalTmcGpUsdWocc,jdbcType=DECIMAL}, #{item.totalTmcGpPercentWocc,jdbcType=DECIMAL},
+      #{item.totalTmcGpUsdCc,jdbcType=DECIMAL}, #{item.totalTmcGpPercentCc,jdbcType=DECIMAL}
+      )
+    </foreach>
+  </insert>
+
+  <delete id="deleteCostTapeDetail" parameterType="java.lang.Integer">
+    delete from cost_tape_detail where cost_id = #{id}
+  </delete>
+
+  <select id="selectCostTapeOrderDetail" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from cost_tape_detail
+    where cost_id = #{id}
+  </select>
+</mapper>

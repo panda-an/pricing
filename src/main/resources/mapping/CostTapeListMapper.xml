@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.CostTapeListMapper">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeList">
+    <id column="cost_id" jdbcType="INTEGER" property="costId" />
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="pid" jdbcType="INTEGER" property="pid" />
+    <result column="part_number" jdbcType="VARCHAR" property="partNumber" />
+    <result column="warranty_code" jdbcType="VARCHAR" property="warrantyCode" />
+    <result column="plant" jdbcType="VARCHAR" property="plant" />
+    <result column="country" jdbcType="VARCHAR" property="country" />
+    <result column="product_family" jdbcType="VARCHAR" property="productFamily" />
+    <result column="sub_geo" jdbcType="VARCHAR" property="subGeo" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="bmc" jdbcType="DECIMAL" property="bmc" />
+    <result column="nbmc" jdbcType="DECIMAL" property="nbmc" />
+    <result column="total" jdbcType="DECIMAL" property="total" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    cost_id, id, pid, part_number, warranty_code, plant, country, product_family, sub_geo, 
+    description, bmc, nbmc, total, type, insert_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeListKey" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from cost_tape_list
+    where cost_id = #{costId,jdbcType=INTEGER}
+      and id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeListKey">
+    delete from cost_tape_list
+    where cost_id = #{costId,jdbcType=INTEGER}
+      and id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.CostTapeList">
+    insert into cost_tape_list (cost_id, id, pid, 
+      part_number, warranty_code, plant, 
+      country, product_family, sub_geo, 
+      description, bmc, nbmc, 
+      total, type, insert_time
+      )
+    values (#{costId,jdbcType=INTEGER}, #{id,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER}, 
+      #{partNumber,jdbcType=VARCHAR}, #{warrantyCode,jdbcType=VARCHAR}, #{plant,jdbcType=VARCHAR}, 
+      #{country,jdbcType=VARCHAR}, #{productFamily,jdbcType=VARCHAR}, #{subGeo,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR}, #{bmc,jdbcType=DECIMAL}, #{nbmc,jdbcType=DECIMAL}, 
+      #{total,jdbcType=DECIMAL}, #{type,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeList">
+    insert into cost_tape_list
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="costId != null">
+        cost_id,
+      </if>
+      <if test="id != null">
+        id,
+      </if>
+      <if test="pid != null">
+        pid,
+      </if>
+      <if test="partNumber != null">
+        part_number,
+      </if>
+      <if test="warrantyCode != null">
+        warranty_code,
+      </if>
+      <if test="plant != null">
+        plant,
+      </if>
+      <if test="country != null">
+        country,
+      </if>
+      <if test="productFamily != null">
+        product_family,
+      </if>
+      <if test="subGeo != null">
+        sub_geo,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="bmc != null">
+        bmc,
+      </if>
+      <if test="nbmc != null">
+        nbmc,
+      </if>
+      <if test="total != null">
+        total,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="costId != null">
+        #{costId,jdbcType=INTEGER},
+      </if>
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="pid != null">
+        #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="partNumber != null">
+        #{partNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="warrantyCode != null">
+        #{warrantyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="plant != null">
+        #{plant,jdbcType=VARCHAR},
+      </if>
+      <if test="country != null">
+        #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="productFamily != null">
+        #{productFamily,jdbcType=VARCHAR},
+      </if>
+      <if test="subGeo != null">
+        #{subGeo,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="bmc != null">
+        #{bmc,jdbcType=DECIMAL},
+      </if>
+      <if test="nbmc != null">
+        #{nbmc,jdbcType=DECIMAL},
+      </if>
+      <if test="total != null">
+        #{total,jdbcType=DECIMAL},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeList">
+    update cost_tape_list
+    <set>
+      <if test="pid != null">
+        pid = #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="partNumber != null">
+        part_number = #{partNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="warrantyCode != null">
+        warranty_code = #{warrantyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="plant != null">
+        plant = #{plant,jdbcType=VARCHAR},
+      </if>
+      <if test="country != null">
+        country = #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="productFamily != null">
+        product_family = #{productFamily,jdbcType=VARCHAR},
+      </if>
+      <if test="subGeo != null">
+        sub_geo = #{subGeo,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="bmc != null">
+        bmc = #{bmc,jdbcType=DECIMAL},
+      </if>
+      <if test="nbmc != null">
+        nbmc = #{nbmc,jdbcType=DECIMAL},
+      </if>
+      <if test="total != null">
+        total = #{total,jdbcType=DECIMAL},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where cost_id = #{costId,jdbcType=INTEGER}
+      and id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeList">
+    update cost_tape_list
+    set pid = #{pid,jdbcType=INTEGER},
+      part_number = #{partNumber,jdbcType=VARCHAR},
+      warranty_code = #{warrantyCode,jdbcType=VARCHAR},
+      plant = #{plant,jdbcType=VARCHAR},
+      country = #{country,jdbcType=VARCHAR},
+      product_family = #{productFamily,jdbcType=VARCHAR},
+      sub_geo = #{subGeo,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      bmc = #{bmc,jdbcType=DECIMAL},
+      nbmc = #{nbmc,jdbcType=DECIMAL},
+      total = #{total,jdbcType=DECIMAL},
+      type = #{type,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP}
+    where cost_id = #{costId,jdbcType=INTEGER}
+      and id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

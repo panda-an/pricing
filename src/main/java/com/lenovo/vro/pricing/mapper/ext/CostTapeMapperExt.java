@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CostTapeMapperExt {
     List<CostTapeExt> getCostTapeData(CostTape costTape);
+
+    List<CostTapeExt> getSbbData(CostTape costTape);
 }

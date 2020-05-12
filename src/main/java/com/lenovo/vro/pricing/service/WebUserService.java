@@ -66,6 +66,7 @@ public class WebUserService implements UserDetailsService {
         Map<String, String> map = new HashMap<>();
         map.put("token", token);
         map.put("region", systemUserExt.getCountry());
+        map.put("id", systemUserExt.getId().toString());
         
         return map;
     }

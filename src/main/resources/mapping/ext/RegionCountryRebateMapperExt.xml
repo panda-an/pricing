@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.RegionCountryRebateMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.RegionCountryRebate">
+    <result column="region" jdbcType="VARCHAR" property="region" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="country" jdbcType="VARCHAR" property="country" />
+    <result column="value" jdbcType="DECIMAL" property="value" />
+    <result column="detail" jdbcType="VARCHAR" property="detail" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    region, type, country, value, detail
+  </sql>
+
+  <select id="selectRebateListByCountry" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    `value`,
+    case when detail &lt;&gt; '' and detail is not null then concat(ROUND(value * 100, 2), '%-', `type`, '-', detail)
+         else concat(ROUND(value * 100, 2), '%-', `type`) end as detail
+    from region_country_rebate
+    where country = #{country,jdbcType=VARCHAR}
+  </select>
+
+</mapper>

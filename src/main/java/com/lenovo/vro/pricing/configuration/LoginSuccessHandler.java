@@ -24,6 +24,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             throws IOException, ServletException {
         Map<String, String> map = webUserService.saveUserInfo((UserDetails) authentication.getPrincipal());
         response.setHeader("region", map.get("region"));
+        response.setHeader("id", map.get("id"));
         response.setHeader("Authorization", map.get("token"));
     }
 }

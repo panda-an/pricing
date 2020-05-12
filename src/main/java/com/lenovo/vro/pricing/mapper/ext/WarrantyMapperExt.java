@@ -1,6 +1,7 @@
 package com.lenovo.vro.pricing.mapper.ext;
 
 import com.lenovo.vro.pricing.entity.Warranty;
+import com.lenovo.vro.pricing.entity.ext.WarrantyExt;
 import com.lenovo.vro.pricing.mapper.WarrantyMapper;
 
 import java.util.List;
@@ -10,6 +11,6 @@ public interface WarrantyMapperExt extends WarrantyMapper {
 
     void insertBatch(List<Warranty> list);
 
-    List<String> getWarrantyCodeList(String country);
+    Warranty selectMtmWarranty(WarrantyExt warrantyExt);
 
 }

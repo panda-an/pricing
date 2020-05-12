@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 
 public class CostTapeExt implements Serializable {
 
+    private String id;
+
     private String partNumber;
 
     private String plant;
@@ -24,6 +26,24 @@ public class CostTapeExt implements Serializable {
     private BigDecimal bmc;
 
     private BigDecimal nbmc;
+
+    private BigDecimal total;
+
+    private String warrantyCode;
+
+    private BigDecimal airCost;
+
+    private String categoryType;
+
+    private String brand;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getPartNumber() {
         return partNumber;
@@ -103,5 +123,45 @@ public class CostTapeExt implements Serializable {
 
     public void setNbmc(BigDecimal nbmc) {
         this.nbmc = nbmc;
+    }
+
+    public String getWarrantyCode() {
+        return warrantyCode;
+    }
+
+    public void setWarrantyCode(String warrantyCode) {
+        this.warrantyCode = warrantyCode;
+    }
+
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    public BigDecimal getAirCost() {
+        return airCost;
+    }
+
+    public void setAirCost(BigDecimal airCost) {
+        this.airCost = airCost;
+    }
+
+    public String getCategoryType() {
+        return categoryType;
+    }
+
+    public void setCategoryType(String categoryType) {
+        this.categoryType = categoryType;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 }

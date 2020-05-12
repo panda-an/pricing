@@ -10,6 +10,12 @@ public class CostTape {
 
     private String warrantyCode;
 
+    private String plant;
+
+    private String productFamily;
+
+    private String subGeo;
+
     public String getCountry() {
         return country;
     }
@@ -40,5 +46,29 @@ public class CostTape {
 
     public void setWarrantyCode(String warrantyCode) {
         this.warrantyCode = warrantyCode;
+    }
+
+    public String getPlant() {
+        return plant;
+    }
+
+    public void setPlant(String plant) {
+        this.plant = plant;
+    }
+
+    public String getProductFamily() {
+        return productFamily;
+    }
+
+    public void setProductFamily(String productFamily) {
+        this.productFamily = productFamily;
+    }
+
+    public String getSubGeo() {
+        return subGeo;
+    }
+
+    public void setSubGeo(String subGeo) {
+        this.subGeo = subGeo;
     }
 }

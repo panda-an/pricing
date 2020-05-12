@@ -3,11 +3,10 @@
 <mapper namespace="com.lenovo.vro.pricing.mapper.ext.WarrantyMapperExt">
   <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.Warranty">
     <id column="warranty_code" jdbcType="VARCHAR" property="warrantyCode" />
-    <id column="country" jdbcType="VARCHAR" property="country" />
     <result column="nbmc" jdbcType="DECIMAL" property="nbmc" />
   </resultMap>
   <sql id="Base_Column_List">
-    warranty_code, country, nbmc
+    w.warranty_code, w.nbmc
   </sql>
 
   <insert id="insertBatch" parameterType="java.util.List">
@@ -22,7 +21,18 @@
     truncate warranty
   </update>
 
-  <select id="getWarrantyCodeList"  parameterType="java.lang.String" resultType="java.lang.String">
-    select warranty_code from warranty where country = #{country}
+  <select id="selectMtmWarranty" parameterType="com.lenovo.vro.pricing.entity.ext.WarrantyExt" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from warranty w
+    inner join warranty_mtm_mapping m on w.warranty_code = m.warranty_code
+    <where>
+      <if test="mtm != null">
+        and m.machine_type = #{mtm}
+      </if>
+      <if test="country != null">
+        and w.country = #{country}
+      </if>
+    </where>
   </select>
+
 </mapper>

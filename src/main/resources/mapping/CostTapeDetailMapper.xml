@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.CostTapeDetailMapper">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeDetail">
+    <result column="cost_id" jdbcType="INTEGER" property="costId" />
+    <result column="category" jdbcType="VARCHAR" property="category" />
+    <result column="total_quantity" jdbcType="INTEGER" property="totalQuantity" />
+    <result column="total_gross_rev" jdbcType="DECIMAL" property="totalGrossRev" />
+    <result column="total_net_rev" jdbcType="DECIMAL" property="totalNetRev" />
+    <result column="total_bmc_gp_usd_wocc" jdbcType="DECIMAL" property="totalBmcGpUsdWocc" />
+    <result column="total_bmc_gp_percent_wocc" jdbcType="DECIMAL" property="totalBmcGpPercentWocc" />
+    <result column="total_tmc_gp_usd_wocc" jdbcType="DECIMAL" property="totalTmcGpUsdWocc" />
+    <result column="total_tmc_gp_percent_wocc" jdbcType="DECIMAL" property="totalTmcGpPercentWocc" />
+    <result column="total_tmc_gp_usd_cc" jdbcType="DECIMAL" property="totalTmcGpUsdCc" />
+    <result column="total_tmc_gp_percent_cc" jdbcType="DECIMAL" property="totalTmcGpPercentCc" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+  </resultMap>
+  <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.CostTapeDetail">
+    insert into cost_tape_detail (cost_id, category, total_quantity, 
+      total_gross_rev, total_net_rev, total_bmc_gp_usd_wocc, 
+      total_bmc_gp_percent_wocc, total_tmc_gp_usd_wocc, 
+      total_tmc_gp_percent_wocc, total_tmc_gp_usd_cc, 
+      total_tmc_gp_percent_cc, insert_time)
+    values (#{costId,jdbcType=INTEGER}, #{category,jdbcType=VARCHAR}, #{totalQuantity,jdbcType=INTEGER}, 
+      #{totalGrossRev,jdbcType=DECIMAL}, #{totalNetRev,jdbcType=DECIMAL}, #{totalBmcGpUsdWocc,jdbcType=DECIMAL}, 
+      #{totalBmcGpPercentWocc,jdbcType=DECIMAL}, #{totalTmcGpUsdWocc,jdbcType=DECIMAL}, 
+      #{totalTmcGpPercentWocc,jdbcType=DECIMAL}, #{totalTmcGpUsdCc,jdbcType=DECIMAL}, 
+      #{totalTmcGpPercentCc,jdbcType=DECIMAL}, #{insertTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeDetail">
+    insert into cost_tape_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="costId != null">
+        cost_id,
+      </if>
+      <if test="category != null">
+        category,
+      </if>
+      <if test="totalQuantity != null">
+        total_quantity,
+      </if>
+      <if test="totalGrossRev != null">
+        total_gross_rev,
+      </if>
+      <if test="totalNetRev != null">
+        total_net_rev,
+      </if>
+      <if test="totalBmcGpUsdWocc != null">
+        total_bmc_gp_usd_wocc,
+      </if>
+      <if test="totalBmcGpPercentWocc != null">
+        total_bmc_gp_percent_wocc,
+      </if>
+      <if test="totalTmcGpUsdWocc != null">
+        total_tmc_gp_usd_wocc,
+      </if>
+      <if test="totalTmcGpPercentWocc != null">
+        total_tmc_gp_percent_wocc,
+      </if>
+      <if test="totalTmcGpUsdCc != null">
+        total_tmc_gp_usd_cc,
+      </if>
+      <if test="totalTmcGpPercentCc != null">
+        total_tmc_gp_percent_cc,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="costId != null">
+        #{costId,jdbcType=INTEGER},
+      </if>
+      <if test="category != null">
+        #{category,jdbcType=VARCHAR},
+      </if>
+      <if test="totalQuantity != null">
+        #{totalQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="totalGrossRev != null">
+        #{totalGrossRev,jdbcType=DECIMAL},
+      </if>
+      <if test="totalNetRev != null">
+        #{totalNetRev,jdbcType=DECIMAL},
+      </if>
+      <if test="totalBmcGpUsdWocc != null">
+        #{totalBmcGpUsdWocc,jdbcType=DECIMAL},
+      </if>
+      <if test="totalBmcGpPercentWocc != null">
+        #{totalBmcGpPercentWocc,jdbcType=DECIMAL},
+      </if>
+      <if test="totalTmcGpUsdWocc != null">
+        #{totalTmcGpUsdWocc,jdbcType=DECIMAL},
+      </if>
+      <if test="totalTmcGpPercentWocc != null">
+        #{totalTmcGpPercentWocc,jdbcType=DECIMAL},
+      </if>
+      <if test="totalTmcGpUsdCc != null">
+        #{totalTmcGpUsdCc,jdbcType=DECIMAL},
+      </if>
+      <if test="totalTmcGpPercentCc != null">
+        #{totalTmcGpPercentCc,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+</mapper>

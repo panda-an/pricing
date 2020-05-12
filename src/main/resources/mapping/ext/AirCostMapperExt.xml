@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.AirCostMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.AirCost">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="country" jdbcType="VARCHAR" property="country" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="cost" jdbcType="DECIMAL" property="cost" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    air.id, air.country, air.`type`, air.cost
+  </sql>
+
+  <select id="getCostTapeAirCost1" parameterType="com.lenovo.vro.pricing.entity.AirCostForm" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from air_cost air
+    inner join machine_type_mapping m on air.`type` = m.`type`
+    <where>
+      <if test="machineType != null">
+        and m.machine_type = #{machineType}
+      </if>
+      <if test="country != null">
+        and air.country = #{country}
+      </if>
+    </where>
+  </select>
+
+  <select id="getCostTapeAirCost2" parameterType="com.lenovo.vro.pricing.entity.AirCost" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from air_cost air
+    <where>
+      <if test="type != null">
+        and air.`type` = #{type}
+      </if>
+      <if test="country != null">
+        and air.country = #{country}
+      </if>
+    </where>
+  </select>
+
+</mapper>
