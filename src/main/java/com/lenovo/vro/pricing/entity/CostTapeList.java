@@ -16,7 +16,7 @@ public class CostTapeList extends CostTapeListKey {
 
     private String productFamily;
 
-    private String subGeo;
+    private String geo;
 
     private String description;
 
@@ -24,9 +24,23 @@ public class CostTapeList extends CostTapeListKey {
 
     private BigDecimal nbmc;
 
-    private BigDecimal total;
+    private BigDecimal tmc;
+
+    private Integer qty;
+
+    private BigDecimal pricing;
+
+    private BigDecimal airCost;
+
+    private BigDecimal fundings;
+
+    private BigDecimal adjCost;
+
+    private BigDecimal tmcPercent;
 
     private String type;
+
+    private String categoryType;
 
     private Date insertTime;
 
@@ -78,12 +92,12 @@ public class CostTapeList extends CostTapeListKey {
         this.productFamily = productFamily == null ? null : productFamily.trim();
     }
 
-    public String getSubGeo() {
-        return subGeo;
+    public String getGeo() {
+        return geo;
     }
 
-    public void setSubGeo(String subGeo) {
-        this.subGeo = subGeo == null ? null : subGeo.trim();
+    public void setGeo(String geo) {
+        this.geo = geo == null ? null : geo.trim();
     }
 
     public String getDescription() {
@@ -110,12 +124,60 @@ public class CostTapeList extends CostTapeListKey {
         this.nbmc = nbmc;
     }
 
-    public BigDecimal getTotal() {
-        return total;
+    public BigDecimal getTmc() {
+        return tmc;
     }
 
-    public void setTotal(BigDecimal total) {
-        this.total = total;
+    public void setTmc(BigDecimal tmc) {
+        this.tmc = tmc;
+    }
+
+    public Integer getQty() {
+        return qty;
+    }
+
+    public void setQty(Integer qty) {
+        this.qty = qty;
+    }
+
+    public BigDecimal getPricing() {
+        return pricing;
+    }
+
+    public void setPricing(BigDecimal pricing) {
+        this.pricing = pricing;
+    }
+
+    public BigDecimal getAirCost() {
+        return airCost;
+    }
+
+    public void setAirCost(BigDecimal airCost) {
+        this.airCost = airCost;
+    }
+
+    public BigDecimal getFundings() {
+        return fundings;
+    }
+
+    public void setFundings(BigDecimal fundings) {
+        this.fundings = fundings;
+    }
+
+    public BigDecimal getAdjCost() {
+        return adjCost;
+    }
+
+    public void setAdjCost(BigDecimal adjCost) {
+        this.adjCost = adjCost;
+    }
+
+    public BigDecimal getTmcPercent() {
+        return tmcPercent;
+    }
+
+    public void setTmcPercent(BigDecimal tmcPercent) {
+        this.tmcPercent = tmcPercent;
     }
 
     public String getType() {
@@ -124,6 +186,14 @@ public class CostTapeList extends CostTapeListKey {
 
     public void setType(String type) {
         this.type = type == null ? null : type.trim();
+    }
+
+    public String getCategoryType() {
+        return categoryType;
+    }
+
+    public void setCategoryType(String categoryType) {
+        this.categoryType = categoryType == null ? null : categoryType.trim();
     }
 
     public Date getInsertTime() {

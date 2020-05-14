@@ -10,17 +10,25 @@
     <result column="plant" jdbcType="VARCHAR" property="plant" />
     <result column="country" jdbcType="VARCHAR" property="country" />
     <result column="product_family" jdbcType="VARCHAR" property="productFamily" />
-    <result column="sub_geo" jdbcType="VARCHAR" property="subGeo" />
+    <result column="geo" jdbcType="VARCHAR" property="geo" />
     <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="bmc" jdbcType="DECIMAL" property="bmc" />
     <result column="nbmc" jdbcType="DECIMAL" property="nbmc" />
-    <result column="total" jdbcType="DECIMAL" property="total" />
+    <result column="tmc" jdbcType="DECIMAL" property="tmc" />
+    <result column="qty" jdbcType="INTEGER" property="qty" />
+    <result column="pricing" jdbcType="DECIMAL" property="pricing" />
+    <result column="air_cost" jdbcType="DECIMAL" property="airCost" />
+    <result column="fundings" jdbcType="DECIMAL" property="fundings" />
+    <result column="adj_cost" jdbcType="DECIMAL" property="adjCost" />
+    <result column="tmc_percent" jdbcType="DECIMAL" property="tmcPercent" />
     <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="category_type" jdbcType="VARCHAR" property="categoryType" />
     <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    cost_id, id, pid, part_number, warranty_code, plant, country, product_family, sub_geo, 
-    description, bmc, nbmc, total, type, insert_time
+    cost_id, id, pid, part_number, warranty_code, plant, country, product_family, geo, 
+    description, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, tmc_percent, 
+    type, category_type, insert_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeListKey" resultMap="BaseResultMap">
     select 
@@ -37,16 +45,20 @@
   <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.CostTapeList">
     insert into cost_tape_list (cost_id, id, pid, 
       part_number, warranty_code, plant, 
-      country, product_family, sub_geo, 
+      country, product_family, geo, 
       description, bmc, nbmc, 
-      total, type, insert_time
-      )
+      tmc, qty, pricing, 
+      air_cost, fundings, adj_cost, 
+      tmc_percent, type, category_type, 
+      insert_time)
     values (#{costId,jdbcType=INTEGER}, #{id,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER}, 
       #{partNumber,jdbcType=VARCHAR}, #{warrantyCode,jdbcType=VARCHAR}, #{plant,jdbcType=VARCHAR}, 
-      #{country,jdbcType=VARCHAR}, #{productFamily,jdbcType=VARCHAR}, #{subGeo,jdbcType=VARCHAR}, 
+      #{country,jdbcType=VARCHAR}, #{productFamily,jdbcType=VARCHAR}, #{geo,jdbcType=VARCHAR}, 
       #{description,jdbcType=VARCHAR}, #{bmc,jdbcType=DECIMAL}, #{nbmc,jdbcType=DECIMAL}, 
-      #{total,jdbcType=DECIMAL}, #{type,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP}
-      )
+      #{tmc,jdbcType=DECIMAL}, #{qty,jdbcType=INTEGER}, #{pricing,jdbcType=DECIMAL}, 
+      #{airCost,jdbcType=DECIMAL}, #{fundings,jdbcType=DECIMAL}, #{adjCost,jdbcType=DECIMAL}, 
+      #{tmcPercent,jdbcType=DECIMAL}, #{type,jdbcType=VARCHAR}, #{categoryType,jdbcType=VARCHAR}, 
+      #{insertTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeList">
     insert into cost_tape_list
@@ -75,8 +87,8 @@
       <if test="productFamily != null">
         product_family,
       </if>
-      <if test="subGeo != null">
-        sub_geo,
+      <if test="geo != null">
+        geo,
       </if>
       <if test="description != null">
         description,
@@ -87,11 +99,32 @@
       <if test="nbmc != null">
         nbmc,
       </if>
-      <if test="total != null">
-        total,
+      <if test="tmc != null">
+        tmc,
+      </if>
+      <if test="qty != null">
+        qty,
+      </if>
+      <if test="pricing != null">
+        pricing,
+      </if>
+      <if test="airCost != null">
+        air_cost,
+      </if>
+      <if test="fundings != null">
+        fundings,
+      </if>
+      <if test="adjCost != null">
+        adj_cost,
+      </if>
+      <if test="tmcPercent != null">
+        tmc_percent,
       </if>
       <if test="type != null">
         type,
+      </if>
+      <if test="categoryType != null">
+        category_type,
       </if>
       <if test="insertTime != null">
         insert_time,
@@ -122,8 +155,8 @@
       <if test="productFamily != null">
         #{productFamily,jdbcType=VARCHAR},
       </if>
-      <if test="subGeo != null">
-        #{subGeo,jdbcType=VARCHAR},
+      <if test="geo != null">
+        #{geo,jdbcType=VARCHAR},
       </if>
       <if test="description != null">
         #{description,jdbcType=VARCHAR},
@@ -134,11 +167,32 @@
       <if test="nbmc != null">
         #{nbmc,jdbcType=DECIMAL},
       </if>
-      <if test="total != null">
-        #{total,jdbcType=DECIMAL},
+      <if test="tmc != null">
+        #{tmc,jdbcType=DECIMAL},
+      </if>
+      <if test="qty != null">
+        #{qty,jdbcType=INTEGER},
+      </if>
+      <if test="pricing != null">
+        #{pricing,jdbcType=DECIMAL},
+      </if>
+      <if test="airCost != null">
+        #{airCost,jdbcType=DECIMAL},
+      </if>
+      <if test="fundings != null">
+        #{fundings,jdbcType=DECIMAL},
+      </if>
+      <if test="adjCost != null">
+        #{adjCost,jdbcType=DECIMAL},
+      </if>
+      <if test="tmcPercent != null">
+        #{tmcPercent,jdbcType=DECIMAL},
       </if>
       <if test="type != null">
         #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryType != null">
+        #{categoryType,jdbcType=VARCHAR},
       </if>
       <if test="insertTime != null">
         #{insertTime,jdbcType=TIMESTAMP},
@@ -166,8 +220,8 @@
       <if test="productFamily != null">
         product_family = #{productFamily,jdbcType=VARCHAR},
       </if>
-      <if test="subGeo != null">
-        sub_geo = #{subGeo,jdbcType=VARCHAR},
+      <if test="geo != null">
+        geo = #{geo,jdbcType=VARCHAR},
       </if>
       <if test="description != null">
         description = #{description,jdbcType=VARCHAR},
@@ -178,11 +232,32 @@
       <if test="nbmc != null">
         nbmc = #{nbmc,jdbcType=DECIMAL},
       </if>
-      <if test="total != null">
-        total = #{total,jdbcType=DECIMAL},
+      <if test="tmc != null">
+        tmc = #{tmc,jdbcType=DECIMAL},
+      </if>
+      <if test="qty != null">
+        qty = #{qty,jdbcType=INTEGER},
+      </if>
+      <if test="pricing != null">
+        pricing = #{pricing,jdbcType=DECIMAL},
+      </if>
+      <if test="airCost != null">
+        air_cost = #{airCost,jdbcType=DECIMAL},
+      </if>
+      <if test="fundings != null">
+        fundings = #{fundings,jdbcType=DECIMAL},
+      </if>
+      <if test="adjCost != null">
+        adj_cost = #{adjCost,jdbcType=DECIMAL},
+      </if>
+      <if test="tmcPercent != null">
+        tmc_percent = #{tmcPercent,jdbcType=DECIMAL},
       </if>
       <if test="type != null">
         type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryType != null">
+        category_type = #{categoryType,jdbcType=VARCHAR},
       </if>
       <if test="insertTime != null">
         insert_time = #{insertTime,jdbcType=TIMESTAMP},
@@ -199,12 +274,19 @@
       plant = #{plant,jdbcType=VARCHAR},
       country = #{country,jdbcType=VARCHAR},
       product_family = #{productFamily,jdbcType=VARCHAR},
-      sub_geo = #{subGeo,jdbcType=VARCHAR},
+      geo = #{geo,jdbcType=VARCHAR},
       description = #{description,jdbcType=VARCHAR},
       bmc = #{bmc,jdbcType=DECIMAL},
       nbmc = #{nbmc,jdbcType=DECIMAL},
-      total = #{total,jdbcType=DECIMAL},
+      tmc = #{tmc,jdbcType=DECIMAL},
+      qty = #{qty,jdbcType=INTEGER},
+      pricing = #{pricing,jdbcType=DECIMAL},
+      air_cost = #{airCost,jdbcType=DECIMAL},
+      fundings = #{fundings,jdbcType=DECIMAL},
+      adj_cost = #{adjCost,jdbcType=DECIMAL},
+      tmc_percent = #{tmcPercent,jdbcType=DECIMAL},
       type = #{type,jdbcType=VARCHAR},
+      category_type = #{categoryType,jdbcType=VARCHAR},
       insert_time = #{insertTime,jdbcType=TIMESTAMP}
     where cost_id = #{costId,jdbcType=INTEGER}
       and id = #{id,jdbcType=INTEGER}

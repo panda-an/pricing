@@ -3,41 +3,51 @@
 <mapper namespace="com.lenovo.vro.pricing.mapper.ext.CostTapeListMapperExt">
   <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeList">
     <id column="cost_id" jdbcType="INTEGER" property="costId" />
-    <result column="id" jdbcType="VARCHAR" property="id" />
-    <result column="pid" jdbcType="VARCHAR" property="pid" />
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="pid" jdbcType="INTEGER" property="pid" />
     <result column="part_number" jdbcType="VARCHAR" property="partNumber" />
     <result column="warranty_code" jdbcType="VARCHAR" property="warrantyCode" />
     <result column="plant" jdbcType="VARCHAR" property="plant" />
     <result column="country" jdbcType="VARCHAR" property="country" />
     <result column="product_family" jdbcType="VARCHAR" property="productFamily" />
-    <result column="sub_geo" jdbcType="VARCHAR" property="subGeo" />
+    <result column="geo" jdbcType="VARCHAR" property="geo" />
     <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="bmc" jdbcType="DECIMAL" property="bmc" />
     <result column="nbmc" jdbcType="DECIMAL" property="nbmc" />
-    <result column="total" jdbcType="DECIMAL" property="total" />
+    <result column="tmc" jdbcType="DECIMAL" property="tmc" />
+    <result column="qty" jdbcType="INTEGER" property="qty" />
+    <result column="pricing" jdbcType="DECIMAL" property="pricing" />
+    <result column="air_cost" jdbcType="DECIMAL" property="airCost" />
+    <result column="fundings" jdbcType="DECIMAL" property="fundings" />
+    <result column="adj_cost" jdbcType="DECIMAL" property="adjCost" />
+    <result column="tmc_percent" jdbcType="DECIMAL" property="tmcPercent" />
     <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="category_type" jdbcType="VARCHAR" property="categoryType" />
   </resultMap>
 
   <sql id="Base_Column_List">
-    cost_id, id, pid, part_number, warranty_code, plant, country, product_family, sub_geo, 
-    description, bmc, nbmc, total, type
+    cost_id, id, pid, part_number, warranty_code, plant, country, product_family, geo,
+    description, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, tmc_percent,
+    type, category_type
   </sql>
 
   <insert id="insertBatch" parameterType="java.util.List">
-    insert into cost_tape_list (cost_id, id, pid, 
-      part_number, warranty_code, plant, 
-      country, product_family, sub_geo, 
-      description, bmc, nbmc, 
-      total, `type`
-      )
+    insert into cost_tape_list (cost_id, id, pid,
+      part_number, warranty_code, plant,
+      country, product_family, geo,
+      description, bmc, nbmc,
+      tmc, qty, pricing,
+      air_cost, fundings, adj_cost,
+      tmc_percent, `type`, category_type)
     values
     <foreach collection="list" item="item" index="index" separator=",">
-    (#{item.costId,jdbcType=INTEGER}, #{item.id,jdbcType=INTEGER}, #{item.pid,jdbcType=INTEGER},
+      (#{item.costId,jdbcType=INTEGER}, #{item.id,jdbcType=INTEGER}, #{item.pid,jdbcType=INTEGER},
       #{item.partNumber,jdbcType=VARCHAR}, #{item.warrantyCode,jdbcType=VARCHAR}, #{item.plant,jdbcType=VARCHAR},
-      #{item.country,jdbcType=VARCHAR}, #{item.productFamily,jdbcType=VARCHAR}, #{item.subGeo,jdbcType=VARCHAR},
+      #{item.country,jdbcType=VARCHAR}, #{item.productFamily,jdbcType=VARCHAR}, #{item.geo,jdbcType=VARCHAR},
       #{item.description,jdbcType=VARCHAR}, #{item.bmc,jdbcType=DECIMAL}, #{item.nbmc,jdbcType=DECIMAL},
-      #{item.total,jdbcType=DECIMAL}, #{item.type,jdbcType=VARCHAR}
-      )
+      #{item.tmc,jdbcType=DECIMAL}, #{item.qty,jdbcType=INTEGER}, #{item.pricing,jdbcType=DECIMAL},
+      #{item.airCost,jdbcType=DECIMAL}, #{item.fundings,jdbcType=DECIMAL}, #{item.adjCost,jdbcType=DECIMAL},
+      #{item.tmcPercent,jdbcType=DECIMAL}, #{item.type,jdbcType=VARCHAR}, #{item.categoryType,jdbcType=VARCHAR})
     </foreach>
   </insert>
 

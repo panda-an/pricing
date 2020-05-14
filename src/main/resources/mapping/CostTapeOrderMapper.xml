@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lenovo.vro.pricing.mapper.CostTapeOrderMapper">
-  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeOrder">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.ext.CostTapeOrderExt">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="order_name" jdbcType="VARCHAR" property="orderName" />
     <result column="region" jdbcType="VARCHAR" property="region" />
     <result column="country" jdbcType="VARCHAR" property="country" />
     <result column="local_currency" jdbcType="VARCHAR" property="localCurrency" />
     <result column="exchange_rates" jdbcType="DECIMAL" property="exchangeRates" />
-    <result column="transport_type" jdbcType="VARCHAR" property="transportType" />
+    <result column="rebate" jdbcType="DECIMAL" property="rebate" />
+    <result column="fulfilment" jdbcType="VARCHAR" property="fulfilment" />
     <result column="user_id" jdbcType="VARCHAR" property="userId" />
     <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, order_name, region, country, local_currency, exchange_rates, transport_type, 
+    id, order_name, region, country, local_currency, exchange_rates, rebate, fulfilment, 
     user_id, insert_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -29,14 +30,14 @@
   <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.CostTapeOrder">
     insert into cost_tape_order (id, order_name, region, 
       country, local_currency, exchange_rates, 
-      transport_type, user_id, insert_time
-      )
+      rebate, fulfilment, user_id, 
+      insert_time)
     values (#{id,jdbcType=INTEGER}, #{orderName,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, 
       #{country,jdbcType=VARCHAR}, #{localCurrency,jdbcType=VARCHAR}, #{exchangeRates,jdbcType=DECIMAL}, 
-      #{transportType,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP}
-      )
+      #{rebate,jdbcType=DECIMAL}, #{fulfilment,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, 
+      #{insertTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeOrder">
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.lenovo.vro.pricing.entity.CostTapeOrder">
     insert into cost_tape_order
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -57,8 +58,11 @@
       <if test="exchangeRates != null">
         exchange_rates,
       </if>
-      <if test="transportType != null">
-        transport_type,
+      <if test="rebate != null">
+        rebate,
+      </if>
+      <if test="fulfilment != null">
+        fulfilment,
       </if>
       <if test="userId != null">
         user_id,
@@ -86,8 +90,11 @@
       <if test="exchangeRates != null">
         #{exchangeRates,jdbcType=DECIMAL},
       </if>
-      <if test="transportType != null">
-        #{transportType,jdbcType=VARCHAR},
+      <if test="rebate != null">
+        #{rebate,jdbcType=DECIMAL},
+      </if>
+      <if test="fulfilment != null">
+        #{fulfilment,jdbcType=VARCHAR},
       </if>
       <if test="userId != null">
         #{userId,jdbcType=VARCHAR},
@@ -115,8 +122,11 @@
       <if test="exchangeRates != null">
         exchange_rates = #{exchangeRates,jdbcType=DECIMAL},
       </if>
-      <if test="transportType != null">
-        transport_type = #{transportType,jdbcType=VARCHAR},
+      <if test="rebate != null">
+        rebate = #{rebate,jdbcType=DECIMAL},
+      </if>
+      <if test="fulfilment != null">
+        fulfilment = #{fulfilment,jdbcType=VARCHAR},
       </if>
       <if test="userId != null">
         user_id = #{userId,jdbcType=VARCHAR},
@@ -134,7 +144,8 @@
       country = #{country,jdbcType=VARCHAR},
       local_currency = #{localCurrency,jdbcType=VARCHAR},
       exchange_rates = #{exchangeRates,jdbcType=DECIMAL},
-      transport_type = #{transportType,jdbcType=VARCHAR},
+      rebate = #{rebate,jdbcType=DECIMAL},
+      fulfilment = #{fulfilment,jdbcType=VARCHAR},
       user_id = #{userId,jdbcType=VARCHAR},
       insert_time = #{insertTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

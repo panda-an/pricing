@@ -16,6 +16,8 @@ public class CostTape {
 
     private String subGeo;
 
+    private String fulfilment;
+
     public String getCountry() {
         return country;
     }
@@ -70,5 +72,13 @@ public class CostTape {
 
     public void setSubGeo(String subGeo) {
         this.subGeo = subGeo;
+    }
+
+    public String getFulfilment() {
+        return fulfilment;
+    }
+
+    public void setFulfilment(String fulfilment) {
+        this.fulfilment = fulfilment;
     }
 }

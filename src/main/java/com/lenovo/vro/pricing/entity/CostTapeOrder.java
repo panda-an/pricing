@@ -16,7 +16,9 @@ public class CostTapeOrder {
 
     private BigDecimal exchangeRates;
 
-    private String transportType;
+    private BigDecimal rebate;
+
+    private String fulfilment;
 
     private String userId;
 
@@ -70,12 +72,20 @@ public class CostTapeOrder {
         this.exchangeRates = exchangeRates;
     }
 
-    public String getTransportType() {
-        return transportType;
+    public BigDecimal getRebate() {
+        return rebate;
     }
 
-    public void setTransportType(String transportType) {
-        this.transportType = transportType == null ? null : transportType.trim();
+    public void setRebate(BigDecimal rebate) {
+        this.rebate = rebate;
+    }
+
+    public String getFulfilment() {
+        return fulfilment;
+    }
+
+    public void setFulfilment(String fulfilment) {
+        this.fulfilment = fulfilment == null ? null : fulfilment.trim();
     }
 
     public String getUserId() {

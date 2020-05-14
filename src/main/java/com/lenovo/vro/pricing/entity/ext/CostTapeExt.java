@@ -17,6 +17,8 @@ public class CostTapeExt implements Serializable {
 
     private String priority;
 
+    private String geo;
+
     private String subGeo;
 
     private String costDescription;
@@ -83,6 +85,14 @@ public class CostTapeExt implements Serializable {
 
     public void setPriority(String priority) {
         this.priority = priority;
+    }
+
+    public String getGeo() {
+        return geo;
+    }
+
+    public void setGeo(String geo) {
+        this.geo = geo;
     }
 
     public String getSubGeo() {

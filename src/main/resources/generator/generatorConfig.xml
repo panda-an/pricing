@@ -41,17 +41,17 @@
                selectByExampleQueryId="false"></table>-->
 <!--        <table tableName="warranty_mtm_mapping" domainObjectName="WarrantyMtmMapping" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>-->
-<!--        <table tableName="cost_tape_order" domainObjectName="CostTapeOrder" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>-->
+        <table tableName="cost_tape_order" domainObjectName="CostTapeOrder" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"></table>
 <!--        <table tableName="cost_tape_list" domainObjectName="CostTapeList" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>-->
 <!--        <table tableName="cost_tape_detail" domainObjectName="CostTapeDetail" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>-->
 <!--        <table tableName="region_country_rebate" domainObjectName="RegionCountryRebate" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>-->
-        <table tableName="machine_type_mapping" domainObjectName="MachineTypeMapping" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+<!--        <table tableName="machine_type_mapping" domainObjectName="MachineTypeMapping" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>
         <table tableName="air_cost" domainObjectName="AirCost" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>
+               selectByExampleQueryId="false"></table>-->
     </context>
 </generatorConfiguration>

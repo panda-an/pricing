@@ -10,8 +10,10 @@
     <result column="one" jdbcType="DECIMAL" property="bmc" />
     <result column="product_family" jdbcType="VARCHAR" property="productFamily" />
     <result column="priority" jdbcType="VARCHAR" property="priority" />
+    <result column="subgeo" jdbcType="VARCHAR" property="geo" />
     <result column="sub_geo" jdbcType="VARCHAR" property="subGeo" />
     <result column="brand" jdbcType="VARCHAR" property="brand" />
+    <result column="category_type" jdbcType="VARCHAR" property="categoryType" />
   </resultMap>
 
   <resultMap id="SbbResultMap" type="com.lenovo.vro.pricing.entity.ext.CostTapeExt">
@@ -22,20 +24,33 @@
     <result column="product_family" jdbcType="VARCHAR" property="productFamily" />
     <result column="priority" jdbcType="VARCHAR" property="priority" />
     <result column="sub_geo" jdbcType="VARCHAR" property="subGeo" />
-    <result column="category_type" jdbcType="VARCHAR" property="categoryType" />
+    <result column="subgeo" jdbcType="VARCHAR" property="geo" />
   </resultMap>
   <sql id="Base_Column_List">
-    c.id, c.part_number, c.brand, c.plant, c.country, c.one, c.description as cost_description, f.product_family, f.priority, f.sub_geo
+    c.id, c.part_number, c.brand, c.plant, c.country, c.one, c.description as cost_description, c.subgeo, f.product_family, f.priority, f.sub_geo
   </sql>
 
   <sql id="Sbb_Column_List">
-    c.id, c.part_number, c.one, c.description as warranty_description, f.product_family, f.priority, f.sub_geo
+    c.id, c.part_number, c.one, c.description as warranty_description, c.subgeo, f.product_family, f.priority, f.sub_geo
   </sql>
 
   <select id="getCostTapeData" resultMap="BaseResultMap" parameterType="com.lenovo.vro.pricing.entity.CostTape">
-    select <include refid="Base_Column_List" />
+    select <include refid="Base_Column_List" />,
+        case c.brand
+        <!--when 'VLH' then 'ALL'
+         when 'SERVICE' then 'ALL'
+         when 'OPTION' then 'ALL'
+         when 'ThinkVision' then 'ALL'
+         when 'VISUAL' then 'ALL'-->
+        when 'ThinkPad' then '1'
+        when 'ThinkCentre' then '1'
+        when 'ThinkStation' then '1'
+        when 'ThinkStation' then '1'
+        when 'ThinkServer' then '1'
+        when 'ThinkReality' then '1'
+        else '0' end as category_type
     from margindb.cost_tape c
-    inner join margindb.cost_tape_family_mapping f on c.family = f.product_family and c.plant = f.plant and c.subgeo = f.sub_geo
+    inner join margindb.cost_tape_family_mapping f on c.family = f.product_family and c.plant = f.plant
     left join margindb.cost_tape_country_mapping_region m on c.country = m.country
     <where>
       <if test="partNumber != null">
@@ -51,22 +66,9 @@
   </select>
 
   <select id="getSbbData" resultMap="SbbResultMap" parameterType="com.lenovo.vro.pricing.entity.CostTape">
-    select <include refid="Sbb_Column_List" />,
-    case c.brand
-            <!--when 'VLH' then 'ALL'
-           when 'SERVICE' then 'ALL'
-           when 'OPTION' then 'ALL'
-           when 'ThinkVision' then 'ALL'
-           when 'VISUAL' then 'ALL'-->
-           when 'ThinkPad' then 'System'
-           when 'ThinkCentre' then 'System'
-           when 'ThinkStation' then 'System'
-           when 'ThinkStation' then 'System'
-           when 'ThinkServer' then 'System'
-           when 'ThinkReality' then 'System'
-           else 'Non - System' end as category_type
+    select <include refid="Sbb_Column_List" />
     from margindb.cost_tape c
-    inner join margindb.cost_tape_family_mapping f on c.family = f.product_family and c.plant = f.plant and c.subgeo = f.sub_geo
+    inner join margindb.cost_tape_family_mapping f on c.family = f.product_family and c.plant = f.plant
     <where>
       <if test="country != null">
         AND c.country = #{country}

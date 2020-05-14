@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
@@ -34,9 +36,9 @@ public class PricingController {
      * @param region 登录用户region
      * @return ResponseBean
      */
-    @GetMapping(value={"/getCostType/{mtm}/{country}/{region}"})
+    @GetMapping(value={"/getCostType/{mtm}/{country}/{region}/{fulfilment}"})
     public ResponseBean getCostType(@PathVariable String mtm, @PathVariable String country,
-                                        @PathVariable String region) {
+                                        @PathVariable String region, @PathVariable String fulfilment) {
         ResponseBean bean = new ResponseBean();
 
         try {
@@ -50,6 +52,7 @@ public class PricingController {
             costTape.setPartNumber(mtm);
             costTape.setCountry(country);
             costTape.setRegion(region);
+            costTape.setFulfilment(fulfilment);
             CostTapeExt resultList = costTypeService.getCostType(costTape, CodeConfig.COST_TAPE);
             bean.setObj(resultList);
             bean.setCode(CodeConfig.OPERATION_SUCCESS);
@@ -316,4 +319,17 @@ public class PricingController {
         return bean;
     }
 
+    @PostMapping("exportData")
+    public void exportData(@RequestBody CostTapeOrderExt form, HttpServletResponse response) {
+
+    }
+
+    @GetMapping("/exportData/{id}")
+    public void exportData(@PathVariable int id, HttpServletResponse response) {
+        try{
+            costOrderListService.exportData(id, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

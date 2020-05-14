@@ -8,13 +8,14 @@
     <result column="country" jdbcType="VARCHAR" property="country" />
     <result column="local_currency" jdbcType="VARCHAR" property="localCurrency" />
     <result column="exchange_rates" jdbcType="DECIMAL" property="exchangeRates" />
-    <result column="transport_type" jdbcType="VARCHAR" property="transportType" />
+    <result column="rebate" jdbcType="DECIMAL" property="rebate" />
+    <result column="fulfilment" jdbcType="VARCHAR" property="fulfilment" />
     <result column="user_id" jdbcType="VARCHAR" property="userId" />
     <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, order_name, region, country, local_currency, exchange_rates,
-    transport_type, user_id, insert_time
+    id, order_name, region, country, local_currency, exchange_rates, rebate, user_id, fulfilment,
+    insert_time
   </sql>
   <select id="selectCostTapeList" parameterType="com.lenovo.vro.pricing.entity.CostTapeOrder" resultMap="BaseResultMap">
     select 
@@ -30,7 +31,7 @@
       <if test="country != null">
         and country = #{country}
       </if>
-      <if test="orderName != null">
+      <if test="orderName != null and orderName.length > 0">
         and order_name like concat ('%', '#{orderName}', '%')
       </if>
     </where>

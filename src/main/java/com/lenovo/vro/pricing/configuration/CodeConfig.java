@@ -22,4 +22,13 @@ public class CodeConfig {
     public static final String COST_TAPE = "0";
     // query cost tape - Sbb type
     public static final String SBB_TAPE = "1";
+
+    // add or del
+    public static final String TYPE_ADD = "1";
+    public static final String TYPE_DEL = "0";
+
+    // 海运
+    public static final String FULFILMENT_OCEAN = "0";
+    // 空运
+    public static final String FULFILMENT_AIR = "0";
 }

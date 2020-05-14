@@ -72,6 +72,9 @@ public class CostTypeServiceImpl implements CostTypeService {
             } else {
                 costTapeExtList = costTapeMapperExt.getSbbData(costTape);
             }
+
+            costTapeExtList = costTapeExtList.stream().
+                    filter(n -> n.getGeo().equals(n.getSubGeo()) || n.getSubGeo().equals("ALL")).collect(Collectors.toList());
             result = filterResult(costTapeExtList, key, partNumber);
         }
 
@@ -83,10 +86,16 @@ public class CostTypeServiceImpl implements CostTypeService {
             }
 
             // air cost
-            if(result != null && costTape.getPartNumber().length() > 4) {
-                String machineType = costTape.getPartNumber().substring(0, 4);
-                setAirCost(country, machineType, result);
+            if(costTape.getFulfilment().equals(CodeConfig.FULFILMENT_AIR)) {
+                if(result != null && costTape.getPartNumber().length() > 4) {
+                    String machineType = costTape.getPartNumber().substring(0, 4);
+                    setAirCost(country, machineType, result);
+                }
+            } else {
+                if(result != null)
+                    result.setAirCost(BigDecimal.ZERO);
             }
+
         }
 
         return result;
@@ -97,12 +106,15 @@ public class CostTypeServiceImpl implements CostTypeService {
         if(!StringUtils.isEmpty(region)) {
             String key = "country - " + region;
             //noinspection ConstantConditions
-            if(stringRedisTemplate.hasKey("key")) {
+            if(stringRedisTemplate.hasKey(key)) {
                 return stringRedisTemplate.opsForList().range(key, 0, -1);
             }
 
             List<String> list = regionCountryMappingMapperExt.getCountryByRegion(region);
-            stringRedisTemplate.opsForList().rightPushAll(key, list);
+            if(!CollectionUtils.isEmpty(list)) {
+                stringRedisTemplate.opsForList().rightPushAll(key, list);
+            }
+
             return list;
         } else {
             throw new Exception("Region is empty");

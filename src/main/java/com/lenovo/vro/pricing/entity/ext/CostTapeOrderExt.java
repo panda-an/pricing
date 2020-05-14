@@ -28,5 +28,4 @@ public class CostTapeOrderExt extends CostTapeOrder {
         this.costTapeDetailList = costTapeDetailList;
     }
 
-
 }
