@@ -69,21 +69,19 @@ public class PricingController {
     /**
      * 获取sbb数据，cost tape第二层
      * @param mtm part number
-     * @param country country
      * @param plant 第一层的plant
      * @param productFamily productFamily
      * @param subGeo subGeo
      * @return ResponseBean
      */
-    @GetMapping(value={"/getSbb/{mtm}/{country}/{plant}/{productFamily}/{subGeo}"})
-    public ResponseBean getSbb(@PathVariable String mtm, @PathVariable String country,
-                               @PathVariable String plant, @PathVariable String productFamily,
+    @GetMapping(value={"/getSbb/{mtm}/{plant}/{productFamily}/{subGeo}"})
+    public ResponseBean getSbb(@PathVariable String mtm, @PathVariable String plant, @PathVariable String productFamily,
                                @PathVariable String subGeo) {
         ResponseBean bean = new ResponseBean();
 
         try {
             CostTape costTape = new CostTape();
-            if(StringUtils.isEmpty(mtm) || StringUtils.isEmpty(country) || StringUtils.isEmpty(plant) ||
+            if(StringUtils.isEmpty(mtm) || StringUtils.isEmpty(plant) ||
                     StringUtils.isEmpty(productFamily) || StringUtils.isEmpty(subGeo)) {
                 bean.setCode(CodeConfig.OPERATION_FAILED);
                 bean.setMsg("Parameter is empty");
@@ -91,7 +89,6 @@ public class PricingController {
             }
 
             costTape.setPartNumber(mtm);
-            costTape.setCountry(country);
             costTape.setPlant(plant);
             costTape.setProductFamily(productFamily);
             costTape.setSubGeo(subGeo);
@@ -321,7 +318,11 @@ public class PricingController {
 
     @PostMapping("exportData")
     public void exportData(@RequestBody CostTapeOrderExt form, HttpServletResponse response) {
-
+        try {
+            costOrderListService.exportData(form, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @GetMapping("/exportData/{id}")

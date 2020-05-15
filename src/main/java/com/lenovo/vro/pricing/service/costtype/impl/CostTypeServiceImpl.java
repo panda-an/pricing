@@ -60,7 +60,7 @@ public class CostTypeServiceImpl implements CostTypeService {
             String plant = costTape.getPlant();
             String subGeo = costTape.getSubGeo();
             String family = costTape.getProductFamily();
-            key = country + "-" + subGeo + "-" + partNumber + "-" + plant + "-" + family;
+            key = subGeo + "-" + partNumber + "-" + plant + "-" + family;
         }
 
         if(redisTemplate.opsForHash().hasKey(COST_DATA, key)) {
@@ -125,8 +125,8 @@ public class CostTypeServiceImpl implements CostTypeService {
     public Warranty getWarranty(String country, String warrantyCode) throws Exception {
         if(!StringUtils.isEmpty(country) && !StringUtils.isEmpty(warrantyCode)) {
             String key = warrantyCode + "-" + country;
-            //noinspection ConstantConditions
-            if(redisTemplate.hasKey("warranty")) {
+
+            if(redisTemplate.opsForHash().hasKey("warranty", key)) {
                 return (Warranty) redisTemplate.opsForHash().get("warranty", key);
             }
 
