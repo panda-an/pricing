@@ -28,7 +28,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -130,11 +129,13 @@ public class CostOrderListServiceImpl implements CostOrderListService {
 
             if(!CollectionUtils.isEmpty(costTapeListList)) {
                 costTapeListMapperExt.deleteCostTapeList(id);
+                costTapeListList.forEach(n -> n.setCostId(id));
                 costTapeListMapperExt.insertBatch(costTapeListList);
             }
 
             if(!CollectionUtils.isEmpty(costTapeDetailList)) {
                 costTapeDetailMapperExt.deleteCostTapeDetail(id);
+                costTapeDetailList.forEach(n -> n.setCostId(id));
                 costTapeDetailMapperExt.insertBatch(costTapeDetailList);
             }
 
