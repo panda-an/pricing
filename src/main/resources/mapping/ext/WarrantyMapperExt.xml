@@ -10,10 +10,11 @@
   </sql>
 
   <insert id="insertBatch" parameterType="java.util.List">
-    insert into warranty (warranty_code, country, nbmc)
+    insert into warranty (warranty_code, country, `type`, nbmc)
     values
     <foreach collection="list" item="item" index="index" separator=",">
-    (#{item.warrantyCode,jdbcType=VARCHAR},  #{item.country,jdbcType=VARCHAR}, #{item.nbmc,jdbcType=DECIMAL})
+    (#{item.warrantyCode,jdbcType=VARCHAR},  #{item.country,jdbcType=VARCHAR},
+      #{item.type,jdbcType=VARCHAR}, #{item.nbmc,jdbcType=DECIMAL})
     </foreach>
   </insert>
 
@@ -31,6 +32,9 @@
       </if>
       <if test="country != null">
         and w.country = #{country}
+      </if>
+      <if test="type != null">
+        and w.`type` = #{type}
       </if>
     </where>
   </select>

@@ -4,11 +4,12 @@
   <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.Warranty">
     <id column="warranty_code" jdbcType="VARCHAR" property="warrantyCode" />
     <id column="country" jdbcType="VARCHAR" property="country" />
+    <id column="type" jdbcType="VARCHAR" property="type" />
     <result column="nbmc" jdbcType="DECIMAL" property="nbmc" />
     <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    warranty_code, country, nbmc, insert_time
+    warranty_code, country, type, nbmc, insert_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.WarrantyKey" resultMap="BaseResultMap">
     select 
@@ -16,17 +17,19 @@
     from warranty
     where warranty_code = #{warrantyCode,jdbcType=VARCHAR}
       and country = #{country,jdbcType=VARCHAR}
+      and type = #{type,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.WarrantyKey">
     delete from warranty
     where warranty_code = #{warrantyCode,jdbcType=VARCHAR}
       and country = #{country,jdbcType=VARCHAR}
+      and type = #{type,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.Warranty">
-    insert into warranty (warranty_code, country, nbmc, 
-      insert_time)
-    values (#{warrantyCode,jdbcType=VARCHAR}, #{country,jdbcType=VARCHAR}, #{nbmc,jdbcType=DECIMAL}, 
-      #{insertTime,jdbcType=TIMESTAMP})
+    insert into warranty (warranty_code, country, `type`,
+      nbmc, insert_time)
+    values (#{warrantyCode,jdbcType=VARCHAR}, #{country,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
+      #{nbmc,jdbcType=DECIMAL}, #{insertTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.Warranty">
     insert into warranty
@@ -36,6 +39,9 @@
       </if>
       <if test="country != null">
         country,
+      </if>
+      <if test="type != null">
+        `type`,
       </if>
       <if test="nbmc != null">
         nbmc,
@@ -50,6 +56,9 @@
       </if>
       <if test="country != null">
         #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
       </if>
       <if test="nbmc != null">
         #{nbmc,jdbcType=DECIMAL},
@@ -71,6 +80,7 @@
     </set>
     where warranty_code = #{warrantyCode,jdbcType=VARCHAR}
       and country = #{country,jdbcType=VARCHAR}
+      and `type` = #{type,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.Warranty">
     update warranty
@@ -78,5 +88,6 @@
       insert_time = #{insertTime,jdbcType=TIMESTAMP}
     where warranty_code = #{warrantyCode,jdbcType=VARCHAR}
       and country = #{country,jdbcType=VARCHAR}
+      and `type` = #{type,jdbcType=VARCHAR}
   </update>
 </mapper>

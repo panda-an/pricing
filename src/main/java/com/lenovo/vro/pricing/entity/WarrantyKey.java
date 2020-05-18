@@ -5,6 +5,8 @@ public class WarrantyKey {
 
     private String country;
 
+    private String type;
+
     public String getWarrantyCode() {
         return warrantyCode;
     }
@@ -19,5 +21,13 @@ public class WarrantyKey {
 
     public void setCountry(String country) {
         this.country = country == null ? null : country.trim();
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type == null ? null : type.trim();
     }
 }

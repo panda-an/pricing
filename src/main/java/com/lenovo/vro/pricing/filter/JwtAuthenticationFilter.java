@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
 
     public JwtAuthenticationFilter() {
-        this.requiresAuthenticationRequestMatcher = new RequestHeaderRequestMatcher("Authorization");
+        this.requiresAuthenticationRequestMatcher = new RequestHeaderRequestMatcher("token");
     }
 
     @Override
@@ -89,7 +89,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     protected String getJwtToken(HttpServletRequest request) {
-        String authInfo = request.getHeader("Authorization");
+        String authInfo = request.getHeader("token");
         return StringUtils.delete(authInfo, "Bearer ");
     }
 

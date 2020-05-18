@@ -6,9 +6,9 @@ import java.util.Date;
 public class Warranty extends WarrantyKey {
     private BigDecimal nbmc;
 
-    private String tbaType;
-
     private Date insertTime;
+
+    private String tbaType;
 
     public BigDecimal getNbmc() {
         return nbmc;

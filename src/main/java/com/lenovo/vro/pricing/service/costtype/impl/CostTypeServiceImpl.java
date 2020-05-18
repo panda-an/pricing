@@ -233,6 +233,14 @@ public class CostTypeServiceImpl implements CostTypeService {
         form.setCountry(country);
         form.setMtm(mtm);
 
+        String brand = result.getBrand();
+        String type = getWarrantyType(brand);
+        if(!StringUtils.isEmpty(type)) {
+            form.setType(type);
+        } else {
+            return;
+        }
+
         String warrantyKey = mtm + "-" + country;
 
         Warranty warranty;
@@ -346,6 +354,33 @@ public class CostTypeServiceImpl implements CostTypeService {
             default:
                 result = "";
         }
+
+        return result;
+    }
+
+    private String getWarrantyType(String brand) {
+        String result;
+        switch (brand) {
+            case "ThinkCentre":
+            case "OPTION":
+            case "SERVICE":
+            case "ThinkPad":
+            case "ThinkReality":
+            case "ThinkServer":
+            case "ThinkStation":
+            case "ThinkVision":
+            case "VLH":
+                result = "1";
+                break;
+            case "VISUAL":
+            case "IDEAPAD":
+            case "IdeaCentre":
+                result = "2";
+                break;
+            default:
+                result = "";
+        }
+
 
         return result;
     }

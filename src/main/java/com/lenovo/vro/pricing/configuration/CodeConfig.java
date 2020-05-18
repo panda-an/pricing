@@ -31,4 +31,9 @@ public class CodeConfig {
     public static final String FULFILMENT_OCEAN = "0";
     // 空运
     public static final String FULFILMENT_AIR = "0";
+
+    // TBG
+    public static final String WARRANTY_TYPE_TBG = "1";
+    // LBG
+    public static final String WARRANTY_TYPE_LBG = "2";
 }

@@ -32,7 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/system/**").hasRole("ADMIN")
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
             .and()
             .csrf().disable()
             .sessionManagement().disable()
@@ -41,7 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .headers().addHeaderWriter(new StaticHeadersWriter(Arrays.asList(
                     new Header("Access-control-Allow-Origin", "*"),
-                    new Header("Access-Control-Expose-Headers", "Authorization"))))
+                    new Header("Access-Control-Expose-Headers", "token"))))
             .and()
             .addFilterAfter(new OptionsRequestFilter(), CorsFilter.class)
             .apply(new LoginConfigure<>()).loginSuccessHandler(loginSuccessHandler())
@@ -94,7 +94,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.setAllowedOrigins(Collections.singletonList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "HEAD", "OPTION"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
-        configuration.addExposedHeader("Authorization");
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "id", "region"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

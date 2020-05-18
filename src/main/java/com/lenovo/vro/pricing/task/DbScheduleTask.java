@@ -20,7 +20,7 @@ public class DbScheduleTask {
     @Autowired
     private DbService dbService;
 
-    @Scheduled(cron = "0 10 10 ? * *")
+    @Scheduled(cron = "0 07 13 ? * *")
     public void insertWarranty() {
         logger.info("Start schedule for insertWarranty");
         String code1 = "";

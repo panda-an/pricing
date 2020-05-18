@@ -124,6 +124,12 @@ public class DbServiceImpl extends BaseService implements DbService {
                 xmlReader.parse(source);
 
                 List<Warranty> dataList = handler.getDataList();
+                if(file.getName().contains("TBG")) {
+                    dataList.parallelStream().forEach(n -> n.setType(CodeConfig.WARRANTY_TYPE_TBG));
+                } else if(file.getName().contains("LBG")) {
+                    dataList.parallelStream().forEach(n -> n.setType(CodeConfig.WARRANTY_TYPE_LBG));
+                }
+
                 resultCode = insertDb(dataList);
                 in.close();
             }
@@ -228,9 +234,6 @@ public class DbServiceImpl extends BaseService implements DbService {
 
                 switch (prefix) {
                     case "A":
-                        /*if(formattedValue.contains("_")) {
-                            formattedValue = formattedValue.substring(0, formattedValue.indexOf("_"));
-                        }*/
                         warranty.setWarrantyCode(formattedValue);
                         break;
                     case "B":

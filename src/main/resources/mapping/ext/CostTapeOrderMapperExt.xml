@@ -17,7 +17,7 @@
     id, order_name, region, country, local_currency, exchange_rates, rebate, user_id, fulfilment,
     insert_time
   </sql>
-  <select id="selectCostTapeList" parameterType="com.lenovo.vro.pricing.entity.CostTapeOrder" resultMap="BaseResultMap">
+  <select id="selectCostTapeList" parameterType="com.lenovo.vro.pricing.entity.ext.CostTapeOrderForm" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from cost_tape_order
@@ -32,7 +32,7 @@
         and country = #{country}
       </if>
       <if test="orderName != null and orderName.length > 0">
-        and order_name like concat ('%', '#{orderName}', '%')
+        and order_name like concat ('%', #{orderName}, '%')
       </if>
     </where>
     order by insert_time desc
