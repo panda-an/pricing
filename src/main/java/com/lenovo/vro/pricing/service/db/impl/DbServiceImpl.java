@@ -124,12 +124,6 @@ public class DbServiceImpl extends BaseService implements DbService {
                 xmlReader.parse(source);
 
                 List<Warranty> dataList = handler.getDataList();
-                if(file.getName().contains("TBG")) {
-                    dataList.parallelStream().forEach(n -> n.setType(CodeConfig.WARRANTY_TYPE_TBG));
-                } else if(file.getName().contains("LBG")) {
-                    dataList.parallelStream().forEach(n -> n.setType(CodeConfig.WARRANTY_TYPE_LBG));
-                }
-
                 resultCode = insertDb(dataList);
                 in.close();
             }
@@ -221,9 +215,7 @@ public class DbServiceImpl extends BaseService implements DbService {
             }
 
             if(warranty != null) {
-                if(warranty.getTbaType().equals("US_DOLLAR")) {
-                    dataList.add(warranty);
-                }
+                dataList.add(warranty);
             }
         }
 
@@ -234,15 +226,24 @@ public class DbServiceImpl extends BaseService implements DbService {
 
                 switch (prefix) {
                     case "A":
-                        warranty.setWarrantyCode(formattedValue);
+                        warranty.setType(formattedValue);
                         break;
                     case "B":
-                        warranty.setCountry(formattedValue);
+                        warranty.setPartNumber(formattedValue);
                         break;
                     case "C":
-                        warranty.setTbaType(formattedValue);
+                        warranty.setBrand(formattedValue);
                         break;
-                    case "D":
+                    case "F":
+                        warranty.setSubGeo(formattedValue);
+                        break;
+                    case "G":
+                        warranty.setCountry(formattedValue);
+                        break;
+                    case "H":
+                        warranty.setWarrantyCode(formattedValue);
+                        break;
+                    case "J":
                         warranty.setNbmc(StringUtils.isEmpty(formattedValue)?null:new BigDecimal(formattedValue));
                         break;
                 }

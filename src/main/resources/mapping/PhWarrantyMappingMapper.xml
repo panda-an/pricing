@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.PhWarrantyMappingMapper">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.PhWarrantyMapping">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="ph_code" jdbcType="VARCHAR" property="phCode" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="warranty_code" jdbcType="VARCHAR" property="warrantyCode" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, ph_code, type, warranty_code, insert_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ph_warranty_mapping
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ph_warranty_mapping
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.PhWarrantyMapping">
+    insert into ph_warranty_mapping (id, ph_code, type, 
+      warranty_code, insert_time)
+    values (#{id,jdbcType=INTEGER}, #{phCode,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
+      #{warrantyCode,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.PhWarrantyMapping">
+    insert into ph_warranty_mapping
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="phCode != null">
+        ph_code,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="warrantyCode != null">
+        warranty_code,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="phCode != null">
+        #{phCode,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="warrantyCode != null">
+        #{warrantyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lenovo.vro.pricing.entity.PhWarrantyMapping">
+    update ph_warranty_mapping
+    <set>
+      <if test="phCode != null">
+        ph_code = #{phCode,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="warrantyCode != null">
+        warranty_code = #{warrantyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.PhWarrantyMapping">
+    update ph_warranty_mapping
+    set ph_code = #{phCode,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      warranty_code = #{warrantyCode,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

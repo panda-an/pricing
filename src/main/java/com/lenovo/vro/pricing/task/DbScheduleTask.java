@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.io.FileNotFoundException;
 
-
 @Component
 @EnableScheduling
 public class DbScheduleTask {
@@ -20,7 +19,7 @@ public class DbScheduleTask {
     @Autowired
     private DbService dbService;
 
-    @Scheduled(cron = "0 07 13 ? * *")
+    @Scheduled(cron = "0 20 17 ? * *")
     public void insertWarranty() {
         logger.info("Start schedule for insertWarranty");
         String code1 = "";

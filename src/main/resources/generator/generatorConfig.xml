@@ -35,8 +35,8 @@
 
 <!--        <table tableName="cost_tape_family_mapping" domainObjectName="CostTypeFamilyMapping" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>-->
-        <table tableName="warranty" domainObjectName="Warranty" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>
+<!--        <table tableName="warranty" domainObjectName="Warranty" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"></table>-->
 <!--        <table tableName="region_country_mapping" domainObjectName="RegionCountryMapping" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>-->
 <!--        <table tableName="warranty_mtm_mapping" domainObjectName="WarrantyMtmMapping" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
@@ -52,6 +52,10 @@
 <!--        <table tableName="machine_type_mapping" domainObjectName="MachineTypeMapping" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>
         <table tableName="air_cost" domainObjectName="AirCost" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"></table>-->
+<!--        <table tableName="machine_type_ph_mapping" domainObjectName="MachineTypePhMapping" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"></table>
+        <table tableName="ph_warranty_mapping" domainObjectName="PhWarrantyMapping" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>-->
     </context>
 </generatorConfiguration>

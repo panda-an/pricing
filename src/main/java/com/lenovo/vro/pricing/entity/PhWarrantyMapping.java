@@ -2,10 +2,12 @@ package com.lenovo.vro.pricing.entity;
 
 import java.util.Date;
 
-public class WarrantyMtmMapping {
+public class PhWarrantyMapping {
     private Integer id;
 
-    private String machineType;
+    private String phCode;
+
+    private String type;
 
     private String warrantyCode;
 
@@ -19,12 +21,20 @@ public class WarrantyMtmMapping {
         this.id = id;
     }
 
-    public String getMachineType() {
-        return machineType;
+    public String getPhCode() {
+        return phCode;
     }
 
-    public void setMachineType(String machineType) {
-        this.machineType = machineType == null ? null : machineType.trim();
+    public void setPhCode(String phCode) {
+        this.phCode = phCode == null ? null : phCode.trim();
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type == null ? null : type.trim();
     }
 
     public String getWarrantyCode() {

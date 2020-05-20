@@ -3,7 +3,6 @@ package com.lenovo.vro.pricing.service.costtype.impl;
 import com.lenovo.vro.pricing.configuration.CodeConfig;
 import com.lenovo.vro.pricing.entity.*;
 import com.lenovo.vro.pricing.entity.ext.CostTapeExt;
-import com.lenovo.vro.pricing.entity.ext.WarrantyExt;
 import com.lenovo.vro.pricing.mapper.ext.*;
 import com.lenovo.vro.pricing.service.costtype.CostTypeService;
 import org.slf4j.Logger;
@@ -47,7 +46,8 @@ public class CostTypeServiceImpl implements CostTypeService {
     private final String COST_DATA = "cost_hash";
 
     @Override
-    public CostTapeExt getCostType(CostTape costTape, String type) throws Exception {
+    public Map<String, Object> getCostType(CostTape costTape, String type) throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
 
         String partNumber = costTape.getPartNumber();
         String country = costTape.getCountry();
@@ -80,25 +80,30 @@ public class CostTypeServiceImpl implements CostTypeService {
 
         if(type.equals(CodeConfig.COST_TAPE)) {
             // warranty - nbmc
-            if(result != null && costTape.getPartNumber().length() > 4) {
-                String mtm = costTape.getPartNumber().substring(0, 4);
-                setWarrantyCost(country, mtm, result);
+            if(result != null && partNumber.length() > 4) {
+                List<Warranty> warrantyList = getWarrantyDataList(partNumber, country);
+                if(!CollectionUtils.isEmpty(warrantyList)) {
+                    resultMap.put("warranty", warrantyList);
+                }
             }
 
             // air cost
             if(costTape.getFulfilment().equals(CodeConfig.FULFILMENT_AIR)) {
-                if(result != null && costTape.getPartNumber().length() > 4) {
-                    String machineType = costTape.getPartNumber().substring(0, 4);
+                if(result != null && partNumber.length() > 4) {
+                    String machineType = partNumber.substring(0, 4);
                     setAirCost(country, machineType, result);
                 }
             } else {
                 if(result != null)
                     result.setAirCost(BigDecimal.ZERO);
             }
-
         }
 
-        return result;
+        if(result != null) {
+            resultMap.put("costTape", result);
+        }
+
+        return resultMap;
     }
 
     @Override
@@ -132,7 +137,7 @@ public class CostTypeServiceImpl implements CostTypeService {
 
             WarrantyKey form = new WarrantyKey();
             form.setCountry(country);
-            form.setWarrantyCode(warrantyCode);
+
             Warranty result = warrantyMapperExt.selectByPrimaryKey(form);
             if(result != null) {
                 redisTemplate.opsForHash().put("warranty", key, result);
@@ -225,40 +230,6 @@ public class CostTypeServiceImpl implements CostTypeService {
         }
 
         return regionCountryRebateList;
-    }
-
-    private void setWarrantyCost(String country, String mtm, CostTapeExt result) {
-        WarrantyExt form = new WarrantyExt();
-
-        form.setCountry(country);
-        form.setMtm(mtm);
-
-        String brand = result.getBrand();
-        String type = getWarrantyType(brand);
-        if(!StringUtils.isEmpty(type)) {
-            form.setType(type);
-        } else {
-            return;
-        }
-
-        String warrantyKey = mtm + "-" + country;
-
-        Warranty warranty;
-        //noinspection ConstantConditions
-        if(redisTemplate.hasKey("warranty")) {
-            warranty = (Warranty) redisTemplate.opsForHash().get("warranty", warrantyKey);
-        } else {
-            warranty = warrantyMapperExt.selectMtmWarranty(form);
-            redisTemplate.opsForHash().put("warranty", warrantyKey, warranty);
-        }
-
-        if(warranty != null) {
-            result.setNbmc(warranty.getNbmc());
-            result.setWarrantyCode(warranty.getWarrantyCode());
-            result.setTotal(result.getNbmc().add(result.getBmc()));
-        } else {
-            result.setTotal(result.getBmc());
-        }
     }
 
     private void setAirCost(String country, String machineType, CostTapeExt result) {
@@ -358,30 +329,28 @@ public class CostTypeServiceImpl implements CostTypeService {
         return result;
     }
 
-    private String getWarrantyType(String brand) {
-        String result;
-        switch (brand) {
-            case "ThinkCentre":
-            case "OPTION":
-            case "SERVICE":
-            case "ThinkPad":
-            case "ThinkReality":
-            case "ThinkServer":
-            case "ThinkStation":
-            case "ThinkVision":
-            case "VLH":
-                result = "1";
-                break;
-            case "VISUAL":
-            case "IDEAPAD":
-            case "IdeaCentre":
-                result = "2";
-                break;
-            default:
-                result = "";
+    private List<Warranty> getWarrantyDataList(String partNumber, String country) {
+        Warranty form = new Warranty();
+        form.setPartNumber(partNumber);
+        form.setCountry(country);
+        String key = partNumber + "-" + country;
+
+        List<Warranty> resultList;
+        if(redisTemplate.opsForHash().hasKey("warranty", key)) {
+            resultList = (List<Warranty>) redisTemplate.opsForHash().get("warranty", key);
+        } else {
+            resultList = warrantyMapperExt.selectMtmWarranty(form);
+
+            if(CollectionUtils.isEmpty(resultList)) {
+                form.setPartNumber(partNumber.substring(0, 4));
+                resultList = warrantyMapperExt.selectMtmWarrantyByPh(form);
+            }
+
+            if(!CollectionUtils.isEmpty(resultList)) {
+                redisTemplate.opsForHash().put("warranty", key, resultList);
+            }
         }
 
-
-        return result;
+        return resultList;
     }
 }

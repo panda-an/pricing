@@ -10,11 +10,14 @@
   </sql>
 
   <insert id="insertBatch" parameterType="java.util.List">
-    insert into warranty (warranty_code, country, `type`, nbmc)
+    insert into warranty (`type`, country, part_number,
+    warranty_code, sub_geo, brand,
+    nbmc)
     values
     <foreach collection="list" item="item" index="index" separator=",">
-    (#{item.warrantyCode,jdbcType=VARCHAR},  #{item.country,jdbcType=VARCHAR},
-      #{item.type,jdbcType=VARCHAR}, #{item.nbmc,jdbcType=DECIMAL})
+    (#{item.type,jdbcType=VARCHAR}, #{item.country,jdbcType=VARCHAR}, #{item.partNumber,jdbcType=VARCHAR},
+      #{item.warrantyCode,jdbcType=VARCHAR}, #{item.subGeo,jdbcType=VARCHAR}, #{item.brand,jdbcType=VARCHAR},
+      #{item.nbmc,jdbcType=DECIMAL})
     </foreach>
   </insert>
 
@@ -22,21 +25,31 @@
     truncate warranty
   </update>
 
-  <select id="selectMtmWarranty" parameterType="com.lenovo.vro.pricing.entity.ext.WarrantyExt" resultMap="BaseResultMap">
+  <select id="selectMtmWarranty" parameterType="com.lenovo.vro.pricing.entity.Warranty" resultMap="BaseResultMap">
     select <include refid="Base_Column_List" />
     from warranty w
-    inner join warranty_mtm_mapping m on w.warranty_code = m.warranty_code
     <where>
-      <if test="mtm != null">
-        and m.machine_type = #{mtm}
+      <if test="partNumber != null">
+        and w.part_number = #{partNumber}
       </if>
       <if test="country != null">
         and w.country = #{country}
       </if>
-      <if test="type != null">
-        and w.`type` = #{type}
-      </if>
     </where>
   </select>
 
+  <select id="selectMtmWarrantyByPh" parameterType="com.lenovo.vro.pricing.entity.Warranty" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from warranty w
+    inner join ph_warranty_mapping pw on w.warranty_code = pw.warranty_code
+    inner join machine_type_ph_mapping mpt on mpt.ph_code = pw.ph_code
+    <where>
+      <if test="partNumber != null">
+        and mpt.machineType = #{partNumber}
+      </if>
+      <if test="country != null">
+        and w.country = #{country}
+      </if>
+    </where>
+  </select>
 </mapper>

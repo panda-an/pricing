@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface CostTypeService {
-    CostTapeExt getCostType(CostTape costTape, String type) throws Exception;
+    Map<String, Object> getCostType(CostTape costTape, String type) throws Exception;
 
     List<String> getCountryList(String region) throws Exception;
 

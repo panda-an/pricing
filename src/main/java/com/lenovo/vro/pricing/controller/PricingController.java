@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/pricing")
@@ -53,8 +54,8 @@ public class PricingController {
             costTape.setCountry(country);
             costTape.setRegion(region);
             costTape.setFulfilment(fulfilment);
-            CostTapeExt resultList = costTypeService.getCostType(costTape, CodeConfig.COST_TAPE);
-            bean.setObj(resultList);
+            Map<String, Object> map = costTypeService.getCostType(costTape, CodeConfig.COST_TAPE);
+            bean.setObj(map);
             bean.setCode(CodeConfig.OPERATION_SUCCESS);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -92,8 +93,8 @@ public class PricingController {
             costTape.setPlant(plant);
             costTape.setProductFamily(productFamily);
             costTape.setSubGeo(subGeo);
-            CostTapeExt resultList = costTypeService.getCostType(costTape, CodeConfig.SBB_TAPE);
-            bean.setObj(resultList);
+            Map<String, Object> map = costTypeService.getCostType(costTape, CodeConfig.SBB_TAPE);
+            bean.setObj(map);
             bean.setCode(CodeConfig.OPERATION_SUCCESS);
         } catch (Exception e) {
             logger.error(e.getMessage());

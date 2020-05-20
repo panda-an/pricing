@@ -1,19 +1,9 @@
 package com.lenovo.vro.pricing.entity;
 
 public class WarrantyKey {
-    private String warrantyCode;
-
     private String country;
 
-    private String type;
-
-    public String getWarrantyCode() {
-        return warrantyCode;
-    }
-
-    public void setWarrantyCode(String warrantyCode) {
-        this.warrantyCode = warrantyCode == null ? null : warrantyCode.trim();
-    }
+    private String partNumber;
 
     public String getCountry() {
         return country;
@@ -23,11 +13,11 @@ public class WarrantyKey {
         this.country = country == null ? null : country.trim();
     }
 
-    public String getType() {
-        return type;
+    public String getPartNumber() {
+        return partNumber;
     }
 
-    public void setType(String type) {
-        this.type = type == null ? null : type.trim();
+    public void setPartNumber(String partNumber) {
+        this.partNumber = partNumber == null ? null : partNumber.trim();
     }
 }
