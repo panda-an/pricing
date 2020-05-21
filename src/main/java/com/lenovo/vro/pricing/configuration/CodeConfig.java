@@ -30,7 +30,7 @@ public class CodeConfig {
     // 海运
     public static final String FULFILMENT_OCEAN = "0";
     // 空运
-    public static final String FULFILMENT_AIR = "0";
+    public static final String FULFILMENT_AIR = "1";
 
     // TBG
     public static final String WARRANTY_TYPE_TBG = "1";
