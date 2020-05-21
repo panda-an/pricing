@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class CostTypeServiceImpl implements CostTypeService {
+public class CostTypeServiceImpl extends CostTapeBaseService implements CostTypeService {
 
     @Autowired
     private CostTapeMapperExt costTapeMapperExt;
@@ -81,7 +81,7 @@ public class CostTypeServiceImpl implements CostTypeService {
         if(type.equals(CodeConfig.COST_TAPE)) {
             // warranty - nbmc
             if(result != null && partNumber.length() > 4) {
-                List<Warranty> warrantyList = getWarrantyDataList(partNumber, country);
+                List<Warranty> warrantyList = getWarrantyDataList(partNumber, country, redisTemplate, warrantyMapperExt);
                 if(!CollectionUtils.isEmpty(warrantyList)) {
                     resultMap.put("warranty", warrantyList);
                 }
@@ -327,30 +327,5 @@ public class CostTypeServiceImpl implements CostTypeService {
         }
 
         return result;
-    }
-
-    private List<Warranty> getWarrantyDataList(String partNumber, String country) {
-        Warranty form = new Warranty();
-        form.setPartNumber(partNumber);
-        form.setCountry(country);
-        String key = partNumber + "-" + country;
-
-        List<Warranty> resultList;
-        if(redisTemplate.opsForHash().hasKey("warranty", key)) {
-            resultList = (List<Warranty>) redisTemplate.opsForHash().get("warranty", key);
-        } else {
-            resultList = warrantyMapperExt.selectMtmWarranty(form);
-
-            if(CollectionUtils.isEmpty(resultList)) {
-                form.setPartNumber(partNumber.substring(0, 4));
-                resultList = warrantyMapperExt.selectMtmWarrantyByPh(form);
-            }
-
-            if(!CollectionUtils.isEmpty(resultList)) {
-                redisTemplate.opsForHash().put("warranty", key, resultList);
-            }
-        }
-
-        return resultList;
     }
 }

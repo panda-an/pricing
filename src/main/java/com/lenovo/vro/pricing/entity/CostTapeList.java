@@ -2,6 +2,7 @@ package com.lenovo.vro.pricing.entity;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class CostTapeList extends CostTapeListKey {
     private Integer pid;
@@ -41,6 +42,8 @@ public class CostTapeList extends CostTapeListKey {
     private String type;
 
     private String categoryType;
+
+    private List<Warranty> warrantyList;
 
     private Date insertTime;
 
@@ -202,5 +205,13 @@ public class CostTapeList extends CostTapeListKey {
 
     public void setInsertTime(Date insertTime) {
         this.insertTime = insertTime;
+    }
+
+    public List<Warranty> getWarrantyList() {
+        return warrantyList;
+    }
+
+    public void setWarrantyList(List<Warranty> warrantyList) {
+        this.warrantyList = warrantyList;
     }
 }

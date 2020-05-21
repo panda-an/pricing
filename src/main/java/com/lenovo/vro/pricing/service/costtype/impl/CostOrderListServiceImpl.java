@@ -6,11 +6,13 @@ import com.lenovo.vro.pricing.configuration.CodeConfig;
 import com.lenovo.vro.pricing.entity.CostTapeDetail;
 import com.lenovo.vro.pricing.entity.CostTapeList;
 import com.lenovo.vro.pricing.entity.CostTapeOrder;
+import com.lenovo.vro.pricing.entity.Warranty;
 import com.lenovo.vro.pricing.entity.ext.CostTapeOrderExt;
 import com.lenovo.vro.pricing.entity.ext.CostTapeOrderForm;
 import com.lenovo.vro.pricing.mapper.ext.CostTapeDetailMapperExt;
 import com.lenovo.vro.pricing.mapper.ext.CostTapeListMapperExt;
 import com.lenovo.vro.pricing.mapper.ext.CostTapeOrderMapperExt;
+import com.lenovo.vro.pricing.mapper.ext.WarrantyMapperExt;
 import com.lenovo.vro.pricing.service.costtype.CostOrderListService;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -23,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -38,7 +41,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class CostOrderListServiceImpl implements CostOrderListService {
+public class CostOrderListServiceImpl extends CostTapeBaseService implements CostOrderListService {
 
     @Autowired
     private CostTapeOrderMapperExt costTapeOrderMapperExt;
@@ -48,6 +51,12 @@ public class CostOrderListServiceImpl implements CostOrderListService {
 
     @Autowired
     private CostTapeListMapperExt costTapeListMapperExt;
+
+    @Autowired
+    private WarrantyMapperExt warrantyMapperExt;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -63,6 +72,21 @@ public class CostOrderListServiceImpl implements CostOrderListService {
         CostTapeOrderExt order = costTapeOrderMapperExt.selectByPrimaryKey(id);
         List<CostTapeDetail> detailList = costTapeDetailMapperExt.selectCostTapeOrderDetail(id);
         List<CostTapeList> costTapeListList = costTapeListMapperExt.selectCostTapeList(id);
+
+        if(!CollectionUtils.isEmpty(costTapeListList) && order!= null) {
+            String country = order.getCountry();
+            for (CostTapeList costTapeList : costTapeListList) {
+                if(costTapeList.getPid() == 0) {
+                    String partNumber = costTapeList.getPartNumber();
+                    if (!StringUtils.isEmpty(partNumber)) {
+                        List<Warranty> warrantyList = getWarrantyDataList(partNumber, country, redisTemplate, warrantyMapperExt);
+                        if (!CollectionUtils.isEmpty(warrantyList)) {
+                            costTapeList.setWarrantyList(warrantyList);
+                        }
+                    }
+                }
+            }
+        }
 
         if(order != null) {
             order.setCostTapeDetailList(detailList);
