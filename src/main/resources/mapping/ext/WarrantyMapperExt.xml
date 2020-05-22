@@ -45,7 +45,7 @@
     inner join machine_type_ph_mapping mpt on mpt.ph_code = pw.ph_code
     <where>
       <if test="partNumber != null">
-        and mpt.machineType = #{partNumber}
+        and mpt.machine_type = #{partNumber}
       </if>
       <if test="country != null">
         and w.country = #{country}

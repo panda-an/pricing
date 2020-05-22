@@ -72,7 +72,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                 costTapeExtList = costTapeMapperExt.getCostTapeData(costTape);
 
                 if(costTapeExtList.stream().map(CostTapeExt::getBrand).distinct().
-                        anyMatch(n -> n.equalsIgnoreCase("service") || n.equalsIgnoreCase("option ") || n.equalsIgnoreCase("thinkvision"))) {
+                        anyMatch(n -> n.equalsIgnoreCase("service") || n.equalsIgnoreCase("option") || n.equalsIgnoreCase("thinkvision"))) {
                     result = filterSameGeoList(costTapeExtList);
                 } else {
                     costTape.setType(null);
