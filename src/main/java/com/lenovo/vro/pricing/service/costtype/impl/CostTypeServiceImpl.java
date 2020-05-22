@@ -56,6 +56,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
         if(type.equals(CodeConfig.COST_TAPE)) {
             String region = costTape.getRegion();
             key = region + "-" + country + "-" + partNumber;
+            costTape.setType("1");
         } else {
             String plant = costTape.getPlant();
             String subGeo = costTape.getSubGeo();
@@ -69,13 +70,21 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
             List<CostTapeExt> costTapeExtList;
             if(type.equals(CodeConfig.COST_TAPE)) {
                 costTapeExtList = costTapeMapperExt.getCostTapeData(costTape);
+
+                if(costTapeExtList.stream().map(CostTapeExt::getBrand).distinct().
+                        anyMatch(n -> n.equalsIgnoreCase("service") || n.equalsIgnoreCase("option ") || n.equalsIgnoreCase("thinkvision"))) {
+                    result = filterSameGeoList(costTapeExtList);
+                } else {
+                    costTape.setType(null);
+                    costTapeExtList = costTapeMapperExt.getCostTapeData(costTape);
+                    costTapeExtList = filterDataGeo(costTapeExtList);
+                    result = filterResult(costTapeExtList, key, partNumber);
+                }
             } else {
                 costTapeExtList = costTapeMapperExt.getSbbData(costTape);
+                costTapeExtList = filterDataGeo(costTapeExtList);
+                result = filterResult(costTapeExtList, key, partNumber);
             }
-
-            costTapeExtList = costTapeExtList.stream().
-                    filter(n -> n.getGeo().equals(n.getSubGeo()) || n.getSubGeo().equals("ALL")).collect(Collectors.toList());
-            result = filterResult(costTapeExtList, key, partNumber);
         }
 
         if(type.equals(CodeConfig.COST_TAPE)) {
@@ -327,5 +336,10 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
         }
 
         return result;
+    }
+
+    private List<CostTapeExt> filterDataGeo(List<CostTapeExt> dataList) {
+        return dataList.stream().
+                filter(n -> n.getGeo().equals(n.getSubGeo()) || n.getSubGeo().equals("ALL")).collect(Collectors.toList());
     }
 }

@@ -30,12 +30,22 @@
     c.id, c.part_number, c.brand, c.plant, c.country, c.one, c.description as cost_description, c.subgeo, f.product_family, f.priority, f.sub_geo
   </sql>
 
+  <sql id="Base_Column_List1">
+    c.id, c.part_number, c.brand, c.plant, c.country, c.one, c.description as cost_description, c.subgeo, c.family as product_family
+  </sql>
+
   <sql id="Sbb_Column_List">
     c.id, c.part_number, c.one, c.description as warranty_description, c.subgeo, f.product_family, f.priority, f.sub_geo
   </sql>
 
   <select id="getCostTapeData" resultMap="BaseResultMap" parameterType="com.lenovo.vro.pricing.entity.CostTape">
-    select <include refid="Base_Column_List" />,
+    select
+    <if test='type != "1"'>
+      <include refid="Base_Column_List" />
+    </if>
+    <if test='type == "1"'>
+      <include refid="Base_Column_List1" />
+    </if>,
         case c.brand
         <!--when 'VLH' then 'ALL'
          when 'SERVICE' then 'ALL'
@@ -50,7 +60,9 @@
         when 'ThinkReality' then '1'
         else '0' end as category_type
     from margindb.cost_tape c
-    inner join margindb.cost_tape_family_mapping f on c.family = f.product_family and c.plant = f.plant
+    <if test='type != "1"'>
+      inner join margindb.cost_tape_family_mapping f on c.family = f.product_family and c.plant = f.plant
+    </if>
     left join margindb.cost_tape_country_mapping_region m on c.country = m.country
     <where>
       <if test="partNumber != null">

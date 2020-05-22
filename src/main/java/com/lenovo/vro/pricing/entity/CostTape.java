@@ -18,6 +18,8 @@ public class CostTape {
 
     private String fulfilment;
 
+    private String type;
+
     public String getCountry() {
         return country;
     }
@@ -80,5 +82,13 @@ public class CostTape {
 
     public void setFulfilment(String fulfilment) {
         this.fulfilment = fulfilment;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
