@@ -38,6 +38,6 @@ public class JwtRefreshSuccessHandler implements AuthenticationSuccessHandler {
 
     protected boolean shouldTokenRefresh(Date issueAt){
         LocalDateTime issueTime = LocalDateTime.ofInstant(issueAt.toInstant(), ZoneId.systemDefault());
-        return LocalDateTime.now().minusSeconds(tokenRefreshInterval).isAfter(issueTime);
+        return LocalDateTime.now().plusSeconds(tokenRefreshInterval).isAfter(issueTime);
     }
 }
