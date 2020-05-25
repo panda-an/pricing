@@ -783,7 +783,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         }
 
         cell = row.createCell(5);
-        cell.setCellValue(data.getTotalBmcGpPercentWocc()!=null?data.getTotalBmcGpPercentWocc().multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":"");
+        cell.setCellValue(data.getTotalBmcGpPercentWocc()!=null?data.getTotalBmcGpPercentWocc().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":"");
 
         cell = row.createCell(6);
         if(data.getTotalTmcGpUsdWocc() == null) {
@@ -793,7 +793,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         }
 
         cell = row.createCell(7);
-        cell.setCellValue(data.getTotalTmcGpPercentWocc()!=null?data.getTotalTmcGpPercentWocc().multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":"");
+        cell.setCellValue(data.getTotalTmcGpPercentWocc()!=null?data.getTotalTmcGpPercentWocc().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":"");
 
 
         cell = row.createCell(8);
@@ -804,6 +804,6 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         }
 
         cell = row.createCell(9);
-        cell.setCellValue(data.getTotalTmcGpPercentCc()!=null?data.getTotalTmcGpPercentCc().multiply(BigDecimal.valueOf(100)).doubleValue()+"%":"");
+        cell.setCellValue(data.getTotalTmcGpPercentCc()!=null?data.getTotalTmcGpPercentCc().doubleValue()+"%":"");
     }
 }

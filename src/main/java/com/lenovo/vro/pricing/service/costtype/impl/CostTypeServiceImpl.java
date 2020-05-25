@@ -328,6 +328,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
             case "Visual":
                 result = "Visual";
                 break;
+            case "OPTION":
             case "Option":
                 result = "Option";
                 break;
