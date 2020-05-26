@@ -10,6 +10,7 @@ import com.lenovo.vro.pricing.service.costtype.CostTypeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -332,5 +333,29 @@ public class PricingController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @PostMapping("/changeTransportType")
+    public ResponseBean changeTransportType(@RequestBody List<AirCostForm> list) {
+        ResponseBean bean = new ResponseBean();
+
+        if(CollectionUtils.isEmpty(list)) {
+            bean.setCode(CodeConfig.OPERATION_FAILED);
+            bean.setMsg("The parameter id is empty!");
+            return bean;
+        }
+
+        try{
+            List<TransportCost> result = costTypeService.changeTransportType(list);
+            bean.setObj(result);
+            bean.setCode(CodeConfig.OPERATION_SUCCESS);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            bean.setCode(CodeConfig.OPERATION_FAILED);
+            bean.setMsg("query transport cost has error");
+            e.printStackTrace();
+        }
+
+        return bean;
     }
 }

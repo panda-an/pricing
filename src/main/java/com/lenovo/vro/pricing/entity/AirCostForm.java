@@ -6,6 +6,12 @@ public class AirCostForm {
 
     private String country;
 
+    private String brand;
+
+    private String type;
+
+    private String partNumber;
+
     public String getMachineType() {
         return machineType;
     }
@@ -20,5 +26,29 @@ public class AirCostForm {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getPartNumber() {
+        return partNumber;
+    }
+
+    public void setPartNumber(String partNumber) {
+        this.partNumber = partNumber;
     }
 }

@@ -74,6 +74,9 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                 if(costTapeExtList.stream().map(CostTapeExt::getBrand).distinct().
                         anyMatch(n -> n.equalsIgnoreCase("service") || n.equalsIgnoreCase("option") || n.equalsIgnoreCase("thinkvision"))) {
                     result = filterSameGeoList(costTapeExtList);
+                    if(result != null) {
+                        redisTemplate.opsForHash().put(COST_DATA, key, result);
+                    }
                 } else {
                     costTape.setType(null);
                     costTapeExtList = costTapeMapperExt.getCostTapeData(costTape);
@@ -100,9 +103,10 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
             if(costTape.getFulfilment().equals(CodeConfig.FULFILMENT_AIR)) {
                 if(result != null && partNumber.length() > 4) {
                     String machineType = partNumber.substring(0, 4);
-                    setAirCost(country, machineType, result);
+                    setAirCost(country, machineType, result, costTape.getFulfilment());
                 }
             } else {
+                // Ocean is all 0
                 if(result != null)
                     result.setAirCost(BigDecimal.ZERO);
             }
@@ -241,20 +245,59 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
         return regionCountryRebateList;
     }
 
-    private void setAirCost(String country, String machineType, CostTapeExt result) {
+    @Override
+    public List<TransportCost> changeTransportType(List<AirCostForm> list) {
+        List<TransportCost> resultList = new ArrayList<>();
+
+        for(AirCostForm form : list) {
+            String country = form.getCountry();
+            String type = form.getType();
+            String partNumber = form.getPartNumber();
+            String brand = form.getBrand();
+
+            if(!StringUtils.isEmpty(country) && !StringUtils.isEmpty(type)
+                    &&!StringUtils.isEmpty(partNumber) &&!StringUtils.isEmpty(brand)) {
+                String machineType = partNumber.substring(0, 4);
+                String key = country + "-" + machineType + "-" + type;
+
+                TransportCost transportCost = new TransportCost();
+                AirCost cost;
+                if(redisTemplate.opsForHash().hasKey("airCost", key)) {
+                    cost = (AirCost) redisTemplate.opsForHash().get("airCost", key);
+                    transportCost.setPartNumber(partNumber);
+                    transportCost.setCost(cost!=null?cost.getCost():BigDecimal.ZERO);
+                    resultList.add(transportCost);
+                } else {
+                    cost = getAirCost(country, brand, machineType, key);
+                    transportCost.setPartNumber(partNumber);
+                    transportCost.setCost(cost!=null?cost.getCost():BigDecimal.ZERO);
+                    resultList.add(transportCost);
+                }
+            }
+        }
+
+        return resultList;
+    }
+
+    private void setAirCost(String country, String machineType, CostTapeExt result, String fulfilment) {
+        String key = country + "-" + machineType + "-" + fulfilment;
+
+        AirCost airCost = getAirCost(country, result.getBrand(), machineType, key);
+        if(airCost == null) {
+            result.setAirCost(BigDecimal.ZERO);
+        } else {
+            result.setAirCost(airCost.getCost());
+        }
+    }
+
+    private AirCost getAirCost(String country, String brand, String machineType, String key) {
+        if(redisTemplate.opsForHash().hasKey("airCost", key)) {
+            return (AirCost) redisTemplate.opsForHash().get("airCost", key);
+        }
+
         AirCostForm form = new AirCostForm();
         form.setCountry(country);
         form.setMachineType(machineType);
-
-        String key = country + "-" + machineType;
-
-        if(redisTemplate.opsForHash().hasKey("airCost", key)) {
-            AirCost airCost = (AirCost) redisTemplate.opsForHash().get("airCost", key);
-            if(airCost != null) {
-                result.setAirCost(airCost.getCost());
-                return;
-            }
-        }
 
         AirCost airCost = airCostMapperExt.getCostTapeAirCost1(form);
         if(airCost == null) {
@@ -269,20 +312,21 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                 subType = null;
             }
 
+            AirCost aForm = new AirCost();
+            aForm.setCountry(country);
+
             if(!StringUtils.isEmpty(subType)) {
-                AirCost aForm = new AirCost();
-                aForm.setCountry(country);
                 aForm.setType(subType);
 
                 AirCost subAirCost = airCostMapperExt.getCostTapeAirCost2(aForm);
 
                 if(subAirCost != null) {
-                    result.setAirCost(subAirCost.getCost());
                     redisTemplate.opsForHash().put("airCost", key, subAirCost);
+
+                    return subAirCost;
                 } else {
-                    String brand = result.getBrand();
                     if(StringUtils.isEmpty(brand)) {
-                        result.setAirCost(BigDecimal.ZERO);
+                        return null;
                     } else {
                         String mappingType = getTypeByBrand(brand);
                         aForm.setCountry(country);
@@ -291,33 +335,32 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                         subAirCost = airCostMapperExt.getCostTapeAirCost2(aForm);
 
                         if(subAirCost != null) {
-                            result.setAirCost(subAirCost.getCost());
                             redisTemplate.opsForHash().put("airCost", key, subAirCost);
+
+                            return subAirCost;
                         } else {
-                            result.setAirCost(BigDecimal.ZERO);
+                            return null;
                         }
                     }
                 }
             } else {
-                String brand = result.getBrand();
                 String mappingType = getTypeByBrand(brand);
-
-                AirCost aForm = new AirCost();
-                aForm.setCountry(country);
                 aForm.setType(mappingType);
 
                 AirCost subAirCost = airCostMapperExt.getCostTapeAirCost2(aForm);
 
                 if(subAirCost != null) {
-                    result.setAirCost(subAirCost.getCost());
                     redisTemplate.opsForHash().put("airCost", key, subAirCost);
+
+                    return subAirCost;
                 } else {
-                    result.setAirCost(BigDecimal.ZERO);
+                    return null;
                 }
             }
         } else {
-            result.setAirCost(airCost.getCost());
             redisTemplate.opsForHash().put("airCost", key, airCost);
+
+            return airCost;
         }
     }
 

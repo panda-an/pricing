@@ -1,8 +1,6 @@
 package com.lenovo.vro.pricing.service.costtype;
 
-import com.lenovo.vro.pricing.entity.CostTape;
-import com.lenovo.vro.pricing.entity.RegionCountryRebate;
-import com.lenovo.vro.pricing.entity.Warranty;
+import com.lenovo.vro.pricing.entity.*;
 import com.lenovo.vro.pricing.entity.ext.CostTapeExt;
 
 import java.util.List;
@@ -17,4 +15,5 @@ public interface CostTypeService {
 
     List<RegionCountryRebate> getRebateByCountry(String country);
 
+    List<TransportCost> changeTransportType(List<AirCostForm> list);
 }
