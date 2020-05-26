@@ -335,6 +335,11 @@ public class PricingController {
         }
     }
 
+    /**
+     * 切换 transport type
+     * @param list cost tape data
+     * @return list for transport cost
+     */
     @PostMapping("/changeTransportType")
     public ResponseBean changeTransportType(@RequestBody List<AirCostForm> list) {
         ResponseBean bean = new ResponseBean();

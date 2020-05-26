@@ -12,6 +12,7 @@
     <result column="product_family" jdbcType="VARCHAR" property="productFamily" />
     <result column="geo" jdbcType="VARCHAR" property="geo" />
     <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="brand" jdbcType="VARCHAR" property="brand" />
     <result column="bmc" jdbcType="DECIMAL" property="bmc" />
     <result column="nbmc" jdbcType="DECIMAL" property="nbmc" />
     <result column="tmc" jdbcType="DECIMAL" property="tmc" />
@@ -27,7 +28,7 @@
 
   <sql id="Base_Column_List">
     cost_id, id, pid, part_number, warranty_code, plant, country, product_family, geo,
-    description, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, tmc_percent,
+    description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, tmc_percent,
     type, category_type
   </sql>
 
@@ -35,8 +36,8 @@
     insert into cost_tape_list (cost_id, id, pid,
       part_number, warranty_code, plant,
       country, product_family, geo,
-      description, bmc, nbmc,
-      tmc, qty, pricing,
+      description, brand, bmc,
+      nbmc, tmc, qty, pricing,
       air_cost, fundings, adj_cost,
       tmc_percent, `type`, category_type)
     values
@@ -44,8 +45,8 @@
       (#{item.costId,jdbcType=INTEGER}, #{item.id,jdbcType=INTEGER}, #{item.pid,jdbcType=INTEGER},
       #{item.partNumber,jdbcType=VARCHAR}, #{item.warrantyCode,jdbcType=VARCHAR}, #{item.plant,jdbcType=VARCHAR},
       #{item.country,jdbcType=VARCHAR}, #{item.productFamily,jdbcType=VARCHAR}, #{item.geo,jdbcType=VARCHAR},
-      #{item.description,jdbcType=VARCHAR}, #{item.bmc,jdbcType=DECIMAL}, #{item.nbmc,jdbcType=DECIMAL},
-      #{item.tmc,jdbcType=DECIMAL}, #{item.qty,jdbcType=INTEGER}, #{item.pricing,jdbcType=DECIMAL},
+      #{item.description,jdbcType=VARCHAR}, #{item.brand,jdbcType=VARCHAR}, #{item.bmc,jdbcType=DECIMAL},
+      #{item.nbmc,jdbcType=DECIMAL}, #{item.tmc,jdbcType=DECIMAL}, #{item.qty,jdbcType=INTEGER}, #{item.pricing,jdbcType=DECIMAL},
       #{item.airCost,jdbcType=DECIMAL}, #{item.fundings,jdbcType=DECIMAL}, #{item.adjCost,jdbcType=DECIMAL},
       #{item.tmcPercent,jdbcType=DECIMAL}, #{item.type,jdbcType=VARCHAR}, #{item.categoryType,jdbcType=VARCHAR})
     </foreach>

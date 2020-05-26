@@ -122,7 +122,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
     @Override
     public List<String> getCountryList(String region) throws Exception {
         if(!StringUtils.isEmpty(region)) {
-            String key = "country - " + region;
+            String key = "country-" + region;
             //noinspection ConstantConditions
             if(stringRedisTemplate.hasKey(key)) {
                 return stringRedisTemplate.opsForList().range(key, 0, -1);
@@ -264,15 +264,16 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                 AirCost cost;
                 if(redisTemplate.opsForHash().hasKey("airCost", key)) {
                     cost = (AirCost) redisTemplate.opsForHash().get("airCost", key);
-                    transportCost.setPartNumber(partNumber);
-                    transportCost.setCost(cost!=null?cost.getCost():BigDecimal.ZERO);
-                    resultList.add(transportCost);
                 } else {
-                    cost = getAirCost(country, brand, machineType, key);
-                    transportCost.setPartNumber(partNumber);
-                    transportCost.setCost(cost!=null?cost.getCost():BigDecimal.ZERO);
-                    resultList.add(transportCost);
+                    if(type.equals(CodeConfig.FULFILMENT_AIR)) {
+                        cost = getAirCost(country, brand, machineType, key);
+                    } else {
+                        cost = null;
+                    }
                 }
+                transportCost.setPartNumber(partNumber);
+                transportCost.setCost(cost!=null?cost.getCost():BigDecimal.ZERO);
+                resultList.add(transportCost);
             }
         }
 

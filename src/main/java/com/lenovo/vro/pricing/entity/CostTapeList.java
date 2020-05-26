@@ -21,6 +21,8 @@ public class CostTapeList extends CostTapeListKey {
 
     private String description;
 
+    private String brand;
+
     private BigDecimal bmc;
 
     private BigDecimal nbmc;
@@ -109,6 +111,14 @@ public class CostTapeList extends CostTapeListKey {
 
     public void setDescription(String description) {
         this.description = description == null ? null : description.trim();
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand == null ? null : brand.trim();
     }
 
     public BigDecimal getBmc() {
@@ -206,6 +216,7 @@ public class CostTapeList extends CostTapeListKey {
     public void setInsertTime(Date insertTime) {
         this.insertTime = insertTime;
     }
+
 
     public List<Warranty> getWarrantyList() {
         return warrantyList;
