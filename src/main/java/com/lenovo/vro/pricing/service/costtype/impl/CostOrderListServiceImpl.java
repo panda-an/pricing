@@ -285,7 +285,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         row = sheet.createRow(index);
         cell = row.createCell(0);
         cell.setCellStyle(style);
-        cell.setCellValue("Fulfilment: ");
+        cell.setCellValue("MOT: ");
 
         cell = row.createCell(1);
         cell.setCellValue(data.getFulfilment());
@@ -625,7 +625,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
                     cell.setCellStyle(defaultStyle);
 
                     cell = row.createCell(10);
-                    cell.setCellValue(data.getTmcPercent()!=null?data.getTmcPercent().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
+                    cell.setCellValue(data.getTmcPercent()!=null?data.getTmcPercent().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":BigDecimal.ZERO.doubleValue()+"%");
                     if(data.getTmcPercent()!=null && data.getTmcPercent().doubleValue() < 0) {
                         cell.setCellStyle(redStyle);
                     } else {

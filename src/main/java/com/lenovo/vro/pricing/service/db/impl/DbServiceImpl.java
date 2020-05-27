@@ -2,8 +2,12 @@ package com.lenovo.vro.pricing.service.db.impl;
 
 import com.google.common.collect.Lists;
 import com.lenovo.vro.pricing.configuration.CodeConfig;
+import com.lenovo.vro.pricing.entity.CostTapeEo;
+import com.lenovo.vro.pricing.entity.CostTapeGsc;
 import com.lenovo.vro.pricing.entity.FutureBean;
 import com.lenovo.vro.pricing.entity.Warranty;
+import com.lenovo.vro.pricing.mapper.ext.CostTapeEoMapperExt;
+import com.lenovo.vro.pricing.mapper.ext.CostTapeGscMapperExt;
 import com.lenovo.vro.pricing.mapper.ext.WarrantyMapperExt;
 import com.lenovo.vro.pricing.service.BaseService;
 import com.lenovo.vro.pricing.service.async.AsyncThreadProcess;
@@ -50,6 +54,12 @@ public class DbServiceImpl extends BaseService implements DbService {
 
     @Autowired
     private WarrantyMapperExt warrantyMapperExt;
+
+    @Autowired
+    private CostTapeGscMapperExt costTapeGscMapperExt;
+
+    @Autowired
+    private CostTapeEoMapperExt costTapeEoMapperExt;
 
     @Autowired
     private AsyncThreadProcess asyncThreadProcess;
@@ -185,8 +195,268 @@ public class DbServiceImpl extends BaseService implements DbService {
 
     }
 
+    @Override
+    public String insertEo() throws FileNotFoundException {
+        logger.info("************ Start load cost tape eo mapping data ************");
+        final String FILE_PATH = "C:\\ftp\\data\\price_mapping\\eo\\";
+        Path path = Paths.get(FILE_PATH);
+        if(!Files.exists(path) || !Files.isDirectory(path)) {
+            logger.error("Cant not find cost tape eo mapping data directory: {}", FILE_PATH);
+            throw new FileNotFoundException("Cant not find cost tape eo mapping data directory!");
+        }
+
+        List<String> resultList = new ArrayList<>();
+
+        String fileName = "";
+        try {
+            Stream<Path> fileList = Files.walk(path, 7);
+            List<Path> list = fileList.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
+
+            if(!CollectionUtils.isEmpty(list)) {
+                rollbackCostTapeEoData();
+            }
+
+            for(Path p : list) {
+                fileName = p.toFile().getName();
+                logger.info("Start load warranty data file: {}", fileName);
+
+                String resultCode = loadCostTapeEoFile(p.toFile());
+                resultList.add(resultCode);
+
+                if(resultCode.equals(CodeConfig.OPERATION_SUCCESS)) {
+                    //Files.delete(p);
+                    logger.info("Load cost tape eo mapping data file: {} success", fileName);
+                } else {
+                    logger.error("Load cost tape eo mapping data file: {} error", fileName);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Load cost tape eo mapping File: {} Error", fileName);
+            resultList.add(CodeConfig.OPERATION_FAILED);
+        }
+
+        if(resultList.stream().anyMatch(n -> n.equals(CodeConfig.OPERATION_FAILED))) {
+            logger.info("************ End load cost tape eo mapping data ************");
+            return CodeConfig.OPERATION_FAILED;
+        } else {
+            logger.info("************ End load cost tape eo mapping data ************");
+            return CodeConfig.OPERATION_SUCCESS;
+        }
+    }
+
+    private String loadCostTapeEoFile(File file) {
+        String resultCode = "";
+
+        try (OPCPackage opcPackage = OPCPackage.open(file)) {
+
+            XSSFReader reader = new XSSFReader(opcPackage);
+            SharedStringsTable sharedStringsTable = reader.getSharedStringsTable();
+            StylesTable stylesTable = reader.getStylesTable();
+            XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+            CostTapeEoSheetHandler handler = new CostTapeEoSheetHandler();
+            XSSFSheetXMLHandler xmlHandler = new XSSFSheetXMLHandler(stylesTable, sharedStringsTable, handler, new DataFormatter(), false);
+            xmlReader.setContentHandler(xmlHandler);
+            XSSFReader.SheetIterator sheetIterator = (XSSFReader.SheetIterator) reader.getSheetsData();
+
+            while (sheetIterator.hasNext()) {
+                InputStream in = sheetIterator.next();
+                InputSource source = new InputSource(in);
+                xmlReader.parse(source);
+
+                List<CostTapeEo> dataList = handler.getDataList();
+                resultCode = insertCostTapeEoMappingDb(dataList);
+                in.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            resultCode = CodeConfig.OPERATION_FAILED;
+            logger.error("Read cost tape eo mapping data file {} error", file.getName());
+            logger.error(e.getMessage());
+        } catch (OpenXML4JException | SAXException e) {
+            logger.error("Read cost tape eo mapping data file {} error!", file.getName());
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            resultCode = CodeConfig.OPERATION_FAILED;
+        }
+
+        return resultCode;
+    }
+
+    private String insertCostTapeEoMappingDb(List<CostTapeEo> dataList) {
+        List<List<CostTapeEo>> warrantyDataList = Lists.partition(dataList, CodeConfig.LIST_NUMBER);
+
+        List<Future<FutureBean>> futureList = new ArrayList<>();
+        CountDownLatch countDownLatch = new CountDownLatch(warrantyDataList.size());
+
+        boolean allDone = true;
+
+        try {
+            for (List<CostTapeEo> list : warrantyDataList) {
+                Future<FutureBean> future = asyncThreadProcess.processCostTapeEoThread(costTapeEoMapperExt, list, countDownLatch);
+                futureList.add(future);
+            }
+
+            countDownLatch.await();
+
+            for(Future<FutureBean> future : futureList) {
+                FutureBean bean = future.get();
+                String status = bean.getStatus();
+                if(StringUtils.isEmpty(status) || status.equalsIgnoreCase(CodeConfig.OPERATION_FAILED)) {
+                    allDone = false;
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            allDone = false;
+        }
+
+        if(!allDone) {
+            logger.error("Load cost tape eo mapping file Data Completed But Has Error, Will Roll back, Please Check Log");
+
+            rollbackCostTapeEoData();
+            return CodeConfig.OPERATION_FAILED;
+        } else {
+            return CodeConfig.OPERATION_SUCCESS;
+        }
+    }
+
+    @Override
+    public String insertGsc() throws FileNotFoundException {
+        logger.info("************ Start load cost tape gsc mapping data ************");
+        final String FILE_PATH = "C:\\ftp\\data\\price_mapping\\gsc\\";
+        Path path = Paths.get(FILE_PATH);
+        if(!Files.exists(path) || !Files.isDirectory(path)) {
+            logger.error("Cant not find cost tape gsc mapping data directory: {}", FILE_PATH);
+            throw new FileNotFoundException("Cant not find cost tape gsc mapping data directory!");
+        }
+
+        List<String> resultList = new ArrayList<>();
+
+        String fileName = "";
+        try {
+            Stream<Path> fileList = Files.walk(path, 7);
+            List<Path> list = fileList.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
+
+            if(!CollectionUtils.isEmpty(list)) {
+                rollbackCostTapeGscData();
+            }
+
+            for(Path p : list) {
+                fileName = p.toFile().getName();
+                logger.info("Start load cost tape gsc mapping data file: {}", fileName);
+
+                String resultCode = loadCostTapeGscFile(p.toFile());
+                resultList.add(resultCode);
+
+                if(resultCode.equals(CodeConfig.OPERATION_SUCCESS)) {
+                    //Files.delete(p);
+                    logger.info("Load cost tape gsc mapping data file: {} success", fileName);
+                } else {
+                    logger.error("Load cost tape gsc mapping data file: {} error", fileName);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Load cost tape gsc mapping File: {} Error", fileName);
+            resultList.add(CodeConfig.OPERATION_FAILED);
+        }
+
+        if(resultList.stream().anyMatch(n -> n.equals(CodeConfig.OPERATION_FAILED))) {
+            logger.info("************ End load cost tape gsc mapping data ************");
+            return CodeConfig.OPERATION_FAILED;
+        } else {
+            logger.info("************ End load cost tape gsc mapping data ************");
+            return CodeConfig.OPERATION_SUCCESS;
+        }
+    }
+
+    private String loadCostTapeGscFile(File file) {
+        String resultCode = "";
+
+        try (OPCPackage opcPackage = OPCPackage.open(file)) {
+
+            XSSFReader reader = new XSSFReader(opcPackage);
+            SharedStringsTable sharedStringsTable = reader.getSharedStringsTable();
+            StylesTable stylesTable = reader.getStylesTable();
+            XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+            CostTapeGscSheetHandler handler = new CostTapeGscSheetHandler();
+            XSSFSheetXMLHandler xmlHandler = new XSSFSheetXMLHandler(stylesTable, sharedStringsTable, handler, new DataFormatter(), false);
+            xmlReader.setContentHandler(xmlHandler);
+            XSSFReader.SheetIterator sheetIterator = (XSSFReader.SheetIterator) reader.getSheetsData();
+
+            while (sheetIterator.hasNext()) {
+                InputStream in = sheetIterator.next();
+                InputSource source = new InputSource(in);
+                xmlReader.parse(source);
+
+                List<CostTapeGsc> dataList = handler.getDataList();
+                resultCode = insertCostTapeGscMappingDb(dataList);
+                in.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            resultCode = CodeConfig.OPERATION_FAILED;
+            logger.error("Read cost tape gsc mapping data file {} error", file.getName());
+            logger.error(e.getMessage());
+        } catch (OpenXML4JException | SAXException e) {
+            logger.error("Read cost tape gsc mapping data file {} error!", file.getName());
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            resultCode = CodeConfig.OPERATION_FAILED;
+        }
+
+        return resultCode;
+    }
+
+    private String insertCostTapeGscMappingDb(List<CostTapeGsc> dataList) {
+        List<List<CostTapeGsc>> warrantyDataList = Lists.partition(dataList, CodeConfig.LIST_NUMBER);
+
+        List<Future<FutureBean>> futureList = new ArrayList<>();
+        CountDownLatch countDownLatch = new CountDownLatch(warrantyDataList.size());
+
+        boolean allDone = true;
+
+        try {
+            for (List<CostTapeGsc> list : warrantyDataList) {
+                Future<FutureBean> future = asyncThreadProcess.processCostTapeGscThread(costTapeGscMapperExt, list, countDownLatch);
+                futureList.add(future);
+            }
+
+            countDownLatch.await();
+
+            for(Future<FutureBean> future : futureList) {
+                FutureBean bean = future.get();
+                String status = bean.getStatus();
+                if(StringUtils.isEmpty(status) || status.equalsIgnoreCase(CodeConfig.OPERATION_FAILED)) {
+                    allDone = false;
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            allDone = false;
+        }
+
+        if(!allDone) {
+            logger.error("Load cost tape gsc mapping file Data Completed But Has Error, Will Roll back, Please Check Log");
+
+            rollbackCostTapeEoData();
+            return CodeConfig.OPERATION_FAILED;
+        } else {
+            return CodeConfig.OPERATION_SUCCESS;
+        }
+    }
+
     private void rollbackWarrantyData() {
         warrantyMapperExt.deleteAll();
+    }
+
+    private void rollbackCostTapeEoData() {
+        costTapeEoMapperExt.deleteAll();
+    }
+
+    private void rollbackCostTapeGscData() {
+        costTapeGscMapperExt.deleteAll();
     }
 
     public class WarrantySheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler{
@@ -245,6 +515,109 @@ public class DbServiceImpl extends BaseService implements DbService {
                         break;
                     case "J":
                         warranty.setNbmc(StringUtils.isEmpty(formattedValue)?null:new BigDecimal(formattedValue));
+                        break;
+                }
+            }
+        }
+    }
+
+    public class CostTapeEoSheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler{
+
+        private CostTapeEo costTapeEo;
+        private List<CostTapeEo> dataList;
+
+        Date date = getInsertDate();
+
+        private List<CostTapeEo> getDataList() {
+            return dataList;
+        }
+
+        @Override
+        public void startRow(int rowNum) {
+            if(rowNum > 0) {
+                costTapeEo = new CostTapeEo();
+                costTapeEo.setInsertTime(date);
+            }
+        }
+
+        @Override
+        public void endRow(int rowNum) {
+            if(dataList == null) {
+                dataList = new ArrayList<>();
+            }
+
+            if(costTapeEo != null) {
+                dataList.add(costTapeEo);
+            }
+        }
+
+        @Override
+        public void cell(String cellReference, String formattedValue, XSSFComment comment) {
+            if(costTapeEo != null) {
+                String prefix = cellReference.replaceAll("\\d+", "");
+
+                switch (prefix) {
+                    case "A":
+                        costTapeEo.setBrand(formattedValue);
+                        break;
+                    case "B":
+                        costTapeEo.setSubgeo(formattedValue);
+                        break;
+                    case "D":
+                        costTapeEo.setNbmc(StringUtils.isEmpty(formattedValue)?null:new BigDecimal(formattedValue));
+                        break;
+                }
+            }
+        }
+    }
+
+    public class CostTapeGscSheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler{
+
+        private CostTapeGsc costTapeGsc;
+        private List<CostTapeGsc> dataList;
+
+        Date date = getInsertDate();
+
+        private List<CostTapeGsc> getDataList() {
+            return dataList;
+        }
+
+        @Override
+        public void startRow(int rowNum) {
+            if(rowNum > 0) {
+                costTapeGsc = new CostTapeGsc();
+                costTapeGsc.setInsertTime(date);
+            }
+        }
+
+        @Override
+        public void endRow(int rowNum) {
+            if(dataList == null) {
+                dataList = new ArrayList<>();
+            }
+
+            if(costTapeGsc != null) {
+                dataList.add(costTapeGsc);
+            }
+        }
+
+        @Override
+        public void cell(String cellReference, String formattedValue, XSSFComment comment) {
+            if(costTapeGsc != null) {
+                String prefix = cellReference.replaceAll("\\d+", "");
+
+                switch (prefix) {
+                    case "B":
+                        costTapeGsc.setBrand(formattedValue);
+                        break;
+                    case "C":
+                        costTapeGsc.setFamily(formattedValue);
+                        break;
+                    case "D":
+                        costTapeGsc.setCountry(formattedValue);
+                        break;
+                    case "G":
+                        costTapeGsc.setNbmc(StringUtils.isEmpty(formattedValue)?null:new BigDecimal(formattedValue));
                         break;
                 }
             }

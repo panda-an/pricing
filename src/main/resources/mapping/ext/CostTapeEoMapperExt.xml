@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.CostTapeEoMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeEo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="brand" jdbcType="VARCHAR" property="brand" />
+    <result column="subgeo" jdbcType="VARCHAR" property="subgeo" />
+    <result column="nbmc" jdbcType="DECIMAL" property="nbmc" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, brand, subgeo, nbmc
+  </sql>
+
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into cost_tape_eo (id, brand, subgeo, 
+      nbmc)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+    (null, #{item.brand,jdbcType=VARCHAR}, #{item.subgeo,jdbcType=VARCHAR},
+      #{item.nbmc,jdbcType=DECIMAL})
+    </foreach>
+  </insert>
+
+  <update id="deleteAll">
+    truncate cost_tape_eo
+  </update>
+
+</mapper>

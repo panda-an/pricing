@@ -8,7 +8,7 @@ spring:
       filters: stat
       driver-class-name: com.mysql.cj.jdbc.Driver
       #基本属性
-      url: jdbc:mysql://127.0.0.1:3306/margindb?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&&rewriteBatchedStatements=true&serverTimezone=GMT%2B8
+      url: jdbc:mysql://10.122.61.153:3306/margindb?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&&rewriteBatchedStatements=true&serverTimezone=GMT%2B8
       username: root
       password: 123456
       #配置初始化大小/最小/最大
@@ -38,7 +38,7 @@ spring:
     # Redis服务器连接端口
     port: 6379
     # Redis服务器连接密码（默认为空）
-    password: panda123
+    password: 123456789
     # 链接超时时间 单位 ms（毫秒）
     timeout: 6000
     ################ Redis 线程池设置 ##############

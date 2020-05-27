@@ -39,7 +39,7 @@
   </select>
 
   <select id="selectMtmWarrantyByPh" parameterType="com.lenovo.vro.pricing.entity.Warranty" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List" />
+    select distinct <include refid="Base_Column_List" />
     from warranty w
     inner join ph_warranty_mapping pw on w.warranty_code = pw.warranty_code
     inner join machine_type_ph_mapping mpt on mpt.ph_code = pw.ph_code

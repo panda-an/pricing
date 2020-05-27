@@ -90,9 +90,9 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
             }
         }
 
-        if(type.equals(CodeConfig.COST_TAPE)) {
+        if(type.equals(CodeConfig.COST_TAPE) && result != null) {
             // warranty - nbmc
-            if(result != null && partNumber.length() > 4) {
+            if(partNumber.length() > 4) {
                 List<Warranty> warrantyList = getWarrantyDataList(partNumber, country, redisTemplate, warrantyMapperExt);
                 if(!CollectionUtils.isEmpty(warrantyList)) {
                     resultMap.put("warranty", warrantyList);
@@ -101,14 +101,13 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
 
             // air cost
             if(costTape.getFulfilment().equals(CodeConfig.FULFILMENT_AIR)) {
-                if(result != null && partNumber.length() > 4) {
+                if(partNumber.length() > 4) {
                     String machineType = partNumber.substring(0, 4);
                     setAirCost(country, machineType, result, costTape.getFulfilment());
                 }
             } else {
                 // Ocean is all 0
-                if(result != null)
-                    result.setAirCost(BigDecimal.ZERO);
+                result.setAirCost(BigDecimal.ZERO);
             }
         }
 

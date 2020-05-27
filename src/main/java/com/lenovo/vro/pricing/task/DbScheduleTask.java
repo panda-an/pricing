@@ -43,4 +43,42 @@ public class DbScheduleTask {
         logger.info("End schedule for insertWarranty");
     }
 
+    @Scheduled(cron = "0 35 20 * * ? ")
+    public void insertCostTapeEo() {
+        logger.info("Start schedule for insertCostTapeEo");
+        String code1 = "";
+        try {
+            code1 = dbService.insertEo();
+            if(code1.equals(CodeConfig.OPERATION_FAILED)) {
+                logger.error("Can not load cost tape eo mapping data file!");
+            } else {
+                logger.info("Load cost tape eo mapping data file process success!");
+            }
+        } catch (FileNotFoundException e) {
+            logger.error("Can not load cost tape eo mapping data file!");
+            e.printStackTrace();
+        }
+
+        logger.info("End schedule for insertCostTapeEo");
+    }
+
+    @Scheduled(cron = "0 37 20 * * ? ")
+    public void insertCostTapeGsc() {
+        logger.info("Start schedule for insertCostTapeGsc");
+        String code1 = "";
+        try {
+            code1 = dbService.insertGsc();
+            if(code1.equals(CodeConfig.OPERATION_FAILED)) {
+                logger.error("Can not load cost tape gsc mapping data file!");
+            } else {
+                logger.info("Load cost tape gsc mapping data file process success!");
+            }
+        } catch (FileNotFoundException e) {
+            logger.error("Can not load cost tape gsc mapping data file!");
+            e.printStackTrace();
+        }
+
+        logger.info("End schedule for insertCostTapeGsc");
+    }
+
 }
