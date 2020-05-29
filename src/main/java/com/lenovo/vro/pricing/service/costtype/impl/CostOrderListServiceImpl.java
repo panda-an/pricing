@@ -666,7 +666,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         setDetailTitleProcess(index, sheet, titleStyle);
         ++index;
 
-        int[] row1 = new int[]{index+1, index+2};
+        int[] row1 = new int[]{index, index+1};
 
         index = index + 3;
         row = sheet.createRow(index);
@@ -681,7 +681,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         setDetailTitleProcess(index, sheet, titleStyle);
         ++index;
 
-        int[] row2 = new int[]{index+1, index+2};
+        int[] row2 = new int[]{index, index+1};
 
         Map<String, int[]> resultMap = new HashMap<>();
         resultMap.put("1", row1);
