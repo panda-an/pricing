@@ -3,6 +3,7 @@
 <mapper namespace="com.lenovo.vro.pricing.mapper.CostTapeGscMapper">
   <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeGsc">
     <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
     <result column="brand" jdbcType="VARCHAR" property="brand" />
     <result column="family" jdbcType="VARCHAR" property="family" />
     <result column="country" jdbcType="VARCHAR" property="country" />
@@ -10,7 +11,7 @@
     <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, brand, family, country, nbmc, insert_time
+    id, `type`, brand, family, country, nbmc, insert_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -23,18 +24,21 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.CostTapeGsc">
-    insert into cost_tape_gsc (id, brand, family, 
-      country, nbmc, insert_time
-      )
-    values (#{id,jdbcType=INTEGER}, #{brand,jdbcType=VARCHAR}, #{family,jdbcType=VARCHAR}, 
-      #{country,jdbcType=VARCHAR}, #{nbmc,jdbcType=DECIMAL}, #{insertTime,jdbcType=TIMESTAMP}
-      )
+    insert into cost_tape_gsc (id, `type`, brand,
+      family, country, nbmc, 
+      insert_time)
+    values (#{id,jdbcType=INTEGER}, #{type,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR}, 
+      #{family,jdbcType=VARCHAR}, #{country,jdbcType=VARCHAR}, #{nbmc,jdbcType=DECIMAL}, 
+      #{insertTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeGsc">
     insert into cost_tape_gsc
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
+      </if>
+      <if test="type != null">
+        `type`,
       </if>
       <if test="brand != null">
         brand,
@@ -56,6 +60,9 @@
       <if test="id != null">
         #{id,jdbcType=INTEGER},
       </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
       <if test="brand != null">
         #{brand,jdbcType=VARCHAR},
       </if>
@@ -76,6 +83,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeGsc">
     update cost_tape_gsc
     <set>
+      <if test="type != null">
+        `type` = #{type,jdbcType=VARCHAR},
+      </if>
       <if test="brand != null">
         brand = #{brand,jdbcType=VARCHAR},
       </if>
@@ -96,7 +106,8 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeGsc">
     update cost_tape_gsc
-    set brand = #{brand,jdbcType=VARCHAR},
+    set `type` = #{type,jdbcType=VARCHAR},
+      brand = #{brand,jdbcType=VARCHAR},
       family = #{family,jdbcType=VARCHAR},
       country = #{country,jdbcType=VARCHAR},
       nbmc = #{nbmc,jdbcType=DECIMAL},

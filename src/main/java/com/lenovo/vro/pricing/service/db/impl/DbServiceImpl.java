@@ -596,7 +596,8 @@ public class DbServiceImpl extends BaseService implements DbService {
                 dataList = new ArrayList<>();
             }
 
-            if(costTapeGsc != null) {
+            if(costTapeGsc != null && !costTapeGsc.getCountry().equals("US") && !costTapeGsc.getCountry().equals("AT") &&
+                    !costTapeGsc.getCountry().equals("DE") && !costTapeGsc.getCountry().equals("GR")) {
                 dataList.add(costTapeGsc);
             }
         }
@@ -615,6 +616,9 @@ public class DbServiceImpl extends BaseService implements DbService {
                         break;
                     case "D":
                         costTapeGsc.setCountry(formattedValue);
+                        break;
+                    case "F":
+                        costTapeGsc.setType(formattedValue);
                         break;
                     case "G":
                         costTapeGsc.setNbmc(StringUtils.isEmpty(formattedValue)?null:new BigDecimal(formattedValue));

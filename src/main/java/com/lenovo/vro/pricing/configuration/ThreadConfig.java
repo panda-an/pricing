@@ -20,9 +20,9 @@ public class ThreadConfig {
     public Executor asyncServiceExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setThreadNamePrefix("async-service-");
-        executor.setCorePoolSize(12);
-        executor.setMaxPoolSize(24);
-        executor.setQueueCapacity(999);
+        executor.setCorePoolSize(6);
+        executor.setMaxPoolSize(12);
+        executor.setQueueCapacity(200);
         executor.setKeepAliveSeconds(60);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.setWaitForTasksToCompleteOnShutdown(true);

@@ -61,15 +61,20 @@
         when 'ThinkReality' then '1'
         else '0' end as category_type,
       case when eo.nbmc is not null then eo.nbmc else 0 end as enbmc,
-      case when gsc.nbmc is not null then gsc.nbmc else 0 end as gnbmc,
-    eo.nbmc + gsc.nbmc as nbmc
+      case when gsc1.nbmc is not null then gsc1.nbmc else 0 end as gnbmc,
+      case
+        when gsc2.nbmc is not null then (1-gsc1.nbmc/100)*c.one+eo.nbmc
+      else
+        eo.nbmc + gsc1.nbmc
+      end as nbmc
     from margindb.cost_tape c
     <if test='type != "1"'>
       inner join margindb.cost_tape_family_mapping f on c.family = f.product_family and c.plant = f.plant
     </if>
     left join margindb.cost_tape_country_mapping_region m on c.country = m.country
-    left join margindb.cost_tape_eo eo on eo.brand = c.brand and eo.subgeo = c.subgeo
-    left join margindb.cost_tape_gsc gsc on gsc.brand = c.brand and gsc.family = c.family and eo.subgeo = c.subgeo
+    left join (select brand, subgeo, max(nbmc) as nbmc from margindb.cost_tape_eo group by brand, subgeo) eo on eo.brand = c.brand and eo.subgeo = c.subgeo
+    left join (select `type`, brand, country, max(nbmc) as nbmc from margindb.cost_tape_gsc where `type` = 'US_DOLLAR' group by `type`, brand, country) gsc1 on gsc1.brand = c.brand and gsc1.country = c.country
+    left join (select `type`, brand, country, max(nbmc) as nbmc from margindb.cost_tape_gsc where `type` = 'PERCENTAGE' group by `type`, brand, country) gsc2 on gsc2.brand = c.brand and gsc2.country = c.country
     <where>
       <if test="partNumber != null">
         AND c.part_number = #{partNumber}

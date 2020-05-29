@@ -3,6 +3,7 @@
 <mapper namespace="com.lenovo.vro.pricing.mapper.ext.CostTapeGscMapperExt">
   <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeGsc">
     <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
     <result column="brand" jdbcType="VARCHAR" property="brand" />
     <result column="family" jdbcType="VARCHAR" property="family" />
     <result column="country" jdbcType="VARCHAR" property="country" />
@@ -10,16 +11,16 @@
   </resultMap>
 
   <sql id="Base_Column_List">
-    id, brand, family, country, nbmc
+    id, `type`, brand, family, country, nbmc
   </sql>
 
   <insert id="insertBatch" parameterType="java.util.List">
-    insert into cost_tape_gsc (id, brand, family, 
+    insert into cost_tape_gsc (id, `type`, brand, family,
       country, nbmc
       )
     values
     <foreach collection="list" item="item" index="index" separator=",">
-    (#{item.id,jdbcType=INTEGER}, #{item.brand,jdbcType=VARCHAR}, #{item.family,jdbcType=VARCHAR},
+    (#{item.id,jdbcType=INTEGER}, #{item.type,jdbcType=VARCHAR}, #{item.brand,jdbcType=VARCHAR}, #{item.family,jdbcType=VARCHAR},
       #{item.country,jdbcType=VARCHAR}, #{item.nbmc,jdbcType=DECIMAL})
     </foreach>
   </insert>

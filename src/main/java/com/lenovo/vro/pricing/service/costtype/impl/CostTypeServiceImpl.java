@@ -43,7 +43,6 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
     private StringRedisTemplate stringRedisTemplate;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final String COST_DATA = "cost_hash";
 
     @Override
     public Map<String, Object> getCostType(CostTape costTape, String type) throws Exception {
@@ -51,11 +50,14 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
 
         String partNumber = costTape.getPartNumber();
         String country = costTape.getCountry();
+        final String hashKey = "costTape" + "-" + country;
+
         CostTapeExt result;
         String key;
+
         if(type.equals(CodeConfig.COST_TAPE)) {
             String region = costTape.getRegion();
-            key = region + "-" + country + "-" + partNumber;
+            key = region + "-" + partNumber;
             costTape.setType("1");
         } else {
             String plant = costTape.getPlant();
@@ -64,8 +66,8 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
             key = subGeo + "-" + partNumber + "-" + plant + "-" + family;
         }
 
-        if(redisTemplate.opsForHash().hasKey(COST_DATA, key)) {
-            result = (CostTapeExt) redisTemplate.opsForHash().get(COST_DATA, key);
+        if(redisTemplate.opsForHash().hasKey(hashKey, key)) {
+            result = (CostTapeExt) redisTemplate.opsForHash().get(hashKey, key);
         } else {
             List<CostTapeExt> costTapeExtList;
             if(type.equals(CodeConfig.COST_TAPE)) {
@@ -75,18 +77,18 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                         anyMatch(n -> n.equalsIgnoreCase("service") || n.equalsIgnoreCase("option") || n.equalsIgnoreCase("thinkvision"))) {
                     result = filterSameGeoList(costTapeExtList);
                     if(result != null) {
-                        redisTemplate.opsForHash().put(COST_DATA, key, result);
+                        redisTemplate.opsForHash().put(hashKey, key, result);
                     }
                 } else {
                     costTape.setType(null);
                     costTapeExtList = costTapeMapperExt.getCostTapeData(costTape);
                     costTapeExtList = filterDataGeo(costTapeExtList);
-                    result = filterResult(costTapeExtList, key, partNumber);
+                    result = filterResult(costTapeExtList, key, partNumber, hashKey);
                 }
             } else {
                 costTapeExtList = costTapeMapperExt.getSbbData(costTape);
                 costTapeExtList = filterDataGeo(costTapeExtList);
-                result = filterResult(costTapeExtList, key, partNumber);
+                result = filterResult(costTapeExtList, key, partNumber, hashKey);
             }
         }
 
@@ -165,7 +167,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
         return dataList.stream().max(Comparator.comparing(CostTapeExt::getBmc)).orElse(null);
     }
 
-    private CostTapeExt filterResult(List<CostTapeExt> costTapeExtList, String key, String partNumber) throws Exception {
+    private CostTapeExt filterResult(List<CostTapeExt> costTapeExtList, String key, String partNumber, String hashKey) throws Exception {
         CostTapeExt result;
         if(!CollectionUtils.isEmpty(costTapeExtList) && costTapeExtList.size() > 1) {
             // family same
@@ -179,7 +181,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                             logger.error("Can not filter cost tape under same geo, priority for mtm: {}", partNumber);
                             throw new Exception("Can not filter cost tape");
                         } else {
-                            redisTemplate.opsForHash().put(COST_DATA, key, result);
+                            redisTemplate.opsForHash().put(hashKey, key, result);
                         }
                     } else {
                         // geo contains all and non-all
@@ -195,7 +197,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                             } else {
                                 result = sameGeoList.get(0);
                             }
-                            redisTemplate.opsForHash().put(COST_DATA, key, result);
+                            redisTemplate.opsForHash().put(hashKey, key, result);
                         } else {
                             logger.error("Same mtm found no 'ALL' value and diverse geos");
                             throw new Exception("Same mtm found no 'ALL' value and diverse geos");
@@ -210,7 +212,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                             logger.error("Cost tape is null for same geo diverse priority");
                             throw new Exception("Can not filter cost tape");
                         }
-                        redisTemplate.opsForHash().put(COST_DATA, key, result);
+                        redisTemplate.opsForHash().put(hashKey, key, result);
                     } else {
                         logger.error("Same mtm found diverse priority and geos");
                         throw new Exception("Same mtm found diverse priority and geos");
@@ -222,7 +224,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
             }
         } else if(!CollectionUtils.isEmpty(costTapeExtList) && costTapeExtList.size() == 1){
             result = costTapeExtList.get(0);
-            redisTemplate.opsForHash().put(COST_DATA, key, result);
+            redisTemplate.opsForHash().put(hashKey, key, result);
         } else {
             result = null;
         }

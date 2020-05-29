@@ -6,6 +6,8 @@ import java.util.Date;
 public class CostTapeGsc {
     private Integer id;
 
+    private String type;
+
     private String brand;
 
     private String family;
@@ -22,6 +24,14 @@ public class CostTapeGsc {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type == null ? null : type.trim();
     }
 
     public String getBrand() {
