@@ -59,7 +59,7 @@
                selectByExampleQueryId="false"></table>-->
         <table tableName="cost_tape_gsc" domainObjectName="CostTapeGsc" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>
-        <table tableName="cost_tape_eo" domainObjectName="CostTapeEo" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>
+<!--        <table tableName="cost_tape_eo" domainObjectName="CostTapeEo" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"></table>-->
     </context>
 </generatorConfiguration>

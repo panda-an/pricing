@@ -43,7 +43,7 @@ public class DbScheduleTask {
         logger.info("End schedule for insertWarranty");
     }
 
-    @Scheduled(cron = "0 35 20 * * ? ")
+    @Scheduled(cron = "0 0 2 2 * ? ")
     public void insertCostTapeEo() {
         logger.info("Start schedule for insertCostTapeEo");
         String code1 = "";
@@ -62,7 +62,7 @@ public class DbScheduleTask {
         logger.info("End schedule for insertCostTapeEo");
     }
 
-    @Scheduled(cron = "0 58 9 * * ? ")
+    @Scheduled(cron = "0 10 2 2 * ? ")
     public void insertCostTapeGsc() {
         logger.info("Start schedule for insertCostTapeGsc");
         String code1 = "";

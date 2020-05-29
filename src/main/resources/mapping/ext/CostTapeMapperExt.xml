@@ -63,7 +63,7 @@
       case when eo.nbmc is not null then eo.nbmc else 0 end as enbmc,
       case when gsc1.nbmc is not null then gsc1.nbmc else 0 end as gnbmc,
       case
-        when gsc2.nbmc is not null then (1-gsc1.nbmc/100)*c.one+eo.nbmc
+        when gsc2.nbmc is not null then (1-gsc2.nbmc/100)*c.one+eo.nbmc
       else
         eo.nbmc + gsc1.nbmc
       end as nbmc
