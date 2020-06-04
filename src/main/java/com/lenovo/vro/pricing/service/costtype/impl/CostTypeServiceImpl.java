@@ -50,6 +50,23 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    /**
+     *  查询costTape的方法，先查缓存，如果没有走db查询并放入缓存
+     *  缓存依据country区分包含costTape和sbb，使用 type区分。0为PC 1为sbb
+     *  costTape data的key是 region和partNumber组合，sbb data是 geo，partN，plant，family组合
+     *  operationType分 0和1， 0是正常操作 1是mbg操作
+     *  正常PC配置logic为：
+     *  1.先查brand =service，option，thinkvision的数据
+     *  2.没有1的情况再继续查询，多余1条要进行过滤
+     *
+     *  之后再计算warranty，freight的cost
+     *
+     * @param costTape 查询数据
+     * @param type costTape或者是sbb
+     * @param operationType 非mbg和mbg
+     * @return hashmap 包含costTape 和 warranty
+     * @throws Exception 各种异常
+     */
     @Override
     public Map<String, Object> getCostType(CostTape costTape, String type, String operationType) throws Exception {
         Map<String, Object> resultMap = new HashMap<>();
@@ -102,7 +119,6 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                     result = filterResult(costTapeExtList, key, partNumber, hashKey);
                 }
             } else {
-                // todo sbb function not confirmed
                 if(type.equals(CodeConfig.COST_TAPE)) {
                     costTapeExtList = costTapeMapperExt.getMbgCostTapeData(costTape);
                     result = filterSameGeoList(costTapeExtList);
@@ -111,7 +127,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                         redisTemplate.opsForHash().put(hashKey, key, result);
                     }
                 } else {
-                    // todo
+                    // todo sbb function not confirmed
                     result = null;
                 }
             }

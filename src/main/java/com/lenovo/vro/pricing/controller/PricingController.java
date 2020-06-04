@@ -79,14 +79,14 @@ public class PricingController {
      * @param subGeo subGeo
      * @return ResponseBean
      */
-    @GetMapping(value={"/getSbb/{mtm}/{plant}/{productFamily}/{subGeo}"})
-    public ResponseBean getSbb(@PathVariable String mtm, @PathVariable String plant, @PathVariable String productFamily,
-                               @PathVariable String subGeo) {
+    @GetMapping(value={"/getSbb/{mtm}/{country}/{plant}/{productFamily}/{subGeo}/{type}"})
+    public ResponseBean getSbb(@PathVariable String mtm, @PathVariable String country, @PathVariable String plant,
+                               @PathVariable String productFamily, @PathVariable String subGeo, @PathVariable String type) {
         ResponseBean bean = new ResponseBean();
 
         try {
             CostTape costTape = new CostTape();
-            if(StringUtils.isEmpty(mtm) || StringUtils.isEmpty(plant) ||
+            if(StringUtils.isEmpty(mtm) || StringUtils.isEmpty(plant) || StringUtils.isEmpty(country) ||
                     StringUtils.isEmpty(productFamily) || StringUtils.isEmpty(subGeo)) {
                 bean.setCode(CodeConfig.OPERATION_FAILED);
                 bean.setMsg("Parameter is empty");
@@ -97,7 +97,8 @@ public class PricingController {
             costTape.setPlant(plant);
             costTape.setProductFamily(productFamily);
             costTape.setSubGeo(subGeo);
-            Map<String, Object> map = costTypeService.getCostType(costTape, CodeConfig.SBB_TAPE, null);
+            costTape.setCountry(country);
+            Map<String, Object> map = costTypeService.getCostType(costTape, CodeConfig.SBB_TAPE, type);
             bean.setObj(map);
             bean.setCode(CodeConfig.OPERATION_SUCCESS);
         } catch (Exception e) {

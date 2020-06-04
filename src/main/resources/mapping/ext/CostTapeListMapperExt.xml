@@ -31,7 +31,7 @@
   <sql id="Base_Column_List">
     cost_id, id, pid, part_number, warranty_code, plant, country, product_family, geo,
     description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, rebate, mbg_freight_id,
-    tmc_percent, `type`, category_type
+    tmc_percent, `type`, category_type1
   </sql>
 
   <insert id="insertBatch" parameterType="java.util.List">
@@ -40,7 +40,7 @@
       country, product_family, geo,
       description, brand, bmc,
       nbmc, tmc, qty, pricing,
-      air_cost, fundings, adj_cost, rebate, mbg_freight_id
+      air_cost, fundings, adj_cost, rebate, mbg_freight_id,
       tmc_percent, `type`, category_type)
     values
     <foreach collection="list" item="item" index="index" separator=",">
