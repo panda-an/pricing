@@ -88,12 +88,12 @@ public class DbScheduleTask {
         try {
             code1 = dbService.insertMbgFreight();
             if(code1.equals(CodeConfig.OPERATION_FAILED)) {
-                logger.error("Can not load cost tape gsc mapping data file!");
+                logger.error("Can not load mbg freight cost data file!");
             } else {
-                logger.info("Load cost tape gsc mapping data file process success!");
+                logger.info("Load mbg freight cost data file process success!");
             }
         } catch (FileNotFoundException e) {
-            logger.error("Can not load cost tape gsc mapping data file!");
+            logger.error("Can not load mbg freight cost data file!");
             e.printStackTrace();
         }
 
