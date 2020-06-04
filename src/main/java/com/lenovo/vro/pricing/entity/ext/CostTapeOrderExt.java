@@ -8,15 +8,15 @@ import java.util.List;
 
 public class CostTapeOrderExt extends CostTapeOrder {
 
-    private List<CostTapeList> costTapeListList;
+    private List<CostTapeListExt> costTapeListList;
 
     private List<CostTapeDetail> costTapeDetailList;
 
-    public List<CostTapeList> getCostTapeListList() {
+    public List<CostTapeListExt> getCostTapeListList() {
         return costTapeListList;
     }
 
-    public void setCostTapeListList(List<CostTapeList> costTapeListList) {
+    public void setCostTapeListList(List<CostTapeListExt> costTapeListList) {
         this.costTapeListList = costTapeListList;
     }
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.MbgWarrantyCostMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.MbgWarrantyCost">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="year" jdbcType="VARCHAR" property="year" />
+    <result column="nbmc" jdbcType="DECIMAL" property="nbmc" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    w.id, w.`type`, w.`year`, w.nbmc
+  </sql>
+
+  <select id="getWarrantyByRegion" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from mbg_warranty_cost w
+    inner join margindb.region_country_mapping c on c.id = w.region
+    where c.region = #{region,jdbcType=VARCHAR}
+  </select>
+
+</mapper>

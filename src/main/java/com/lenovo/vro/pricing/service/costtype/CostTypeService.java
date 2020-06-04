@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 public interface CostTypeService {
-    Map<String, Object> getCostType(CostTape costTape, String type) throws Exception;
+    Map<String, Object> getCostType(CostTape costTape, String type, String operationType) throws Exception;
 
     List<String> getCountryList(String region) throws Exception;
+
+    List<MbgWarrantyCost> getMbgWarrantyCostList(String region) throws Exception;
 
     Warranty getWarranty(String country, String warrantyCode) throws Exception;
 

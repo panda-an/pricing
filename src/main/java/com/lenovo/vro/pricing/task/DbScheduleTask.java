@@ -81,4 +81,22 @@ public class DbScheduleTask {
         logger.info("End schedule for insertCostTapeGsc");
     }
 
+    @Scheduled(cron = "0 53 12 * * ? ")
+    public void insertMbgFreightCost() {
+        logger.info("Start schedule for insertMbgFreightCost");
+        String code1 = "";
+        try {
+            code1 = dbService.insertMbgFreight();
+            if(code1.equals(CodeConfig.OPERATION_FAILED)) {
+                logger.error("Can not load cost tape gsc mapping data file!");
+            } else {
+                logger.info("Load cost tape gsc mapping data file process success!");
+            }
+        } catch (FileNotFoundException e) {
+            logger.error("Can not load cost tape gsc mapping data file!");
+            e.printStackTrace();
+        }
+
+        logger.info("End schedule for insertMbgFreightCost");
+    }
 }

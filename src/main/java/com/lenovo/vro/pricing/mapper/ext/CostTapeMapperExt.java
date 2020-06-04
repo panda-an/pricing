@@ -9,4 +9,6 @@ public interface CostTapeMapperExt {
     List<CostTapeExt> getCostTapeData(CostTape costTape);
 
     List<CostTapeExt> getSbbData(CostTape costTape);
+
+    List<CostTapeExt> getMbgCostTapeData(CostTape costTape);
 }

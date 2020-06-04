@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,16 +36,19 @@ public class PricingController {
      * @param mtm part number
      * @param country country
      * @param region 登录用户region
+     * @param fulfilment 运输方式
+     * @param type 是mbg还是非mbg情况
      * @return ResponseBean
      */
-    @GetMapping(value={"/getCostType/{mtm}/{country}/{region}/{fulfilment}"})
+    @GetMapping(value={"/getCostType/{mtm}/{country}/{region}/{fulfilment}/{type}"})
     public ResponseBean getCostType(@PathVariable String mtm, @PathVariable String country,
-                                        @PathVariable String region, @PathVariable String fulfilment) {
+                                        @PathVariable String region, @PathVariable String fulfilment,
+                                        @PathVariable String type) {
         ResponseBean bean = new ResponseBean();
 
         try {
             CostTape costTape = new CostTape();
-            if(StringUtils.isEmpty(mtm) || StringUtils.isEmpty(country) ||StringUtils.isEmpty(region)) {
+            if(StringUtils.isEmpty(mtm) || StringUtils.isEmpty(country) ||StringUtils.isEmpty(region) || StringUtils.isEmpty(type)) {
                 bean.setCode(CodeConfig.OPERATION_FAILED);
                 bean.setMsg("Parameter is empty");
                 return bean;
@@ -54,7 +58,7 @@ public class PricingController {
             costTape.setCountry(country);
             costTape.setRegion(region);
             costTape.setFulfilment(fulfilment);
-            Map<String, Object> map = costTypeService.getCostType(costTape, CodeConfig.COST_TAPE);
+            Map<String, Object> map = costTypeService.getCostType(costTape, CodeConfig.COST_TAPE, type);
             bean.setObj(map);
             bean.setCode(CodeConfig.OPERATION_SUCCESS);
         } catch (Exception e) {
@@ -93,7 +97,7 @@ public class PricingController {
             costTape.setPlant(plant);
             costTape.setProductFamily(productFamily);
             costTape.setSubGeo(subGeo);
-            Map<String, Object> map = costTypeService.getCostType(costTape, CodeConfig.SBB_TAPE);
+            Map<String, Object> map = costTypeService.getCostType(costTape, CodeConfig.SBB_TAPE, null);
             bean.setObj(map);
             bean.setCode(CodeConfig.OPERATION_SUCCESS);
         } catch (Exception e) {
@@ -117,7 +121,13 @@ public class PricingController {
 
         try{
             List<String> listCountry = costTypeService.getCountryList(region);
-            bean.setObj(listCountry);
+            List<MbgWarrantyCost> mbgWarrantyCostList = costTypeService.getMbgWarrantyCostList(region);
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("country", listCountry);
+            map.put("mbgWarranty", mbgWarrantyCostList);
+
+            bean.setObj(map);
             bean.setCode(CodeConfig.OPERATION_SUCCESS);
         } catch (Exception e) {
             logger.error(e.getMessage());

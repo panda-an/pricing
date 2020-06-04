@@ -11,4 +11,6 @@ public interface DbService {
     String insertEo() throws FileNotFoundException;
 
     String insertGsc() throws FileNotFoundException;
+
+    String insertMbgFreight() throws FileNotFoundException;
 }

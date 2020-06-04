@@ -39,6 +39,10 @@
     c.id, c.part_number, c.one, c.description as warranty_description, c.subgeo, f.product_family, f.priority, f.sub_geo
   </sql>
 
+  <sql id="Mbg_Column_List">
+    c.id, c.part_number, c.one, c.description as cost_description, c.subgeo, c.family as product_family
+  </sql>
+
   <select id="getCostTapeData" resultMap="BaseResultMap" parameterType="com.lenovo.vro.pricing.entity.CostTape">
     select
     <if test='type != "1"'>
@@ -65,7 +69,7 @@
       case
         when gsc2.nbmc is not null then (1-gsc2.nbmc/100)*c.one+eo.nbmc
       else
-        eo.nbmc + gsc1.nbmc
+        case when gsc1.nbmc is not null then eo.nbmc + gsc1.nbmc else eo.nbmc end
       end as nbmc
     from margindb.cost_tape c
     <if test='type != "1"'>
@@ -93,11 +97,11 @@
     from margindb.cost_tape c
     inner join margindb.cost_tape_family_mapping f on c.family = f.product_family and c.plant = f.plant
     <where>
-      <if test="country != null">
-        AND c.country = #{country}
-      </if>
       <if test="partNumber != null">
         AND c.part_number = #{partNumber}
+      </if>
+      <if test="country != null">
+        AND c.country = #{country}
       </if>
       <if test="plant != null">
         AND c.plant = #{plant}
@@ -107,6 +111,19 @@
       </if>
       <if test="subGeo != null">
         AND c.subgeo = #{subGeo}
+      </if>
+    </where>
+  </select>
+
+  <select id="getMbgCostTapeData" parameterType="com.lenovo.vro.pricing.entity.CostTape" resultMap="BaseResultMap">
+    select <include refid="Mbg_Column_List" />
+    from margindb.cost_tape c
+    <where>
+      <if test="partNumber != null">
+        AND c.part_number = #{partNumber}
+      </if>
+      <if test="country != null">
+        AND c.country = #{country}
       </if>
     </where>
   </select>

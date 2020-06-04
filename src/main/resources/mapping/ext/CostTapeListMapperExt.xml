@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lenovo.vro.pricing.mapper.ext.CostTapeListMapperExt">
-  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeList">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.ext.CostTapeListExt">
     <id column="cost_id" jdbcType="INTEGER" property="costId" />
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="pid" jdbcType="INTEGER" property="pid" />
@@ -21,6 +21,8 @@
     <result column="air_cost" jdbcType="DECIMAL" property="airCost" />
     <result column="fundings" jdbcType="DECIMAL" property="fundings" />
     <result column="adj_cost" jdbcType="DECIMAL" property="adjCost" />
+    <result column="rebate" jdbcType="DECIMAL" property="rebate" />
+    <result column="mbg_freight_id" jdbcType="INTEGER" property="mbgFreightId" />
     <result column="tmc_percent" jdbcType="DECIMAL" property="tmcPercent" />
     <result column="type" jdbcType="VARCHAR" property="type" />
     <result column="category_type" jdbcType="VARCHAR" property="categoryType" />
@@ -28,8 +30,8 @@
 
   <sql id="Base_Column_List">
     cost_id, id, pid, part_number, warranty_code, plant, country, product_family, geo,
-    description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, tmc_percent,
-    type, category_type
+    description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, rebate, mbg_freight_id,
+    tmc_percent, `type`, category_type
   </sql>
 
   <insert id="insertBatch" parameterType="java.util.List">
@@ -38,7 +40,7 @@
       country, product_family, geo,
       description, brand, bmc,
       nbmc, tmc, qty, pricing,
-      air_cost, fundings, adj_cost,
+      air_cost, fundings, adj_cost, rebate, mbg_freight_id
       tmc_percent, `type`, category_type)
     values
     <foreach collection="list" item="item" index="index" separator=",">
@@ -47,8 +49,9 @@
       #{item.country,jdbcType=VARCHAR}, #{item.productFamily,jdbcType=VARCHAR}, #{item.geo,jdbcType=VARCHAR},
       #{item.description,jdbcType=VARCHAR}, #{item.brand,jdbcType=VARCHAR}, #{item.bmc,jdbcType=DECIMAL},
       #{item.nbmc,jdbcType=DECIMAL}, #{item.tmc,jdbcType=DECIMAL}, #{item.qty,jdbcType=INTEGER}, #{item.pricing,jdbcType=DECIMAL},
-      #{item.airCost,jdbcType=DECIMAL}, #{item.fundings,jdbcType=DECIMAL}, #{item.adjCost,jdbcType=DECIMAL},
-      #{item.tmcPercent,jdbcType=DECIMAL}, #{item.type,jdbcType=VARCHAR}, #{item.categoryType,jdbcType=VARCHAR})
+      #{item.airCost,jdbcType=DECIMAL}, #{item.fundings,jdbcType=DECIMAL}, #{item.adjCost,jdbcType=DECIMAL}, #{item.rebate,jdbcType=DECIMAL},
+      #{item.mbgFreightId,jdbcType=INTEGER}, #{item.tmcPercent,jdbcType=DECIMAL},
+      #{item.type,jdbcType=VARCHAR}, #{item.categoryType,jdbcType=VARCHAR})
     </foreach>
   </insert>
 

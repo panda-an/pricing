@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.MbgFreightCostMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.MbgFreightCost">
+    <id column="product_family" jdbcType="VARCHAR" property="productFamily" />
+    <id column="country" jdbcType="VARCHAR" property="country" />
+    <id column="mot" jdbcType="VARCHAR" property="mot" />
+    <result column="product_number" jdbcType="VARCHAR" property="productNumber" />
+    <result column="fee" jdbcType="DECIMAL" property="fee" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    product_family, country, mot, product_number, fee
+  </sql>
+
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into mbg_freight_cost (id, product_family, country, mot,
+      product_number, fee)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+    (null, #{item.productFamily,jdbcType=VARCHAR}, #{item.country,jdbcType=VARCHAR}, #{item.mot,jdbcType=VARCHAR},
+      #{item.productNumber,jdbcType=VARCHAR}, #{item.fee,jdbcType=DECIMAL})
+    </foreach>
+  </insert>
+
+  <update id="deleteAll">
+    truncate mbg_freight_cost;
+  </update>
+
+  <select id="getMbgFreightCost" parameterType="com.lenovo.vro.pricing.entity.MbgFreightCost" resultMap="BaseResultMap" >
+    select <include refid="Base_Column_List" />
+    from mbg_freight_cost
+    <where>
+      <if test="productFamily != null">
+        AND product_family = #{productFamily}
+      </if>
+      <if test="country != null">
+        AND country = #{country}
+      </if>
+      <if test="mot != null">
+        AND mot = #{mot}
+      </if>
+      <if test="productNumber != null">
+        AND product_number = #{productNumber}
+      </if>
+    </where>
+  </select>
+</mapper>

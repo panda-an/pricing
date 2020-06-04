@@ -21,6 +21,8 @@
     <result column="air_cost" jdbcType="DECIMAL" property="airCost" />
     <result column="fundings" jdbcType="DECIMAL" property="fundings" />
     <result column="adj_cost" jdbcType="DECIMAL" property="adjCost" />
+    <result column="rebate" jdbcType="DECIMAL" property="rebate" />
+    <result column="mbg_freight_id" jdbcType="INTEGER" property="mbgFreightId" />
     <result column="tmc_percent" jdbcType="DECIMAL" property="tmcPercent" />
     <result column="type" jdbcType="VARCHAR" property="type" />
     <result column="category_type" jdbcType="VARCHAR" property="categoryType" />
@@ -28,8 +30,8 @@
   </resultMap>
   <sql id="Base_Column_List">
     cost_id, id, pid, part_number, warranty_code, plant, country, product_family, geo, 
-    description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, tmc_percent, 
-    type, category_type, insert_time
+    description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, rebate, 
+    mbg_freight_id, tmc_percent, `type`, category_type, insert_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeListKey" resultMap="BaseResultMap">
     select 
@@ -50,16 +52,18 @@
       description, brand, bmc, 
       nbmc, tmc, qty, pricing, 
       air_cost, fundings, adj_cost, 
-      tmc_percent, `type`, category_type,
-      insert_time)
+      rebate, mbg_freight_id, tmc_percent, 
+      `type`, category_type, insert_time
+      )
     values (#{costId,jdbcType=INTEGER}, #{id,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER}, 
       #{partNumber,jdbcType=VARCHAR}, #{warrantyCode,jdbcType=VARCHAR}, #{plant,jdbcType=VARCHAR}, 
       #{country,jdbcType=VARCHAR}, #{productFamily,jdbcType=VARCHAR}, #{geo,jdbcType=VARCHAR}, 
       #{description,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR}, #{bmc,jdbcType=DECIMAL}, 
       #{nbmc,jdbcType=DECIMAL}, #{tmc,jdbcType=DECIMAL}, #{qty,jdbcType=INTEGER}, #{pricing,jdbcType=DECIMAL}, 
       #{airCost,jdbcType=DECIMAL}, #{fundings,jdbcType=DECIMAL}, #{adjCost,jdbcType=DECIMAL}, 
-      #{tmcPercent,jdbcType=DECIMAL}, #{type,jdbcType=VARCHAR}, #{categoryType,jdbcType=VARCHAR}, 
-      #{insertTime,jdbcType=TIMESTAMP})
+      #{rebate,jdbcType=DECIMAL}, #{mbgFreightId,jdbcType=INTEGER}, #{tmcPercent,jdbcType=DECIMAL}, 
+      #{type,jdbcType=VARCHAR}, #{categoryType,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeList">
     insert into cost_tape_list
@@ -120,6 +124,12 @@
       </if>
       <if test="adjCost != null">
         adj_cost,
+      </if>
+      <if test="rebate != null">
+        rebate,
+      </if>
+      <if test="mbgFreightId != null">
+        mbg_freight_id,
       </if>
       <if test="tmcPercent != null">
         tmc_percent,
@@ -192,6 +202,12 @@
       <if test="adjCost != null">
         #{adjCost,jdbcType=DECIMAL},
       </if>
+      <if test="rebate != null">
+        #{rebate,jdbcType=DECIMAL},
+      </if>
+      <if test="mbgFreightId != null">
+        #{mbgFreightId,jdbcType=INTEGER},
+      </if>
       <if test="tmcPercent != null">
         #{tmcPercent,jdbcType=DECIMAL},
       </if>
@@ -260,6 +276,12 @@
       <if test="adjCost != null">
         adj_cost = #{adjCost,jdbcType=DECIMAL},
       </if>
+      <if test="rebate != null">
+        rebate = #{rebate,jdbcType=DECIMAL},
+      </if>
+      <if test="mbgFreightId != null">
+        mbg_freight_id = #{mbgFreightId,jdbcType=INTEGER},
+      </if>
       <if test="tmcPercent != null">
         tmc_percent = #{tmcPercent,jdbcType=DECIMAL},
       </if>
@@ -295,6 +317,8 @@
       air_cost = #{airCost,jdbcType=DECIMAL},
       fundings = #{fundings,jdbcType=DECIMAL},
       adj_cost = #{adjCost,jdbcType=DECIMAL},
+      rebate = #{rebate,jdbcType=DECIMAL},
+      mbg_freight_id = #{mbgFreightId,jdbcType=INTEGER},
       tmc_percent = #{tmcPercent,jdbcType=DECIMAL},
       `type` = #{type,jdbcType=VARCHAR},
       category_type = #{categoryType,jdbcType=VARCHAR},

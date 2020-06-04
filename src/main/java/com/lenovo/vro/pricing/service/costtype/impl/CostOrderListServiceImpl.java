@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.lenovo.vro.pricing.configuration.CodeConfig;
 import com.lenovo.vro.pricing.entity.*;
+import com.lenovo.vro.pricing.entity.ext.CostTapeListExt;
 import com.lenovo.vro.pricing.entity.ext.CostTapeOrderExt;
 import com.lenovo.vro.pricing.entity.ext.CostTapeOrderForm;
 import com.lenovo.vro.pricing.mapper.ext.CostTapeDetailMapperExt;
@@ -68,11 +69,11 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
     public CostTapeOrderExt selectCostTapeOrderDetail(Integer id) {
         CostTapeOrderExt order = costTapeOrderMapperExt.selectByPrimaryKey(id);
         List<CostTapeDetail> detailList = costTapeDetailMapperExt.selectCostTapeOrderDetail(id);
-        List<CostTapeList> costTapeListList = costTapeListMapperExt.selectCostTapeList(id);
+        List<CostTapeListExt> costTapeListList = costTapeListMapperExt.selectCostTapeList(id);
 
         if(!CollectionUtils.isEmpty(costTapeListList) && order!= null) {
             String country = order.getCountry();
-            for (CostTapeList costTapeList : costTapeListList) {
+            for (CostTapeListExt costTapeList : costTapeListList) {
                 if(costTapeList.getPid() == 0) {
                     String partNumber = costTapeList.getPartNumber();
                     if (!StringUtils.isEmpty(partNumber)) {
@@ -113,7 +114,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         int id = insertDto.getId();
 
         if(id != 0) {
-            List<CostTapeList> costTapeListList = form.getCostTapeListList();
+            List<CostTapeListExt> costTapeListList = form.getCostTapeListList();
             List<CostTapeDetail> costTapeDetailList = form.getCostTapeDetailList();
 
             try{
@@ -148,7 +149,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         try {
             costTapeOrderMapperExt.updateByPrimaryKeySelective(updateDto);
 
-            List<CostTapeList> costTapeListList = form.getCostTapeListList();
+            List<CostTapeListExt> costTapeListList = form.getCostTapeListList();
             List<CostTapeDetail> costTapeDetailList = form.getCostTapeDetailList();
 
             if(!CollectionUtils.isEmpty(costTapeListList)) {
@@ -198,7 +199,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         index++;
 
         // list data
-        List<CostTapeList> costTapeListList = data.getCostTapeListList();
+        List<CostTapeListExt> costTapeListList = data.getCostTapeListList();
         if(!CollectionUtils.isEmpty(costTapeListList)) {
             List<List<CostTapeList>> dataList = new ArrayList<>();
             for(CostTapeList temp : costTapeListList) {

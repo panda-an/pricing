@@ -2,12 +2,10 @@ package com.lenovo.vro.pricing.service.db.impl;
 
 import com.google.common.collect.Lists;
 import com.lenovo.vro.pricing.configuration.CodeConfig;
-import com.lenovo.vro.pricing.entity.CostTapeEo;
-import com.lenovo.vro.pricing.entity.CostTapeGsc;
-import com.lenovo.vro.pricing.entity.FutureBean;
-import com.lenovo.vro.pricing.entity.Warranty;
+import com.lenovo.vro.pricing.entity.*;
 import com.lenovo.vro.pricing.mapper.ext.CostTapeEoMapperExt;
 import com.lenovo.vro.pricing.mapper.ext.CostTapeGscMapperExt;
+import com.lenovo.vro.pricing.mapper.ext.MbgFreightCostMapperExt;
 import com.lenovo.vro.pricing.mapper.ext.WarrantyMapperExt;
 import com.lenovo.vro.pricing.service.BaseService;
 import com.lenovo.vro.pricing.service.async.AsyncThreadProcess;
@@ -60,6 +58,9 @@ public class DbServiceImpl extends BaseService implements DbService {
 
     @Autowired
     private CostTapeEoMapperExt costTapeEoMapperExt;
+
+    @Autowired
+    private MbgFreightCostMapperExt mbgFreightCostMapperExt;
 
     @Autowired
     private AsyncThreadProcess asyncThreadProcess;
@@ -371,6 +372,132 @@ public class DbServiceImpl extends BaseService implements DbService {
         }
     }
 
+    @Override
+    public String insertMbgFreight() throws FileNotFoundException {
+        logger.info("************ Start load mbg freight cost data ************");
+        final String FILE_PATH = "C:\\ftp\\data\\mbg_freight\\";
+        Path path = Paths.get(FILE_PATH);
+        if(!Files.exists(path) || !Files.isDirectory(path)) {
+            logger.error("Cant not find mbg freight cost data directory: {}", FILE_PATH);
+            throw new FileNotFoundException("Cant not find mbg freight cost data directory!");
+        }
+
+        List<String> resultList = new ArrayList<>();
+
+        String fileName = "";
+        try {
+            Stream<Path> fileList = Files.walk(path, 7);
+            List<Path> list = fileList.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
+
+            if(!CollectionUtils.isEmpty(list)) {
+                rollbackCostTapeGscData();
+            }
+
+            for(Path p : list) {
+                fileName = p.toFile().getName();
+                logger.info("Start load mbg freight cost data file: {}", fileName);
+
+                String resultCode = loadMbgFreightCostFile(p.toFile());
+                resultList.add(resultCode);
+
+                if(resultCode.equals(CodeConfig.OPERATION_SUCCESS)) {
+                    //Files.delete(p);
+                    logger.info("Load mbg freight cost data file: {} success", fileName);
+                } else {
+                    logger.error("Load mbg freight cost data file: {} error", fileName);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Load mbg freight cost data File: {} Error", fileName);
+            resultList.add(CodeConfig.OPERATION_FAILED);
+        }
+
+        if(resultList.stream().anyMatch(n -> n.equals(CodeConfig.OPERATION_FAILED))) {
+            logger.info("************ End load mbg freight cost data ************");
+            return CodeConfig.OPERATION_FAILED;
+        } else {
+            logger.info("************ End load mbg freight cost data ************");
+            return CodeConfig.OPERATION_SUCCESS;
+        }
+    }
+
+    private String loadMbgFreightCostFile(File file) {
+        String resultCode = "";
+
+        try (OPCPackage opcPackage = OPCPackage.open(file)) {
+
+            XSSFReader reader = new XSSFReader(opcPackage);
+            SharedStringsTable sharedStringsTable = reader.getSharedStringsTable();
+            StylesTable stylesTable = reader.getStylesTable();
+            XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+            MbgFreightSheetHandler handler = new MbgFreightSheetHandler();
+            XSSFSheetXMLHandler xmlHandler = new XSSFSheetXMLHandler(stylesTable, sharedStringsTable, handler, new DataFormatter(), false);
+            xmlReader.setContentHandler(xmlHandler);
+            XSSFReader.SheetIterator sheetIterator = (XSSFReader.SheetIterator) reader.getSheetsData();
+
+            while (sheetIterator.hasNext()) {
+                InputStream in = sheetIterator.next();
+                InputSource source = new InputSource(in);
+                xmlReader.parse(source);
+
+                List<MbgFreightCost> dataList = handler.getDataList();
+                resultCode = insertMbgFreightCostDb(dataList);
+                in.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            resultCode = CodeConfig.OPERATION_FAILED;
+            logger.error("Read mbg freight cost data file {} error", file.getName());
+            logger.error(e.getMessage());
+        } catch (OpenXML4JException | SAXException e) {
+            logger.error("Read mbg freight cost data file {} error!", file.getName());
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            resultCode = CodeConfig.OPERATION_FAILED;
+        }
+
+        return resultCode;
+    }
+
+    private String insertMbgFreightCostDb(List<MbgFreightCost> dataList) {
+        List<List<MbgFreightCost>> mbgFreightDataList = Lists.partition(dataList, CodeConfig.LIST_NUMBER);
+
+        List<Future<FutureBean>> futureList = new ArrayList<>();
+        CountDownLatch countDownLatch = new CountDownLatch(mbgFreightDataList.size());
+
+        boolean allDone = true;
+
+        try {
+            for (List<MbgFreightCost> list : mbgFreightDataList) {
+                Future<FutureBean> future = asyncThreadProcess.processMbgFreightCostThread(mbgFreightCostMapperExt, list, countDownLatch);
+                futureList.add(future);
+            }
+
+            countDownLatch.await();
+
+            for(Future<FutureBean> future : futureList) {
+                FutureBean bean = future.get();
+                String status = bean.getStatus();
+                if(StringUtils.isEmpty(status) || status.equalsIgnoreCase(CodeConfig.OPERATION_FAILED)) {
+                    allDone = false;
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            allDone = false;
+        }
+
+        if(!allDone) {
+            logger.error("Load mbg freight cost file Data Completed But Has Error, Will Roll back, Please Check Log");
+
+            rollbackMbgFreightCostData();
+            return CodeConfig.OPERATION_FAILED;
+        } else {
+            return CodeConfig.OPERATION_SUCCESS;
+        }
+    }
+
     private String loadCostTapeGscFile(File file) {
         String resultCode = "";
 
@@ -457,6 +584,10 @@ public class DbServiceImpl extends BaseService implements DbService {
 
     private void rollbackCostTapeGscData() {
         costTapeGscMapperExt.deleteAll();
+    }
+
+    private void rollbackMbgFreightCostData() {
+        mbgFreightCostMapperExt.deleteAll();
     }
 
     public class WarrantySheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler{
@@ -622,6 +753,70 @@ public class DbServiceImpl extends BaseService implements DbService {
                         break;
                     case "G":
                         costTapeGsc.setNbmc(StringUtils.isEmpty(formattedValue)?null:new BigDecimal(formattedValue));
+                        break;
+                }
+            }
+        }
+    }
+
+    public class MbgFreightSheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler{
+
+        private MbgFreightCost mbgFreightCost;
+        private List<MbgFreightCost> dataList;
+
+        Date date = getInsertDate();
+
+        private List<MbgFreightCost> getDataList() {
+            return dataList;
+        }
+
+        @Override
+        public void startRow(int rowNum) {
+            if(rowNum > 0) {
+                mbgFreightCost = new MbgFreightCost();
+                mbgFreightCost.setInsertTime(date);
+            }
+        }
+
+        @Override
+        public void endRow(int rowNum) {
+            if(dataList == null) {
+                dataList = new ArrayList<>();
+            }
+
+            if(mbgFreightCost != null && !StringUtils.isEmpty(mbgFreightCost.getMot())) {
+                dataList.add(mbgFreightCost);
+            }
+        }
+
+        @Override
+        public void cell(String cellReference, String formattedValue, XSSFComment comment) {
+            if(mbgFreightCost != null) {
+                String prefix = cellReference.replaceAll("\\d+", "");
+
+                switch (prefix) {
+                    case "A":
+                        mbgFreightCost.setProductFamily(formattedValue);
+                        break;
+                    case "B":
+                        mbgFreightCost.setProductNumber(formattedValue);
+                        break;
+                    case "D":
+                        mbgFreightCost.setCountry(formattedValue);
+                        break;
+                    case "E":
+                        if(formattedValue.equalsIgnoreCase("air")) {
+                            mbgFreightCost.setMot("1");
+                        } else if(formattedValue.equalsIgnoreCase("ocean")) {
+                            mbgFreightCost.setMot("0");
+                        } else if(formattedValue.equalsIgnoreCase("TRUCK")){
+                            mbgFreightCost.setMot("2");
+                        } else {
+                            mbgFreightCost.setMot("");
+                        }
+                        break;
+                    case "F":
+                        mbgFreightCost.setFee(StringUtils.isEmpty(formattedValue)?null:new BigDecimal(formattedValue));
                         break;
                 }
             }

@@ -37,6 +37,12 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
     private AirCostMapperExt airCostMapperExt;
 
     @Autowired
+    private MbgWarrantyCostMapperExt mbgWarrantyCostMapperExt;
+
+    @Autowired
+    private MbgFreightCostMapperExt mbgFreightCostMapperExt;
+
+    @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
@@ -45,7 +51,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public Map<String, Object> getCostType(CostTape costTape, String type) throws Exception {
+    public Map<String, Object> getCostType(CostTape costTape, String type, String operationType) throws Exception {
         Map<String, Object> resultMap = new HashMap<>();
 
         String partNumber = costTape.getPartNumber();
@@ -70,46 +76,86 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
             result = (CostTapeExt) redisTemplate.opsForHash().get(hashKey, key);
         } else {
             List<CostTapeExt> costTapeExtList;
-            if(type.equals(CodeConfig.COST_TAPE)) {
-                costTapeExtList = costTapeMapperExt.getCostTapeData(costTape);
+            if(operationType.equals("0")) {
+                if(type.equals(CodeConfig.COST_TAPE)) {
+                    costTapeExtList = costTapeMapperExt.getCostTapeData(costTape);
 
-                if(costTapeExtList.stream().map(CostTapeExt::getBrand).distinct().
-                        anyMatch(n -> n.equalsIgnoreCase("service") || n.equalsIgnoreCase("option") || n.equalsIgnoreCase("thinkvision"))) {
-                    result = filterSameGeoList(costTapeExtList);
-                    if(result != null) {
-                        redisTemplate.opsForHash().put(hashKey, key, result);
+                    if(costTapeExtList.stream().filter(n -> !StringUtils.isEmpty(n.getBrand())).map(CostTapeExt::getBrand).distinct().
+                            anyMatch(n -> n.equalsIgnoreCase("service") || n.equalsIgnoreCase("option")
+                                    || n.equalsIgnoreCase("thinkvision"))) {
+                        result = filterSameGeoList(costTapeExtList);
+                        if(result != null) {
+                            if(result.getBrand().equalsIgnoreCase("option")) {
+
+                            }
+                            redisTemplate.opsForHash().put(hashKey, key, result);
+                        }
+                    } else {
+                        costTape.setType(null);
+                        costTapeExtList = costTapeMapperExt.getCostTapeData(costTape);
+                        costTapeExtList = filterDataGeo(costTapeExtList);
+                        result = filterResult(costTapeExtList, key, partNumber, hashKey);
                     }
                 } else {
-                    costTape.setType(null);
-                    costTapeExtList = costTapeMapperExt.getCostTapeData(costTape);
+                    costTapeExtList = costTapeMapperExt.getSbbData(costTape);
                     costTapeExtList = filterDataGeo(costTapeExtList);
                     result = filterResult(costTapeExtList, key, partNumber, hashKey);
                 }
             } else {
-                costTapeExtList = costTapeMapperExt.getSbbData(costTape);
-                costTapeExtList = filterDataGeo(costTapeExtList);
-                result = filterResult(costTapeExtList, key, partNumber, hashKey);
+                // todo sbb function not confirmed
+                if(type.equals(CodeConfig.COST_TAPE)) {
+                    costTapeExtList = costTapeMapperExt.getMbgCostTapeData(costTape);
+                    result = filterSameGeoList(costTapeExtList);
+
+                    if(result != null) {
+                        redisTemplate.opsForHash().put(hashKey, key, result);
+                    }
+                } else {
+                    // todo
+                    result = null;
+                }
             }
+
         }
 
         if(type.equals(CodeConfig.COST_TAPE) && result != null) {
-            // warranty - nbmc
-            if(partNumber.length() > 4) {
+            // warranty - nbmc, mbg warranty cost has passed the value when the page is initialization
+            if(partNumber.length() > 4 && operationType.equals("0")) {
                 List<Warranty> warrantyList = getWarrantyDataList(partNumber, country, redisTemplate, warrantyMapperExt);
                 if(!CollectionUtils.isEmpty(warrantyList)) {
                     resultMap.put("warranty", warrantyList);
                 }
             }
 
-            // air cost
-            if(costTape.getFulfilment().equals(CodeConfig.FULFILMENT_AIR)) {
-                if(partNumber.length() > 4) {
-                    String machineType = partNumber.substring(0, 4);
-                    setAirCost(country, machineType, result, costTape.getFulfilment());
+            // non-mbg freight
+            if(operationType.equals("0")) {
+                // air cost
+                if(costTape.getFulfilment().equals(CodeConfig.FULFILMENT_AIR)) {
+                    if(partNumber.length() > 4) {
+                        String machineType = partNumber.substring(0, 4);
+                        setAirCost(country, machineType, result, costTape.getFulfilment());
+                    }
+                } else {
+                    // Ocean is all 0
+                    result.setAirCost(BigDecimal.ZERO);
                 }
             } else {
-                // Ocean is all 0
-                result.setAirCost(BigDecimal.ZERO);
+                // mbg freight
+                MbgFreightCost mbgForm = new MbgFreightCost();
+                mbgForm.setProductFamily(result.getProductFamily());
+                mbgForm.setCountry(country);
+                mbgForm.setMot(costTape.getFulfilment());
+                if(costTape.getPartNumber().startsWith("ZG")) {
+                    mbgForm.setProductNumber(costTape.getPartNumber());
+                }
+
+                List<MbgFreightCost> mbgFreightCostList = mbgFreightCostMapperExt.getMbgFreightCost(mbgForm);
+                MbgFreightCost mbgFreightCost;
+                if(!CollectionUtils.isEmpty(mbgFreightCostList)) {
+                    mbgFreightCost = mbgFreightCostList.stream().distinct().max(Comparator.comparing(MbgFreightCost::getFee)).orElse(null);
+
+                    result.setAirCost(mbgFreightCost==null?BigDecimal.ZERO:mbgFreightCost.getFee());
+                }
             }
         }
 
@@ -132,6 +178,25 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
             List<String> list = regionCountryMappingMapperExt.getCountryByRegion(region);
             if(!CollectionUtils.isEmpty(list)) {
                 stringRedisTemplate.opsForList().rightPushAll(key, list);
+            }
+
+            return list;
+        } else {
+            throw new Exception("Region is empty");
+        }
+    }
+
+    @Override
+    public List<MbgWarrantyCost> getMbgWarrantyCostList(String region) throws Exception {
+        if(!StringUtils.isEmpty(region)) {
+            final String key = "mbgWarranty";
+            if(redisTemplate.opsForHash().hasKey(key, region)) {
+                return (List<MbgWarrantyCost>) redisTemplate.opsForHash().get(key, region);
+            }
+
+            List<MbgWarrantyCost> list = mbgWarrantyCostMapperExt.getWarrantyByRegion(region);
+            if(!CollectionUtils.isEmpty(list)) {
+                redisTemplate.opsForHash().put(key, region, list);
             }
 
             return list;
@@ -167,6 +232,14 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
         return dataList.stream().max(Comparator.comparing(CostTapeExt::getBmc)).orElse(null);
     }
 
+    /**
+     * 具体的逻辑是： 分三种情况，
+     * 1当product family一样，subgeo一样，priority一样的时候取cost最高
+     * 2当product family一样， subgeo有ALL和非All的情况，priority一样选非all的
+     * 3当product family一样，subgeo一样，priority不一样选priority高的
+     *
+     * All non null data will store redis database
+     */
     private CostTapeExt filterResult(List<CostTapeExt> costTapeExtList, String key, String partNumber, String hashKey) throws Exception {
         CostTapeExt result;
         if(!CollectionUtils.isEmpty(costTapeExtList) && costTapeExtList.size() > 1) {
