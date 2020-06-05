@@ -4,9 +4,12 @@ import com.lenovo.vro.pricing.entity.CostTapeDetail;
 import com.lenovo.vro.pricing.entity.CostTapeList;
 import com.lenovo.vro.pricing.entity.CostTapeOrder;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class CostTapeOrderExt extends CostTapeOrder {
+
+    private BigDecimal rebateValue;
 
     private List<CostTapeListExt> costTapeListList;
 
@@ -28,4 +31,11 @@ public class CostTapeOrderExt extends CostTapeOrder {
         this.costTapeDetailList = costTapeDetailList;
     }
 
+    public BigDecimal getRebateValue() {
+        return rebateValue;
+    }
+
+    public void setRebateValue(BigDecimal rebateValue) {
+        this.rebateValue = rebateValue;
+    }
 }

@@ -21,7 +21,7 @@
     <result column="air_cost" jdbcType="DECIMAL" property="airCost" />
     <result column="fundings" jdbcType="DECIMAL" property="fundings" />
     <result column="adj_cost" jdbcType="DECIMAL" property="adjCost" />
-    <result column="rebate" jdbcType="DECIMAL" property="rebate" />
+    <result column="rebate" jdbcType="VARCHAR" property="rebate" />
     <result column="mbg_freight_id" jdbcType="INTEGER" property="mbgFreightId" />
     <result column="tmc_percent" jdbcType="DECIMAL" property="tmcPercent" />
     <result column="type" jdbcType="VARCHAR" property="type" />
@@ -31,7 +31,7 @@
   <sql id="Base_Column_List">
     cost_id, id, pid, part_number, warranty_code, plant, country, product_family, geo, 
     description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, rebate, 
-    mbg_freight_id, tmc_percent, `type`, category_type, insert_time
+    mbg_freight_id, tmc_percent, type, category_type, insert_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeListKey" resultMap="BaseResultMap">
     select 
@@ -53,7 +53,7 @@
       nbmc, tmc, qty, pricing, 
       air_cost, fundings, adj_cost, 
       rebate, mbg_freight_id, tmc_percent, 
-      `type`, category_type, insert_time
+      type, category_type, insert_time
       )
     values (#{costId,jdbcType=INTEGER}, #{id,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER}, 
       #{partNumber,jdbcType=VARCHAR}, #{warrantyCode,jdbcType=VARCHAR}, #{plant,jdbcType=VARCHAR}, 
@@ -61,7 +61,7 @@
       #{description,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR}, #{bmc,jdbcType=DECIMAL}, 
       #{nbmc,jdbcType=DECIMAL}, #{tmc,jdbcType=DECIMAL}, #{qty,jdbcType=INTEGER}, #{pricing,jdbcType=DECIMAL}, 
       #{airCost,jdbcType=DECIMAL}, #{fundings,jdbcType=DECIMAL}, #{adjCost,jdbcType=DECIMAL}, 
-      #{rebate,jdbcType=DECIMAL}, #{mbgFreightId,jdbcType=INTEGER}, #{tmcPercent,jdbcType=DECIMAL}, 
+      #{rebate,jdbcType=VARCHAR}, #{mbgFreightId,jdbcType=INTEGER}, #{tmcPercent,jdbcType=DECIMAL}, 
       #{type,jdbcType=VARCHAR}, #{categoryType,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -135,7 +135,7 @@
         tmc_percent,
       </if>
       <if test="type != null">
-        `type`,
+        type,
       </if>
       <if test="categoryType != null">
         category_type,
@@ -203,7 +203,7 @@
         #{adjCost,jdbcType=DECIMAL},
       </if>
       <if test="rebate != null">
-        #{rebate,jdbcType=DECIMAL},
+        #{rebate,jdbcType=VARCHAR},
       </if>
       <if test="mbgFreightId != null">
         #{mbgFreightId,jdbcType=INTEGER},
@@ -277,7 +277,7 @@
         adj_cost = #{adjCost,jdbcType=DECIMAL},
       </if>
       <if test="rebate != null">
-        rebate = #{rebate,jdbcType=DECIMAL},
+        rebate = #{rebate,jdbcType=VARCHAR},
       </if>
       <if test="mbgFreightId != null">
         mbg_freight_id = #{mbgFreightId,jdbcType=INTEGER},
@@ -286,7 +286,7 @@
         tmc_percent = #{tmcPercent,jdbcType=DECIMAL},
       </if>
       <if test="type != null">
-        `type` = #{type,jdbcType=VARCHAR},
+        type = #{type,jdbcType=VARCHAR},
       </if>
       <if test="categoryType != null">
         category_type = #{categoryType,jdbcType=VARCHAR},
@@ -317,10 +317,10 @@
       air_cost = #{airCost,jdbcType=DECIMAL},
       fundings = #{fundings,jdbcType=DECIMAL},
       adj_cost = #{adjCost,jdbcType=DECIMAL},
-      rebate = #{rebate,jdbcType=DECIMAL},
+      rebate = #{rebate,jdbcType=VARCHAR},
       mbg_freight_id = #{mbgFreightId,jdbcType=INTEGER},
       tmc_percent = #{tmcPercent,jdbcType=DECIMAL},
-      `type` = #{type,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
       category_type = #{categoryType,jdbcType=VARCHAR},
       insert_time = #{insertTime,jdbcType=TIMESTAMP}
     where cost_id = #{costId,jdbcType=INTEGER}

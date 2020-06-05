@@ -9,7 +9,6 @@ public class CostTapeListExt extends CostTapeList {
 
     private List<Warranty> warrantyList;
 
-
     public List<Warranty> getWarrantyList() {
         return warrantyList;
     }

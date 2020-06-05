@@ -16,7 +16,7 @@ public class CostTapeOrder {
 
     private BigDecimal exchangeRates;
 
-    private BigDecimal rebate;
+    private Integer rebate;
 
     private String fulfilment;
 
@@ -72,11 +72,11 @@ public class CostTapeOrder {
         this.exchangeRates = exchangeRates;
     }
 
-    public BigDecimal getRebate() {
+    public Integer getRebate() {
         return rebate;
     }
 
-    public void setRebate(BigDecimal rebate) {
+    public void setRebate(Integer rebate) {
         this.rebate = rebate;
     }
 

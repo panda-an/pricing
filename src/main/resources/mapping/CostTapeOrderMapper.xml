@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lenovo.vro.pricing.mapper.CostTapeOrderMapper">
-  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.ext.CostTapeOrderExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeOrder">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="order_name" jdbcType="VARCHAR" property="orderName" />
     <result column="region" jdbcType="VARCHAR" property="region" />
     <result column="country" jdbcType="VARCHAR" property="country" />
     <result column="local_currency" jdbcType="VARCHAR" property="localCurrency" />
     <result column="exchange_rates" jdbcType="DECIMAL" property="exchangeRates" />
-    <result column="rebate" jdbcType="DECIMAL" property="rebate" />
+    <result column="rebate" jdbcType="INTEGER" property="rebate" />
     <result column="fulfilment" jdbcType="VARCHAR" property="fulfilment" />
     <result column="user_id" jdbcType="VARCHAR" property="userId" />
     <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
@@ -34,10 +34,10 @@
       insert_time)
     values (#{id,jdbcType=INTEGER}, #{orderName,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, 
       #{country,jdbcType=VARCHAR}, #{localCurrency,jdbcType=VARCHAR}, #{exchangeRates,jdbcType=DECIMAL}, 
-      #{rebate,jdbcType=DECIMAL}, #{fulfilment,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, 
+      #{rebate,jdbcType=INTEGER}, #{fulfilment,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, 
       #{insertTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.lenovo.vro.pricing.entity.CostTapeOrder">
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.lenovo.vro.pricing.entity.CostTapeOrder">
     insert into cost_tape_order
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -91,7 +91,7 @@
         #{exchangeRates,jdbcType=DECIMAL},
       </if>
       <if test="rebate != null">
-        #{rebate,jdbcType=DECIMAL},
+        #{rebate,jdbcType=INTEGER},
       </if>
       <if test="fulfilment != null">
         #{fulfilment,jdbcType=VARCHAR},
@@ -123,7 +123,7 @@
         exchange_rates = #{exchangeRates,jdbcType=DECIMAL},
       </if>
       <if test="rebate != null">
-        rebate = #{rebate,jdbcType=DECIMAL},
+        rebate = #{rebate,jdbcType=INTEGER},
       </if>
       <if test="fulfilment != null">
         fulfilment = #{fulfilment,jdbcType=VARCHAR},
@@ -144,7 +144,7 @@
       country = #{country,jdbcType=VARCHAR},
       local_currency = #{localCurrency,jdbcType=VARCHAR},
       exchange_rates = #{exchangeRates,jdbcType=DECIMAL},
-      rebate = #{rebate,jdbcType=DECIMAL},
+      rebate = #{rebate,jdbcType=INTEGER},
       fulfilment = #{fulfilment,jdbcType=VARCHAR},
       user_id = #{userId,jdbcType=VARCHAR},
       insert_time = #{insertTime,jdbcType=TIMESTAMP}

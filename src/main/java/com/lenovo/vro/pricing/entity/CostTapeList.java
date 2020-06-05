@@ -38,7 +38,7 @@ public class CostTapeList extends CostTapeListKey {
 
     private BigDecimal adjCost;
 
-    private BigDecimal rebate;
+    private String rebate;
 
     private Integer mbgFreightId;
 
@@ -186,12 +186,12 @@ public class CostTapeList extends CostTapeListKey {
         this.adjCost = adjCost;
     }
 
-    public BigDecimal getRebate() {
+    public String getRebate() {
         return rebate;
     }
 
-    public void setRebate(BigDecimal rebate) {
-        this.rebate = rebate;
+    public void setRebate(String rebate) {
+        this.rebate = rebate == null ? null : rebate.trim();
     }
 
     public Integer getMbgFreightId() {

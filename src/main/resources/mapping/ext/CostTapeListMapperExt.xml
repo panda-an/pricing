@@ -21,7 +21,7 @@
     <result column="air_cost" jdbcType="DECIMAL" property="airCost" />
     <result column="fundings" jdbcType="DECIMAL" property="fundings" />
     <result column="adj_cost" jdbcType="DECIMAL" property="adjCost" />
-    <result column="rebate" jdbcType="DECIMAL" property="rebate" />
+    <result column="rebate" jdbcType="VARCHAR" property="rebate" />
     <result column="mbg_freight_id" jdbcType="INTEGER" property="mbgFreightId" />
     <result column="tmc_percent" jdbcType="DECIMAL" property="tmcPercent" />
     <result column="type" jdbcType="VARCHAR" property="type" />
@@ -31,7 +31,7 @@
   <sql id="Base_Column_List">
     cost_id, id, pid, part_number, warranty_code, plant, country, product_family, geo,
     description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, rebate, mbg_freight_id,
-    tmc_percent, `type`, category_type1
+    tmc_percent, `type`, category_type
   </sql>
 
   <insert id="insertBatch" parameterType="java.util.List">
@@ -49,7 +49,7 @@
       #{item.country,jdbcType=VARCHAR}, #{item.productFamily,jdbcType=VARCHAR}, #{item.geo,jdbcType=VARCHAR},
       #{item.description,jdbcType=VARCHAR}, #{item.brand,jdbcType=VARCHAR}, #{item.bmc,jdbcType=DECIMAL},
       #{item.nbmc,jdbcType=DECIMAL}, #{item.tmc,jdbcType=DECIMAL}, #{item.qty,jdbcType=INTEGER}, #{item.pricing,jdbcType=DECIMAL},
-      #{item.airCost,jdbcType=DECIMAL}, #{item.fundings,jdbcType=DECIMAL}, #{item.adjCost,jdbcType=DECIMAL}, #{item.rebate,jdbcType=DECIMAL},
+      #{item.airCost,jdbcType=DECIMAL}, #{item.fundings,jdbcType=DECIMAL}, #{item.adjCost,jdbcType=DECIMAL}, #{item.rebate,jdbcType=VARCHAR},
       #{item.mbgFreightId,jdbcType=INTEGER}, #{item.tmcPercent,jdbcType=DECIMAL},
       #{item.type,jdbcType=VARCHAR}, #{item.categoryType,jdbcType=VARCHAR})
     </foreach>

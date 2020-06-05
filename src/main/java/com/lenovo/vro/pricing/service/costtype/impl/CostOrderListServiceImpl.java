@@ -67,7 +67,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
 
     @Override
     public CostTapeOrderExt selectCostTapeOrderDetail(Integer id) {
-        CostTapeOrderExt order = costTapeOrderMapperExt.selectByPrimaryKey(id);
+        CostTapeOrderExt order = costTapeOrderMapperExt.selectById(id);
         List<CostTapeDetail> detailList = costTapeDetailMapperExt.selectCostTapeOrderDetail(id);
         List<CostTapeListExt> costTapeListList = costTapeListMapperExt.selectCostTapeList(id);
 
@@ -81,6 +81,13 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
                         if (!CollectionUtils.isEmpty(warrantyList)) {
                             costTapeList.setWarrantyList(warrantyList);
                         }
+                    }
+                }
+
+                if(country.equalsIgnoreCase("jp")) {
+                    String rebate = costTapeList.getRebate();
+                    if(!StringUtils.isEmpty(rebate) && rebate.contains("|")) {
+                        costTapeList.setRebate(rebate.split("\\|")[0]);
                     }
                 }
             }
@@ -269,7 +276,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         cell.setCellValue("Rebates: ");
 
         cell = row.createCell(1);
-        cell.setCellValue(data.getRebate().multiply(BigDecimal.valueOf(100)).doubleValue() + "%");
+        //cell.setCellValue(data.getRebate().multiply(BigDecimal.valueOf(100)).doubleValue() + "%");
         cell.setCellStyle(dataStyle);
 
         ++index;

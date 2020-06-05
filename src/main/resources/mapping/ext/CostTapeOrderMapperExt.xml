@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lenovo.vro.pricing.mapper.ext.CostTapeOrderMapperExt">
-  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeOrder">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.ext.CostTapeOrderExt">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="order_name" jdbcType="VARCHAR" property="orderName" />
     <result column="region" jdbcType="VARCHAR" property="region" />
     <result column="country" jdbcType="VARCHAR" property="country" />
     <result column="local_currency" jdbcType="VARCHAR" property="localCurrency" />
     <result column="exchange_rates" jdbcType="DECIMAL" property="exchangeRates" />
-    <result column="rebate" jdbcType="DECIMAL" property="rebate" />
+    <result column="rebateValue" jdbcType="DECIMAL" property="rebateValue" />
+    <result column="rebate" jdbcType="INTEGER" property="rebate" />
     <result column="fulfilment" jdbcType="VARCHAR" property="fulfilment" />
     <result column="user_id" jdbcType="VARCHAR" property="userId" />
-    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
   </resultMap>
-  <sql id="Base_Column_List">
-    id, order_name, region, country, local_currency, exchange_rates, rebate, user_id, fulfilment,
-    insert_time
+  <sql id="Order_Column_List">
+    cost.id, cost.order_name, cost.region, cost.country, cost.local_currency, cost.exchange_rates,
+    rebate.value as rebate_value, cost.rebate as rebate, cost.user_id, cost.fulfilment
   </sql>
+
+  <sql id="Base_Column_List">
+    id, order_name, region, country, local_currency, exchange_rates, rebate, fulfilment,
+    user_id, insert_time
+  </sql>
+
   <select id="selectCostTapeList" parameterType="com.lenovo.vro.pricing.entity.ext.CostTapeOrderForm" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
@@ -41,4 +47,12 @@
   <delete id="deleteCostTapeOrder" parameterType="java.lang.Integer">
     delete from cost_tape_order where id = #{id}
   </delete>
+
+  <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Order_Column_List" />
+    from cost_tape_order cost
+    left join margindb.region_country_rebate rebate on cost.rebate = rebate.id
+    where cost.id = #{id,jdbcType=INTEGER}
+  </select>
 </mapper>
