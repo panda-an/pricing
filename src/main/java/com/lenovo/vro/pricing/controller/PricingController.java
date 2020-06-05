@@ -286,7 +286,7 @@ public class PricingController {
         }
 
         try {
-            CostTapeOrderExt result = costOrderListService.selectCostTapeOrderDetail(id);
+            CostTapeOrderExt result = costOrderListService.selectCostTapeOrderDetail(id, "0");
             bean.setObj(result);
             bean.setCode(CodeConfig.OPERATION_SUCCESS);
         } catch (Exception e) {

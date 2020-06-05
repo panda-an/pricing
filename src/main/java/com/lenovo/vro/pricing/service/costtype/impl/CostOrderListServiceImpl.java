@@ -66,7 +66,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
     }
 
     @Override
-    public CostTapeOrderExt selectCostTapeOrderDetail(Integer id) {
+    public CostTapeOrderExt selectCostTapeOrderDetail(Integer id, String type) {
         CostTapeOrderExt order = costTapeOrderMapperExt.selectById(id);
         List<CostTapeDetail> detailList = costTapeDetailMapperExt.selectCostTapeOrderDetail(id);
         List<CostTapeListExt> costTapeListList = costTapeListMapperExt.selectCostTapeList(id);
@@ -84,7 +84,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
                     }
                 }
 
-                if(country.equalsIgnoreCase("jp")) {
+                if(country.equalsIgnoreCase("jp") && type.equalsIgnoreCase("0")) {
                     String rebate = costTapeList.getRebate();
                     if(!StringUtils.isEmpty(rebate) && rebate.contains("|")) {
                         costTapeList.setRebate(rebate.split("\\|")[0]);
@@ -188,7 +188,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
 
     @Override
     public void exportData(int id, HttpServletResponse response) {
-        CostTapeOrderExt costTapeOrderExt = selectCostTapeOrderDetail(id);
+        CostTapeOrderExt costTapeOrderExt = selectCostTapeOrderDetail(id, "1");
         exportDataProcess(costTapeOrderExt, response);
     }
 
@@ -202,7 +202,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         index++;
         // list title
         XSSFRow row = sheet.createRow(index);
-        setListTitle(wb, row);
+        setListTitle(wb, row, data);
         index++;
 
         // list data
@@ -219,7 +219,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
                 dataList.add(list);
             }
 
-            index = setCostTapeListData(wb, sheet, dataList, index);
+            index = setCostTapeListData(wb, data.getCountry(), sheet, dataList, index);
         }
 
         index++;
@@ -243,7 +243,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         }
     }
 
-    private Integer setInfoData(Integer index, XSSFWorkbook wb, XSSFSheet sheet, CostTapeOrder data) {
+    private Integer setInfoData(Integer index, XSSFWorkbook wb, XSSFSheet sheet, CostTapeOrderExt data) {
         IndexedColorMap colorMap = wb.getStylesSource().getIndexedColors();
 
         XSSFCellStyle style = wb.createCellStyle();
@@ -269,15 +269,19 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         cell.setCellValue(data.getExchangeRates().doubleValue());
         cell.setCellStyle(dataStyle);
 
-        ++index;
-        row = sheet.createRow(index);
-        cell = row.createCell(0);
-        cell.setCellStyle(style);
-        cell.setCellValue("Rebates: ");
+        if(!data.getCountry().equalsIgnoreCase("jp")) {
+            ++index;
+            row = sheet.createRow(index);
+            cell = row.createCell(0);
+            cell.setCellStyle(style);
+            cell.setCellValue("Rebates: ");
 
-        cell = row.createCell(1);
-        //cell.setCellValue(data.getRebate().multiply(BigDecimal.valueOf(100)).doubleValue() + "%");
-        cell.setCellStyle(dataStyle);
+            cell = row.createCell(1);
+            if(data.getRebateValue() != null) {
+                cell.setCellValue(data.getRebateValue().multiply(BigDecimal.valueOf(100)).doubleValue() + "%");
+                cell.setCellStyle(dataStyle);
+            }
+        }
 
         ++index;
         row = sheet.createRow(index);
@@ -313,7 +317,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         return index;
     }
 
-    private void setListTitle(XSSFWorkbook wb, XSSFRow row) {
+    private void setListTitle(XSSFWorkbook wb, XSSFRow row, CostTapeOrderExt data) {
         XSSFFont font = wb.createFont();
         font.setBold(true);
 
@@ -337,53 +341,72 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         styleOther.setBorderRight(BorderStyle.THIN);
         styleOther.setBorderTop(BorderStyle.THIN);
 
-        XSSFCell cell = row.createCell(0);
+        int cellIndex = 0;
+
+        XSSFCell cell = row.createCell(cellIndex);
         cell.setCellValue("Part Number");
         cell.setCellStyle(styleGreen);
+        cellIndex++;
 
-        cell = row.createCell(1);
+        cell = row.createCell(cellIndex);
         cell.setCellValue("Description");
         cell.setCellStyle(styleGreen);
+        cellIndex++;
 
-        cell = row.createCell(2);
+        cell = row.createCell(cellIndex);
         cell.setCellValue("Price");
         cell.setCellStyle(styleGreen);
+        cellIndex++;
 
-        cell = row.createCell(3);
+        cell = row.createCell(cellIndex);
         cell.setCellValue("QTY");
         cell.setCellStyle(styleGreen);
+        cellIndex++;
 
-        cell = row.createCell(4);
+        if(data.getCountry().equalsIgnoreCase("jp")) {
+            cell = row.createCell(cellIndex);
+            cell.setCellValue("Rebate");
+            cell.setCellStyle(styleOther);
+            cellIndex++;
+        }
+
+        cell = row.createCell(cellIndex);
         cell.setCellValue("BMC Cost");
         cell.setCellStyle(styleOther);
+        cellIndex++;
 
-        cell = row.createCell(5);
+        cell = row.createCell(cellIndex);
         cell.setCellValue("Non BMC Cost");
         cell.setCellStyle(styleOther);
+        cellIndex++;
 
-        cell = row.createCell(6);
+        cell = row.createCell(cellIndex);
         cell.setCellValue("TMC Cost");
         cell.setCellStyle(styleOther);
+        cellIndex++;
 
-        cell = row.createCell(7);
+        cell = row.createCell(cellIndex);
         cell.setCellValue("Air cost");
         cell.setCellStyle(styleOther);
+        cellIndex++;
 
-        cell = row.createCell(8);
+        cell = row.createCell(cellIndex);
         cell.setCellValue("Fundings/other cost adj");
         cell.setCellStyle(styleOther);
+        cellIndex++;
 
-        cell = row.createCell(9);
+        cell = row.createCell(cellIndex);
         cell.setCellValue("Adj Cost");
         cell.setCellStyle(styleOther);
+        cellIndex++;
 
-        cell = row.createCell(10);
+        cell = row.createCell(cellIndex);
         cell.setCellValue("TMC %");
         cell.setCellStyle(styleGreen);
 
     }
 
-    private Integer setCostTapeListData(XSSFWorkbook wb, XSSFSheet sheet, List<List<CostTapeList>> dataList, Integer index) {
+    private Integer setCostTapeListData(XSSFWorkbook wb, String country, XSSFSheet sheet, List<List<CostTapeList>> dataList, Integer index) {
         // 带$ 的格式
         XSSFCellStyle priceStyle = wb.createCellStyle();
         priceStyle.setDataFormat(wb.createDataFormat().getFormat("_(\"$\"* #,##0.00_);_(\"$\"* (#,##0.00);_(\"$\"* \"-\"??_);_(@_)"));
@@ -476,66 +499,92 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
             for(int j=0;j<list.size();j++) {
                 CostTapeList data = list.get(j);
 
+                int cellIndex = 0;
+
                 // Part Number
                 row = sheet.createRow(index + j);
-                cell = row.createCell(0);
+                cell = row.createCell(cellIndex);
                 cell.setCellValue(data.getPartNumber());
                 cell.setCellStyle(purpleStyle);
+                cellIndex++;
 
                 // Description
-                cell = row.createCell(1);
+                cell = row.createCell(cellIndex);
                 cell.setCellValue(data.getDescription());
                 cell.setCellStyle(defaultStyle);
+                cellIndex++;
 
                 if(list.size() > 1) {
                     // price
-                    cell = row.createCell(2);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue("");
                     cell.setCellStyle(purpleStyle);
+                    cellIndex++;
 
                     // qty
                     String type = data.getType();
                     if(StringUtils.isEmpty(type)) {
-                        cell = row.createCell(3);
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue("");
                         cell.setCellStyle(purpleStyle);
                     } else {
                         if(type.equals(CodeConfig.TYPE_ADD)) {
-                            cell = row.createCell(3);
+                            cell = row.createCell(cellIndex);
                             cell.setCellValue("ADD");
                             cell.setCellStyle(purpleRightStyle);
                         } else {
-                            cell = row.createCell(3);
+                            cell = row.createCell(cellIndex);
                             cell.setCellValue("DEL");
                             cell.setCellStyle(purpleRedStyle);
                         }
                     }
+                    cellIndex++;
 
-                    cell = row.createCell(4);
+                    if(!StringUtils.isEmpty(country) && country.equalsIgnoreCase("jp")) {
+                        cell = row.createCell(cellIndex);
+
+                        String rebate = data.getRebate();
+                        if(!StringUtils.isEmpty(rebate) && rebate.contains("|")) {
+                            String value = rebate.split("\\|")[1];
+                            if(!StringUtils.isEmpty(value)) {
+                                cell.setCellValue(new BigDecimal(value).multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() + "%");
+                                cell.setCellStyle(defaultStyle);
+                            }
+                        }
+                        cellIndex++;
+                    }
+
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getBmc()!=null?data.getBmc().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(5);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getNbmc()!=null?data.getNbmc().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(6);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getTmc()!=null?data.getTmc().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(7);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getAirCost()!=null?data.getAirCost().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(8);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getFundings()!=null?data.getFundings().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(9);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getAdjCost()!=null?data.getAdjCost().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(10);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getTmcPercent()!=null?data.getTmcPercent().multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":BigDecimal.ZERO.doubleValue()+"%");
                     if(data.getTmcPercent()!=null && data.getTmcPercent().doubleValue() < 0) {
                         cell.setCellStyle(redStyle);
@@ -544,50 +593,68 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
                     }
 
                     if(j == list.size() - 1) {
+                        cellIndex = 0;
                         data = list.get(0);
                         row = sheet.createRow(index + j + 1);
 
-                        cell = row.createCell(0);
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue("CTO");
                         cell.setCellStyle(ctoStyle);
+                        cellIndex++;
 
-                        cell = row.createCell(1);
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue("");
                         cell.setCellStyle(ctoStyle);
+                        cellIndex++;
 
-                        cell = row.createCell(2);
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue(data.getPricing() != null?data.getPricing().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(): BigDecimal.ZERO.doubleValue());
                         cell.setCellStyle(ctoDollarStyle);
+                        cellIndex++;
 
-                        cell = row.createCell(3);
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue(data.getQty() != null? data.getQty() :0);
                         cell.setCellStyle(ctoStyle);
+                        cellIndex++;
 
-                        cell = row.createCell(4);
+                        if(!StringUtils.isEmpty(country) && country.equalsIgnoreCase("jp")) {
+                            cell = row.createCell(cellIndex);
+                            cell.setCellValue("");
+                            cell.setCellStyle(defaultStyle);
+                            cellIndex++;
+                        }
+
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue(data.getBmc()!=null?data.getBmc().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                         cell.setCellStyle(defaultStyle);
+                        cellIndex++;
 
-                        cell = row.createCell(5);
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue(data.getNbmc()!=null?data.getNbmc().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                         cell.setCellStyle(defaultStyle);
+                        cellIndex++;
 
-                        cell = row.createCell(6);
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue(data.getTmc()!=null?data.getTmc().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                         cell.setCellStyle(defaultStyle);
+                        cellIndex++;
 
-                        cell = row.createCell(7);
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue(data.getAirCost()!=null?data.getAirCost().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                         cell.setCellStyle(defaultStyle);
+                        cellIndex++;
 
-                        cell = row.createCell(8);
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue(data.getFundings()!=null?data.getFundings().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                         cell.setCellStyle(defaultStyle);
+                        cellIndex++;
 
-                        cell = row.createCell(9);
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue(data.getAdjCost()!=null?data.getAdjCost().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                         cell.setCellStyle(defaultStyle);
+                        cellIndex++;
 
-                        cell = row.createCell(10);
+                        cell = row.createCell(cellIndex);
                         cell.setCellValue(data.getTmcPercent()!=null?data.getTmcPercent().multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":BigDecimal.ZERO.doubleValue()+"%");
                         if(data.getTmcPercent() != null && data.getTmcPercent().doubleValue() < 0) {
                             cell.setCellStyle(redStyle);
@@ -599,40 +666,62 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
                     }
                 } else {
                     // price
-                    cell = row.createCell(2);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getPricing() != null?data.getPricing().doubleValue(): BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(purpleStyle);
+                    cellIndex++;
 
                     // QTY
-                    cell = row.createCell(3);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getQty() != null? data.getQty() :0);
                     cell.setCellStyle(purpleStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(4);
+                    if(!StringUtils.isEmpty(country) && country.equalsIgnoreCase("jp")) {
+                        cell = row.createCell(cellIndex);
+
+                        String rebate = data.getRebate();
+                        if(!StringUtils.isEmpty(rebate) && rebate.contains("|")) {
+                            String value = rebate.split("\\|")[1];
+                            if(!StringUtils.isEmpty(value)) {
+                                cell.setCellValue(new BigDecimal(value).multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() + "%");
+                                cell.setCellStyle(defaultStyle);
+                            }
+                        }
+                        cellIndex++;
+                    }
+
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getBmc()!=null?data.getBmc().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(5);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getNbmc()!=null?data.getNbmc().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(6);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getTmc()!=null?data.getTmc().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(7);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getAirCost()!=null?data.getAirCost().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(8);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getFundings()!=null?data.getFundings().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(9);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getAdjCost()!=null?data.getAdjCost().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue():BigDecimal.ZERO.doubleValue());
                     cell.setCellStyle(defaultStyle);
+                    cellIndex++;
 
-                    cell = row.createCell(10);
+                    cell = row.createCell(cellIndex);
                     cell.setCellValue(data.getTmcPercent()!=null?data.getTmcPercent().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":BigDecimal.ZERO.doubleValue()+"%");
                     if(data.getTmcPercent()!=null && data.getTmcPercent().doubleValue() < 0) {
                         cell.setCellStyle(redStyle);

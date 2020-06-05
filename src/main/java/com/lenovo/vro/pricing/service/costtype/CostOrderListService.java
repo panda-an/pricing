@@ -11,7 +11,7 @@ public interface CostOrderListService {
 
     PageInfo<CostTapeOrder> selectCostTapeOrderList(CostTapeOrderForm form);
 
-    CostTapeOrderExt selectCostTapeOrderDetail(Integer id);
+    CostTapeOrderExt selectCostTapeOrderDetail(Integer id, String type);
 
     String deleteCostTapeOrder(Integer id);
 
