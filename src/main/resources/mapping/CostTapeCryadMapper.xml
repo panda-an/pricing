@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.CostTapeCryadMapper">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeCryad">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="country" jdbcType="VARCHAR" property="country" />
+    <result column="key" jdbcType="VARCHAR" property="key" />
+    <result column="cryad" jdbcType="DECIMAL" property="cryad" />
+    <result column="cryad_percent" jdbcType="DECIMAL" property="cryadPercent" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, country, key, cryad, cryad_percent, insert_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from cost_tape_cryad
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from cost_tape_cryad
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.CostTapeCryad">
+    insert into cost_tape_cryad (id, country, key, 
+      cryad, cryad_percent, insert_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{country,jdbcType=VARCHAR}, #{key,jdbcType=VARCHAR}, 
+      #{cryad,jdbcType=DECIMAL}, #{cryadPercent,jdbcType=DECIMAL}, #{insertTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeCryad">
+    insert into cost_tape_cryad
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="country != null">
+        country,
+      </if>
+      <if test="key != null">
+        key,
+      </if>
+      <if test="cryad != null">
+        cryad,
+      </if>
+      <if test="cryadPercent != null">
+        cryad_percent,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="country != null">
+        #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="key != null">
+        #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="cryad != null">
+        #{cryad,jdbcType=DECIMAL},
+      </if>
+      <if test="cryadPercent != null">
+        #{cryadPercent,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeCryad">
+    update cost_tape_cryad
+    <set>
+      <if test="country != null">
+        country = #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="key != null">
+        key = #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="cryad != null">
+        cryad = #{cryad,jdbcType=DECIMAL},
+      </if>
+      <if test="cryadPercent != null">
+        cryad_percent = #{cryadPercent,jdbcType=DECIMAL},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeCryad">
+    update cost_tape_cryad
+    set country = #{country,jdbcType=VARCHAR},
+      key = #{key,jdbcType=VARCHAR},
+      cryad = #{cryad,jdbcType=DECIMAL},
+      cryad_percent = #{cryadPercent,jdbcType=DECIMAL},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

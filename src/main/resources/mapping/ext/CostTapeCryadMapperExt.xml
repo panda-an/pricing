@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.CostTapeCryadMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeCryad">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="country" jdbcType="VARCHAR" property="country" />
+    <result column="key" jdbcType="VARCHAR" property="key" />
+    <result column="cryad" jdbcType="DECIMAL" property="cryad" />
+    <result column="cryad_percent" jdbcType="DECIMAL" property="cryadPercent" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    cc.id, cc.country, cc.`key`, cc.cryad, cc.cryad_percent
+  </sql>
+
+  <select id="getCryad" parameterType="com.lenovo.vro.pricing.entity.CostTape" resultMap="BaseResultMap">
+    SELECT
+      <include refid="Base_Column_List" />
+    FROM
+    margindb.cost_tape c
+    left join margindb.cost_tape_cryad cc on c.country = cc.country
+    where
+    c.part_number = #{partNumber}
+    and c.country = #{country}
+    and c.description like concat('%', cc.`key`, '%') ;
+  </select>
+
+</mapper>

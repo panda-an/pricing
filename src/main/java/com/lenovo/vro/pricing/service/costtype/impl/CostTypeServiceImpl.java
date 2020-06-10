@@ -43,6 +43,9 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
     private MbgFreightCostMapperExt mbgFreightCostMapperExt;
 
     @Autowired
+    private CostTapeCryadMapperExt costTapeCryadMapperExt;
+
+    @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
@@ -102,8 +105,14 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                                     || n.equalsIgnoreCase("thinkvision"))) {
                         result = filterSameGeoList(costTapeExtList);
                         if(result != null) {
-                            if(result.getBrand().equalsIgnoreCase("option")) {
 
+                            if(result.getBrand().equalsIgnoreCase("option") && !StringUtils.isEmpty(result.getCostDescription())) {
+                                CostTapeCryad cryadResult = costTapeCryadMapperExt.getCryad(costTape);
+
+                                if(cryadResult != null) {
+                                    BigDecimal cryadNbmc = result.getBmc().multiply(cryadResult.getCryadPercent()).add(cryadResult.getCryad());
+                                    result.setNbmc(result.getNbmc()==null?BigDecimal.ZERO.add(cryadNbmc):result.getNbmc().add(cryadNbmc));
+                                }
                             }
                             redisTemplate.opsForHash().put(hashKey, key, result);
                         }
