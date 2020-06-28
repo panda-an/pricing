@@ -32,10 +32,7 @@ import org.springframework.util.StringUtils;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,7 +57,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
 
     @Override
     public PageInfo<CostTapeOrder> selectCostTapeOrderList(CostTapeOrderForm form) {
-        PageHelper.offsetPage(form.getPageNum(), form.getPageSize());
+        PageHelper.startPage(form.getPageNum(), form.getPageSize());
         List<CostTapeOrder> result = costTapeOrderMapperExt.selectCostTapeList(form);
         return new PageInfo<>(result);
     }
@@ -74,12 +71,12 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         if(!CollectionUtils.isEmpty(costTapeListList) && order!= null) {
             String country = order.getCountry();
             for (CostTapeListExt costTapeList : costTapeListList) {
-                if(costTapeList.getPid() == 0) {
+                if(costTapeList.getPid().contains("*")) {
                     String partNumber = costTapeList.getPartNumber();
                     if (!StringUtils.isEmpty(partNumber)) {
-                        List<Warranty> warrantyList = getWarrantyDataList(partNumber, country, redisTemplate, warrantyMapperExt);
-                        if (!CollectionUtils.isEmpty(warrantyList)) {
-                            costTapeList.setWarrantyList(warrantyList);
+                        HashMap<String, List<Warranty>> warrantyMap = getWarrantyDataList(partNumber, country, redisTemplate, warrantyMapperExt);
+                        if (!MapUtils.isEmpty(warrantyMap)) {
+                            costTapeList.setWarrantyList(warrantyMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
                         }
                     }
                 }
@@ -211,9 +208,9 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
             List<List<CostTapeList>> dataList = new ArrayList<>();
             for(CostTapeList temp : costTapeListList) {
                 List<CostTapeList> list = new ArrayList<>();
-                if(temp.getPid() == 0) {
+                if(temp.getPid().contains("*")) {
                     list.add(temp);
-                    list.addAll(costTapeListList.stream().filter(n -> n.getPid().intValue() == temp.getId().intValue()).collect(Collectors.toList()));
+                    list.addAll(costTapeListList.stream().filter(n -> n.getPid().substring(1).equals(temp.getPid())).collect(Collectors.toList()));
                 }
 
                 dataList.add(list);
@@ -655,7 +652,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
                         cellIndex++;
 
                         cell = row.createCell(cellIndex);
-                        cell.setCellValue(data.getTmcPercent()!=null?data.getTmcPercent().multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":BigDecimal.ZERO.doubleValue()+"%");
+                        cell.setCellValue(data.getTmcPercent()!=null?data.getTmcPercent().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":BigDecimal.ZERO.doubleValue()+"%");
                         if(data.getTmcPercent() != null && data.getTmcPercent().doubleValue() < 0) {
                             cell.setCellStyle(redStyle);
                         } else {

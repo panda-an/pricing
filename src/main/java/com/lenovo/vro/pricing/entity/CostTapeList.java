@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class CostTapeList extends CostTapeListKey {
-    private Integer pid;
+    private String pid;
 
     private String partNumber;
 
@@ -44,18 +44,26 @@ public class CostTapeList extends CostTapeListKey {
 
     private BigDecimal tmcPercent;
 
+    private BigDecimal bmcPercent;
+
     private String type;
 
     private String categoryType;
 
+    private String comment;
+
+    private String warrantyCategoryType;
+
+    private String recoveryType;
+
     private Date insertTime;
 
-    public Integer getPid() {
+    public String getPid() {
         return pid;
     }
 
-    public void setPid(Integer pid) {
-        this.pid = pid;
+    public void setPid(String pid) {
+        this.pid = pid == null ? null : pid.trim();
     }
 
     public String getPartNumber() {
@@ -210,6 +218,14 @@ public class CostTapeList extends CostTapeListKey {
         this.tmcPercent = tmcPercent;
     }
 
+    public BigDecimal getBmcPercent() {
+        return bmcPercent;
+    }
+
+    public void setBmcPercent(BigDecimal bmcPercent) {
+        this.bmcPercent = bmcPercent;
+    }
+
     public String getType() {
         return type;
     }
@@ -224,6 +240,30 @@ public class CostTapeList extends CostTapeListKey {
 
     public void setCategoryType(String categoryType) {
         this.categoryType = categoryType == null ? null : categoryType.trim();
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment == null ? null : comment.trim();
+    }
+
+    public String getWarrantyCategoryType() {
+        return warrantyCategoryType;
+    }
+
+    public void setWarrantyCategoryType(String warrantyCategoryType) {
+        this.warrantyCategoryType = warrantyCategoryType == null ? null : warrantyCategoryType.trim();
+    }
+
+    public String getRecoveryType() {
+        return recoveryType;
+    }
+
+    public void setRecoveryType(String recoveryType) {
+        this.recoveryType = recoveryType == null ? null : recoveryType.trim();
     }
 
     public Date getInsertTime() {

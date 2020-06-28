@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.ext.CostTapeListExt">
     <id column="cost_id" jdbcType="INTEGER" property="costId" />
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="pid" jdbcType="INTEGER" property="pid" />
+    <result column="pid" jdbcType="VARCHAR" property="pid" />
     <result column="part_number" jdbcType="VARCHAR" property="partNumber" />
     <result column="warranty_code" jdbcType="VARCHAR" property="warrantyCode" />
     <result column="plant" jdbcType="VARCHAR" property="plant" />
@@ -24,14 +24,19 @@
     <result column="rebate" jdbcType="VARCHAR" property="rebate" />
     <result column="mbg_freight_id" jdbcType="INTEGER" property="mbgFreightId" />
     <result column="tmc_percent" jdbcType="DECIMAL" property="tmcPercent" />
+    <result column="bmc_percent" jdbcType="DECIMAL" property="bmcPercent" />
     <result column="type" jdbcType="VARCHAR" property="type" />
     <result column="category_type" jdbcType="VARCHAR" property="categoryType" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="warranty_category_type" jdbcType="VARCHAR" property="warrantyCategoryType" />
+    <result column="recovery_type" jdbcType="VARCHAR" property="recoveryType" />
   </resultMap>
 
   <sql id="Base_Column_List">
     cost_id, id, pid, part_number, warranty_code, plant, country, product_family, geo,
-    description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, rebate, mbg_freight_id,
-    tmc_percent, `type`, category_type
+    description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, rebate,
+    mbg_freight_id, tmc_percent, bmc_percent, `type`, category_type, comment, warranty_category_type,
+    recovery_type
   </sql>
 
   <insert id="insertBatch" parameterType="java.util.List">
@@ -40,18 +45,21 @@
       country, product_family, geo,
       description, brand, bmc,
       nbmc, tmc, qty, pricing,
-      air_cost, fundings, adj_cost, rebate, mbg_freight_id,
-      tmc_percent, `type`, category_type)
+      air_cost, fundings, adj_cost,
+      rebate, mbg_freight_id, tmc_percent,
+      bmc_percent, `type`, category_type,
+      comment, warranty_category_type, recovery_type)
     values
     <foreach collection="list" item="item" index="index" separator=",">
-      (#{item.costId,jdbcType=INTEGER}, #{item.id,jdbcType=INTEGER}, #{item.pid,jdbcType=INTEGER},
+      (#{item.costId,jdbcType=INTEGER}, #{item.id,jdbcType=INTEGER}, #{item.pid,jdbcType=VARCHAR},
       #{item.partNumber,jdbcType=VARCHAR}, #{item.warrantyCode,jdbcType=VARCHAR}, #{item.plant,jdbcType=VARCHAR},
       #{item.country,jdbcType=VARCHAR}, #{item.productFamily,jdbcType=VARCHAR}, #{item.geo,jdbcType=VARCHAR},
       #{item.description,jdbcType=VARCHAR}, #{item.brand,jdbcType=VARCHAR}, #{item.bmc,jdbcType=DECIMAL},
       #{item.nbmc,jdbcType=DECIMAL}, #{item.tmc,jdbcType=DECIMAL}, #{item.qty,jdbcType=INTEGER}, #{item.pricing,jdbcType=DECIMAL},
-      #{item.airCost,jdbcType=DECIMAL}, #{item.fundings,jdbcType=DECIMAL}, #{item.adjCost,jdbcType=DECIMAL}, #{item.rebate,jdbcType=VARCHAR},
-      #{item.mbgFreightId,jdbcType=INTEGER}, #{item.tmcPercent,jdbcType=DECIMAL},
-      #{item.type,jdbcType=VARCHAR}, #{item.categoryType,jdbcType=VARCHAR})
+      #{item.airCost,jdbcType=DECIMAL}, #{item.fundings,jdbcType=DECIMAL}, #{item.adjCost,jdbcType=DECIMAL},
+      #{item.rebate,jdbcType=VARCHAR}, #{item.mbgFreightId,jdbcType=INTEGER}, #{item.tmcPercent,jdbcType=DECIMAL},
+      #{item.bmcPercent,jdbcType=DECIMAL}, #{item.type,jdbcType=VARCHAR}, #{item.categoryType,jdbcType=VARCHAR},
+      #{item.comment,jdbcType=VARCHAR}, #{item.warrantyCategoryType,jdbcType=VARCHAR}, #{item.recoveryType,jdbcType=VARCHAR})
     </foreach>
   </insert>
 

@@ -116,7 +116,9 @@
   </select>
 
   <select id="getMbgCostTapeData" parameterType="com.lenovo.vro.pricing.entity.CostTape" resultMap="BaseResultMap">
-    select <include refid="Mbg_Column_List" />
+    select <include refid="Mbg_Column_List" />,
+    case when left(c.part_number, 2) = 'ZA' then '1'
+    else '0' end as category_type
     from margindb.cost_tape c
     <where>
       <if test="partNumber != null">

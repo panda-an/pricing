@@ -7,6 +7,8 @@ public class CostTapeExt implements Serializable {
 
     private String id;
 
+    private String pid;
+
     private String partNumber;
 
     private String plant;
@@ -173,5 +175,13 @@ public class CostTapeExt implements Serializable {
 
     public void setBrand(String brand) {
         this.brand = brand;
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public void setPid(String pid) {
+        this.pid = pid;
     }
 }

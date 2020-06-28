@@ -1,10 +1,12 @@
 package com.lenovo.vro.pricing.service.costtype.impl;
 
+import com.lenovo.vro.pricing.common.snowflake.SnowflakeIdWorker;
 import com.lenovo.vro.pricing.configuration.CodeConfig;
 import com.lenovo.vro.pricing.entity.*;
 import com.lenovo.vro.pricing.entity.ext.CostTapeExt;
 import com.lenovo.vro.pricing.mapper.ext.*;
 import com.lenovo.vro.pricing.service.costtype.CostTypeService;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,19 +138,25 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                         redisTemplate.opsForHash().put(hashKey, key, result);
                     }
                 } else {
-                    // todo sbb function not confirmed
                     result = null;
                 }
             }
-
         }
+
+        //unique id
+        if(operationType.equals("0") && result != null) {
+            SnowflakeIdWorker idWorker = new SnowflakeIdWorker(0, 0);
+            long id = idWorker.nextId();
+            result.setPid(Long.toString(id));
+        }
+
 
         if(type.equals(CodeConfig.COST_TAPE) && result != null) {
             // warranty - nbmc, mbg warranty cost has passed the value when the page is initialization
             if(partNumber.length() > 4 && operationType.equals("0")) {
-                List<Warranty> warrantyList = getWarrantyDataList(partNumber, country, redisTemplate, warrantyMapperExt);
-                if(!CollectionUtils.isEmpty(warrantyList)) {
-                    resultMap.put("warranty", warrantyList);
+                HashMap<String, List<Warranty>> warrantyMap = getWarrantyDataList(partNumber, country, redisTemplate, warrantyMapperExt);
+                if(!MapUtils.isEmpty(warrantyMap)) {
+                    resultMap.put("warranty", warrantyMap);
                 }
             }
 

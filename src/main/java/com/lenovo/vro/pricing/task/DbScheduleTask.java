@@ -33,6 +33,7 @@ public class DbScheduleTask {
                 logger.error("Can not load warranty data file!");
             } else {
                 redisTemplate.delete("warranty");
+                redisTemplate.delete("warranty-ph");
                 logger.info("Load warranty data file process success!");
             }
         } catch (FileNotFoundException e) {
