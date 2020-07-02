@@ -4,6 +4,7 @@ import com.lenovo.vro.pricing.entity.Warranty;
 import com.lenovo.vro.pricing.mapper.ext.WarrantyMapperExt;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,8 +13,8 @@ import java.util.stream.Collectors;
 
 public class CostTapeBaseService {
 
-    protected HashMap<String, List<Warranty>> getWarrantyDataList(String partNumber, String country, RedisTemplate<String,
-            Object> redisTemplate, WarrantyMapperExt warrantyMapperExt) {
+    protected HashMap<String, List<Warranty>> getWarrantyDataList(String partNumber, String country, String brand,
+                RedisTemplate<String, Object> redisTemplate, WarrantyMapperExt warrantyMapperExt) {
         HashMap<String, List<Warranty>> warrantyMap = new HashMap<>();
 
         Warranty form = new Warranty();
@@ -41,6 +42,9 @@ public class CostTapeBaseService {
                 phResultList = (List<Warranty>) redisTemplate.opsForHash().get(phWarrantyKey, key);
             } else {
                 form.setPartNumber(partNumber.substring(0, 4));
+                if(resultList != null && resultList.size() == 1 && !StringUtils.isEmpty(brand)) {
+                    form.setBrand(brand);
+                }
                 phResultList = warrantyMapperExt.selectMtmWarrantyByPh(form);
 
                 if(!CollectionUtils.isEmpty(phResultList)) {
@@ -54,9 +58,8 @@ public class CostTapeBaseService {
             }
         }
 
-        warrantyMap.put("warrantyPh", phResultList);
         warrantyMap.put("warranty", resultList);
-
+        warrantyMap.put("warrantyPh", phResultList);
 
         return warrantyMap;
     }

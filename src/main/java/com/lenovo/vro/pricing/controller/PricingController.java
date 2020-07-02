@@ -188,6 +188,27 @@ public class PricingController {
     }
 
     /**
+     * 获取SBB INFO
+     */
+    @PostMapping("/getSbbInfo")
+    public ResponseBean getSbbInfo(@RequestBody CostTape form) {
+        ResponseBean bean = new ResponseBean();
+
+        try{
+            List<CostTape> result = costTypeService.getSbbInfo(form);
+            bean.setObj(result);
+            bean.setCode(CodeConfig.OPERATION_SUCCESS);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            bean.setCode(CodeConfig.OPERATION_FAILED);
+            bean.setMsg("Query for sbb info has error");
+            e.printStackTrace();
+        }
+
+        return bean;
+    }
+
+    /**
      * 保存创建的order data
      * @param form 数据
      * @return ResponseBean

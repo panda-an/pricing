@@ -13,6 +13,7 @@
     <result column="total_tmc_gp_percent_wocc" jdbcType="DECIMAL" property="totalTmcGpPercentWocc" />
     <result column="total_tmc_gp_usd_cc" jdbcType="DECIMAL" property="totalTmcGpUsdCc" />
     <result column="total_tmc_gp_percent_cc" jdbcType="DECIMAL" property="totalTmcGpPercentCc" />
+    <result column="recovery_type" jdbcType="VARCHAR" property="recoveryType" />
     <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
   </resultMap>
   <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.CostTapeDetail">
@@ -20,12 +21,14 @@
       total_gross_rev, total_net_rev, total_bmc_gp_usd_wocc, 
       total_bmc_gp_percent_wocc, total_tmc_gp_usd_wocc, 
       total_tmc_gp_percent_wocc, total_tmc_gp_usd_cc, 
-      total_tmc_gp_percent_cc, insert_time)
+      total_tmc_gp_percent_cc, recovery_type, insert_time
+      )
     values (#{costId,jdbcType=INTEGER}, #{category,jdbcType=VARCHAR}, #{totalQuantity,jdbcType=INTEGER}, 
       #{totalGrossRev,jdbcType=DECIMAL}, #{totalNetRev,jdbcType=DECIMAL}, #{totalBmcGpUsdWocc,jdbcType=DECIMAL}, 
       #{totalBmcGpPercentWocc,jdbcType=DECIMAL}, #{totalTmcGpUsdWocc,jdbcType=DECIMAL}, 
       #{totalTmcGpPercentWocc,jdbcType=DECIMAL}, #{totalTmcGpUsdCc,jdbcType=DECIMAL}, 
-      #{totalTmcGpPercentCc,jdbcType=DECIMAL}, #{insertTime,jdbcType=TIMESTAMP})
+      #{totalTmcGpPercentCc,jdbcType=DECIMAL}, #{recoveryType,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeDetail">
     insert into cost_tape_detail
@@ -62,6 +65,9 @@
       </if>
       <if test="totalTmcGpPercentCc != null">
         total_tmc_gp_percent_cc,
+      </if>
+      <if test="recoveryType != null">
+        recovery_type,
       </if>
       <if test="insertTime != null">
         insert_time,
@@ -100,6 +106,9 @@
       </if>
       <if test="totalTmcGpPercentCc != null">
         #{totalTmcGpPercentCc,jdbcType=DECIMAL},
+      </if>
+      <if test="recoveryType != null">
+        #{recoveryType,jdbcType=VARCHAR},
       </if>
       <if test="insertTime != null">
         #{insertTime,jdbcType=TIMESTAMP},

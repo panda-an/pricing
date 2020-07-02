@@ -1,6 +1,11 @@
 package com.lenovo.vro.pricing.entity;
 
-public class CostTape {
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+public class CostTape implements Serializable {
+
+    private int id;
 
     private String country;
 
@@ -19,6 +24,20 @@ public class CostTape {
     private String fulfilment;
 
     private String type;
+
+    private String brand;
+
+    private BigDecimal bmc;
+
+    private String description;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getCountry() {
         return country;
@@ -90,5 +109,29 @@ public class CostTape {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public BigDecimal getBmc() {
+        return bmc;
+    }
+
+    public void setBmc(BigDecimal bmc) {
+        this.bmc = bmc;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -26,6 +26,8 @@ public class CostTapeDetail {
 
     private BigDecimal totalTmcGpPercentCc;
 
+    private String recoveryType;
+
     private Date insertTime;
 
     public Integer getCostId() {
@@ -114,6 +116,14 @@ public class CostTapeDetail {
 
     public void setTotalTmcGpPercentCc(BigDecimal totalTmcGpPercentCc) {
         this.totalTmcGpPercentCc = totalTmcGpPercentCc;
+    }
+
+    public String getRecoveryType() {
+        return recoveryType;
+    }
+
+    public void setRecoveryType(String recoveryType) {
+        this.recoveryType = recoveryType == null ? null : recoveryType.trim();
     }
 
     public Date getInsertTime() {

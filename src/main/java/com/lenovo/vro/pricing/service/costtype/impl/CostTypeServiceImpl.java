@@ -144,7 +144,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
         }
 
         //unique id
-        if(operationType.equals("0") && result != null) {
+        if(type.equals(CodeConfig.COST_TAPE) && operationType.equals("0") && result != null) {
             SnowflakeIdWorker idWorker = new SnowflakeIdWorker(0, 0);
             long id = idWorker.nextId();
             result.setPid(Long.toString(id));
@@ -154,7 +154,8 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
         if(type.equals(CodeConfig.COST_TAPE) && result != null) {
             // warranty - nbmc, mbg warranty cost has passed the value when the page is initialization
             if(partNumber.length() > 4 && operationType.equals("0")) {
-                HashMap<String, List<Warranty>> warrantyMap = getWarrantyDataList(partNumber, country, redisTemplate, warrantyMapperExt);
+                HashMap<String, List<Warranty>> warrantyMap = getWarrantyDataList(partNumber, country,
+                        result.getBrand(), redisTemplate, warrantyMapperExt);
                 if(!MapUtils.isEmpty(warrantyMap)) {
                     resultMap.put("warranty", warrantyMap);
                 }
@@ -385,6 +386,23 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
         }
 
         return resultList;
+    }
+
+    @Override
+    public List<CostTape> getSbbInfo(CostTape form) throws Exception {
+        if(form == null || StringUtils.isEmpty(form.getCountry())) {
+            throw new Exception("country is empty!");
+        }
+
+        List<CostTape> list;
+        if(redisTemplate.opsForHash().hasKey("sbblist", form.getCountry())) {
+            list = (List<CostTape>) redisTemplate.opsForHash().get("sbblist", form.getCountry());
+        } else {
+            list = costTapeMapperExt.getSbbInfo(form);
+            redisTemplate.opsForHash().put("sbblist", form.getCountry(), list);
+        }
+
+        return list;
     }
 
     private void setAirCost(String country, String machineType, CostTapeExt result, String fulfilment) {

@@ -13,11 +13,12 @@
     <result column="total_tmc_gp_percent_wocc" jdbcType="DECIMAL" property="totalTmcGpPercentWocc" />
     <result column="total_tmc_gp_usd_cc" jdbcType="DECIMAL" property="totalTmcGpUsdCc" />
     <result column="total_tmc_gp_percent_cc" jdbcType="DECIMAL" property="totalTmcGpPercentCc" />
+    <result column="recovery_type" jdbcType="VARCHAR" property="recoveryType" />
   </resultMap>
   <sql id="Base_Column_List">
     cost_id, category, total_quantity, total_gross_rev, total_net_rev, total_bmc_gp_usd_wocc,
     total_bmc_gp_percent_wocc, total_tmc_gp_usd_wocc, total_tmc_gp_percent_wocc, total_tmc_gp_usd_cc, 
-    total_tmc_gp_percent_cc
+    total_tmc_gp_percent_cc, recovery_type
   </sql>
 
   <insert id="insertBatch" parameterType="java.util.List">
@@ -25,7 +26,7 @@
       total_quantity, total_gross_rev, total_net_rev, 
       total_bmc_gp_usd_wocc, total_bmc_gp_percent_wocc, 
       total_tmc_gp_usd_wocc, total_tmc_gp_percent_wocc, 
-      total_tmc_gp_usd_cc, total_tmc_gp_percent_cc
+      total_tmc_gp_usd_cc, total_tmc_gp_percent_cc, recovery_type
       )
     values
     <foreach collection="list" item="item" index="index" separator=",">
@@ -33,7 +34,7 @@
       #{item.totalQuantity,jdbcType=INTEGER}, #{item.totalGrossRev,jdbcType=DECIMAL}, #{item.totalNetRev,jdbcType=DECIMAL},
       #{item.totalBmcGpUsdWocc,jdbcType=DECIMAL}, #{item.totalBmcGpPercentWocc,jdbcType=DECIMAL},
       #{item.totalTmcGpUsdWocc,jdbcType=DECIMAL}, #{item.totalTmcGpPercentWocc,jdbcType=DECIMAL},
-      #{item.totalTmcGpUsdCc,jdbcType=DECIMAL}, #{item.totalTmcGpPercentCc,jdbcType=DECIMAL}
+      #{item.totalTmcGpUsdCc,jdbcType=DECIMAL}, #{item.totalTmcGpPercentCc,jdbcType=DECIMAL}, #{item.recoveryType,jdbcType=VARCHAR}
       )
     </foreach>
   </insert>

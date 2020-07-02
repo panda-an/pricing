@@ -71,10 +71,11 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         if(!CollectionUtils.isEmpty(costTapeListList) && order!= null) {
             String country = order.getCountry();
             for (CostTapeListExt costTapeList : costTapeListList) {
-                if(costTapeList.getPid().contains("*")) {
+                if(costTapeList.getPid().contains("*") && (!costTapeList.getPartNumber().startsWith("ZA") || !costTapeList.getPartNumber().startsWith("ZG"))) {
                     String partNumber = costTapeList.getPartNumber();
                     if (!StringUtils.isEmpty(partNumber)) {
-                        HashMap<String, List<Warranty>> warrantyMap = getWarrantyDataList(partNumber, country, redisTemplate, warrantyMapperExt);
+                        HashMap<String, List<Warranty>> warrantyMap = getWarrantyDataList(partNumber, country,
+                                costTapeList.getBrand(), redisTemplate, warrantyMapperExt);
                         if (!MapUtils.isEmpty(warrantyMap)) {
                             costTapeList.setWarrantyList(warrantyMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
                         }

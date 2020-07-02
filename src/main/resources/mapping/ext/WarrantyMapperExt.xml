@@ -50,6 +50,9 @@
       <if test="country != null">
         and w.country = #{country}
       </if>
+      <if test="brand != null">
+        and w.brand = #{brand}
+      </if>
     </where>
   </select>
 </mapper>

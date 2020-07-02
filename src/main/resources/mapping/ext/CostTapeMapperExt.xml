@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lenovo.vro.pricing.mapper.ext.CostTapeMapperExt">
+
   <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.ext.CostTapeExt">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="part_number" jdbcType="VARCHAR" property="partNumber" />
@@ -27,6 +28,15 @@
     <result column="sub_geo" jdbcType="VARCHAR" property="subGeo" />
     <result column="subgeo" jdbcType="VARCHAR" property="geo" />
   </resultMap>
+
+  <resultMap id="SbbInfoMap" type="com.lenovo.vro.pricing.entity.CostTape">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="part_number" jdbcType="VARCHAR" property="partNumber" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="one" jdbcType="DECIMAL" property="bmc" />
+    <result column="brand" jdbcType="VARCHAR" property="brand" />
+    <result column="country" jdbcType="VARCHAR" property="country" />
+  </resultMap>
   <sql id="Base_Column_List">
     c.id, c.part_number, c.brand, c.plant, c.country, c.one, c.description as cost_description, c.subgeo, f.product_family, f.priority, f.sub_geo
   </sql>
@@ -41,6 +51,10 @@
 
   <sql id="Mbg_Column_List">
     c.id, c.part_number, c.one, c.description as cost_description, c.subgeo, c.family as product_family
+  </sql>
+
+  <sql id="Sbb_Info_List">
+    c.id, c.part_number, c.one, c.description, c.brand, c.country
   </sql>
 
   <select id="getCostTapeData" resultMap="BaseResultMap" parameterType="com.lenovo.vro.pricing.entity.CostTape">
@@ -128,5 +142,39 @@
         AND c.country = #{country}
       </if>
     </where>
+  </select>
+
+  <select id="getSbbInfo" parameterType="com.lenovo.vro.pricing.entity.CostTape" resultMap="SbbInfoMap">
+    select <include refid="Sbb_Info_List" />
+    from margindb.cost_tape c
+    inner join margindb.region_country_mapping m on c.subgeo = m.subgeo
+    where
+      data_type = '1'
+    <if test="country != null">
+      AND c.country = #{country}
+    </if>
+    <if test="country != null">
+      AND m.country = #{country}
+    </if>
+    <if test="partNumber != null">
+      AND c.part_number = #{partNumber}
+    </if>
+
+    union all
+
+    select <include refid="Sbb_Info_List" />
+    from margindb.cost_tape c
+    inner join margindb.region_country_mapping m on c.subgeo = m.subgeo
+    where
+      data_type = '1'
+      <if test="country != null">
+        AND c.country = 'ALL'
+      </if>
+      <if test="country != null">
+        AND m.country = #{country}
+      </if>
+      <if test="partNumber != null">
+        AND c.part_number = #{partNumber}
+      </if>
   </select>
 </mapper>
