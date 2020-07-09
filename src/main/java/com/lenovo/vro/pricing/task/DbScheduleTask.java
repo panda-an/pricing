@@ -82,7 +82,7 @@ public class DbScheduleTask {
         logger.info("End schedule for insertCostTapeGsc");
     }
 
-    @Scheduled(cron = "0 53 12 * * ? ")
+    //@Scheduled(cron = "0 53 12 * * ? ")
     public void insertMbgFreightCost() {
         logger.info("Start schedule for insertMbgFreightCost");
         String code1 = "";

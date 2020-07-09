@@ -191,9 +191,45 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
     }
 
     private void exportDataProcess(CostTapeOrderExt data, HttpServletResponse response) {
-        XSSFWorkbook wb = new XSSFWorkbook();
-        XSSFSheet sheet = wb.createSheet("sheet1");
+        CostTapeOrderExt normalData = new CostTapeOrderExt();
+        BeanUtils.copyProperties(data, normalData);
 
+        normalData.setCostTapeListList(data.getCostTapeListList().stream().filter(n -> n.getRecoveryType().equals("0")).collect(Collectors.toList()));
+        normalData.setCostTapeDetailList(data.getCostTapeDetailList().stream().filter(n -> n.getRecoveryType().equals("0")).collect(Collectors.toList()));
+
+        XSSFWorkbook wb = new XSSFWorkbook();
+        XSSFSheet sheet = wb.createSheet("normal");
+
+        createReport(normalData, wb, sheet);
+
+        normalData.setCostTapeListList(data.getCostTapeListList().stream().filter(n -> n.getRecoveryType().equals("1")).collect(Collectors.toList()));
+        normalData.setCostTapeDetailList(data.getCostTapeDetailList().stream().filter(n -> n.getRecoveryType().equals("1")).collect(Collectors.toList()));
+
+        sheet = wb.createSheet("recovery");
+
+        createReport(normalData, wb, sheet);
+
+        sheet = wb.createSheet("total");
+        //total detail data
+        Map<String, int[]> indexMap = setDetailTitle(0, wb, sheet);
+        List<CostTapeDetail> detailList = data.getCostTapeDetailList().stream().filter(n -> n.getRecoveryType().equals("2")).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(detailList)) {
+            setDetailData(indexMap, sheet, detailList, data.getExchangeRates());
+        }
+
+        try {
+            response.setContentType("application/force-download");
+            response.addHeader("Content-Disposition", "attachment;fileName=" + data.getOrderName() + ".xlsx");
+            OutputStream o = response.getOutputStream();
+            wb.write(o);
+            o.flush();
+            o.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createReport(CostTapeOrderExt data, XSSFWorkbook wb, XSSFSheet sheet) {
         Integer index = 0;
         // base info
         index = setInfoData(index, wb, sheet, data);
@@ -202,6 +238,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         XSSFRow row = sheet.createRow(index);
         setListTitle(wb, row, data);
         index++;
+
 
         // list data
         List<CostTapeListExt> costTapeListList = data.getCostTapeListList();
@@ -227,17 +264,6 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         List<CostTapeDetail> detailList = data.getCostTapeDetailList();
         if(!CollectionUtils.isEmpty(detailList)) {
             setDetailData(indexMap, sheet, detailList, data.getExchangeRates());
-        }
-
-        try {
-            response.setContentType("application/force-download");
-            response.addHeader("Content-Disposition", "attachment;fileName=" + data.getOrderName() + ".xlsx");
-            OutputStream o = response.getOutputStream();
-            wb.write(o);
-            o.flush();
-            o.close();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -298,7 +324,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         cell.setCellValue("MOT: ");
 
         cell = row.createCell(1);
-        cell.setCellValue(data.getFulfilment());
+        cell.setCellValue(getFulfilmentValue(data.getFulfilment()));
         cell.setCellStyle(dataStyle);
 
         ++index;
@@ -897,5 +923,18 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
 
         cell = row.createCell(9);
         cell.setCellValue(data.getTotalTmcGpPercentCc()!=null?data.getTotalTmcGpPercentCc().doubleValue()+"%":"");
+    }
+
+    private String getFulfilmentValue(String value) {
+        switch (value){
+            case "0":
+                return "Ocean";
+            case "1":
+                return "Air";
+            case "2":
+                return "trunk";
+            default:
+                return "";
+        }
     }
 }

@@ -349,7 +349,7 @@ public class PricingController {
         return bean;
     }
 
-    @PostMapping("exportData")
+    @PostMapping("/exportData")
     public void exportData(@RequestBody CostTapeOrderExt form, HttpServletResponse response) {
         try {
             costOrderListService.exportData(form, response);

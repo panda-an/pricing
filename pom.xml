@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.lenovo.vro</groupId>
     <artifactId>pricing</artifactId>
-    <version>1.6-SNAPSHOT</version>
+    <version>1.7-SNAPSHOT</version>
     <name>pricing</name>
     <description>Pricing Tool</description>
 
@@ -117,7 +117,6 @@
             <artifactId>pagehelper-spring-boot-starter</artifactId>
             <version>1.2.13</version>
         </dependency>
-
 
     </dependencies>
 
