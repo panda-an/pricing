@@ -4,7 +4,8 @@
   <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeList">
     <id column="cost_id" jdbcType="INTEGER" property="costId" />
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="pid" jdbcType="VARCHAR" property="pid" />
+    <id column="pid" jdbcType="VARCHAR" property="pid" />
+    <result column="recovery_type" jdbcType="VARCHAR" property="recoveryType" />
     <result column="part_number" jdbcType="VARCHAR" property="partNumber" />
     <result column="warranty_code" jdbcType="VARCHAR" property="warrantyCode" />
     <result column="plant" jdbcType="VARCHAR" property="plant" />
@@ -29,14 +30,13 @@
     <result column="category_type" jdbcType="VARCHAR" property="categoryType" />
     <result column="comment" jdbcType="VARCHAR" property="comment" />
     <result column="warranty_category_type" jdbcType="VARCHAR" property="warrantyCategoryType" />
-    <result column="recovery_type" jdbcType="VARCHAR" property="recoveryType" />
     <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    cost_id, id, pid, part_number, warranty_code, plant, country, product_family, geo, 
-    description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, rebate, 
-    mbg_freight_id, tmc_percent, bmc_percent, `type`, category_type, comment, warranty_category_type,
-    recovery_type, insert_time
+    cost_id, id, pid, recovery_type, part_number, warranty_code, plant, country, product_family, 
+    geo, description, brand, bmc, nbmc, tmc, qty, pricing, air_cost, fundings, adj_cost, 
+    rebate, mbg_freight_id, tmc_percent, bmc_percent, type, category_type, comment, warranty_category_type, 
+    insert_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeListKey" resultMap="BaseResultMap">
     select 
@@ -44,32 +44,34 @@
     from cost_tape_list
     where cost_id = #{costId,jdbcType=INTEGER}
       and id = #{id,jdbcType=INTEGER}
+      and pid = #{pid,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeListKey">
     delete from cost_tape_list
     where cost_id = #{costId,jdbcType=INTEGER}
       and id = #{id,jdbcType=INTEGER}
+      and pid = #{pid,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.CostTapeList">
     insert into cost_tape_list (cost_id, id, pid, 
-      part_number, warranty_code, plant, 
-      country, product_family, geo, 
-      description, brand, bmc, 
-      nbmc, tmc, qty, pricing, 
-      air_cost, fundings, adj_cost, 
-      rebate, mbg_freight_id, tmc_percent, 
-      bmc_percent, `type`, category_type,
-      comment, warranty_category_type, recovery_type, 
+      recovery_type, part_number, warranty_code, 
+      plant, country, product_family, 
+      geo, description, brand, 
+      bmc, nbmc, tmc, qty, 
+      pricing, air_cost, fundings, 
+      adj_cost, rebate, mbg_freight_id, 
+      tmc_percent, bmc_percent, type, 
+      category_type, comment, warranty_category_type, 
       insert_time)
     values (#{costId,jdbcType=INTEGER}, #{id,jdbcType=INTEGER}, #{pid,jdbcType=VARCHAR}, 
-      #{partNumber,jdbcType=VARCHAR}, #{warrantyCode,jdbcType=VARCHAR}, #{plant,jdbcType=VARCHAR}, 
-      #{country,jdbcType=VARCHAR}, #{productFamily,jdbcType=VARCHAR}, #{geo,jdbcType=VARCHAR}, 
-      #{description,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR}, #{bmc,jdbcType=DECIMAL}, 
-      #{nbmc,jdbcType=DECIMAL}, #{tmc,jdbcType=DECIMAL}, #{qty,jdbcType=INTEGER}, #{pricing,jdbcType=DECIMAL}, 
-      #{airCost,jdbcType=DECIMAL}, #{fundings,jdbcType=DECIMAL}, #{adjCost,jdbcType=DECIMAL}, 
-      #{rebate,jdbcType=VARCHAR}, #{mbgFreightId,jdbcType=INTEGER}, #{tmcPercent,jdbcType=DECIMAL}, 
-      #{bmcPercent,jdbcType=DECIMAL}, #{type,jdbcType=VARCHAR}, #{categoryType,jdbcType=VARCHAR}, 
-      #{comment,jdbcType=VARCHAR}, #{warrantyCategoryType,jdbcType=VARCHAR}, #{recoveryType,jdbcType=VARCHAR}, 
+      #{recoveryType,jdbcType=VARCHAR}, #{partNumber,jdbcType=VARCHAR}, #{warrantyCode,jdbcType=VARCHAR}, 
+      #{plant,jdbcType=VARCHAR}, #{country,jdbcType=VARCHAR}, #{productFamily,jdbcType=VARCHAR}, 
+      #{geo,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR}, 
+      #{bmc,jdbcType=DECIMAL}, #{nbmc,jdbcType=DECIMAL}, #{tmc,jdbcType=DECIMAL}, #{qty,jdbcType=INTEGER}, 
+      #{pricing,jdbcType=DECIMAL}, #{airCost,jdbcType=DECIMAL}, #{fundings,jdbcType=DECIMAL}, 
+      #{adjCost,jdbcType=DECIMAL}, #{rebate,jdbcType=VARCHAR}, #{mbgFreightId,jdbcType=INTEGER}, 
+      #{tmcPercent,jdbcType=DECIMAL}, #{bmcPercent,jdbcType=DECIMAL}, #{type,jdbcType=VARCHAR}, 
+      #{categoryType,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR}, #{warrantyCategoryType,jdbcType=VARCHAR}, 
       #{insertTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeList">
@@ -83,6 +85,9 @@
       </if>
       <if test="pid != null">
         pid,
+      </if>
+      <if test="recoveryType != null">
+        recovery_type,
       </if>
       <if test="partNumber != null">
         part_number,
@@ -145,7 +150,7 @@
         bmc_percent,
       </if>
       <if test="type != null">
-        `type`,
+        type,
       </if>
       <if test="categoryType != null">
         category_type,
@@ -155,9 +160,6 @@
       </if>
       <if test="warrantyCategoryType != null">
         warranty_category_type,
-      </if>
-      <if test="recoveryType != null">
-        recovery_type,
       </if>
       <if test="insertTime != null">
         insert_time,
@@ -172,6 +174,9 @@
       </if>
       <if test="pid != null">
         #{pid,jdbcType=VARCHAR},
+      </if>
+      <if test="recoveryType != null">
+        #{recoveryType,jdbcType=VARCHAR},
       </if>
       <if test="partNumber != null">
         #{partNumber,jdbcType=VARCHAR},
@@ -245,9 +250,6 @@
       <if test="warrantyCategoryType != null">
         #{warrantyCategoryType,jdbcType=VARCHAR},
       </if>
-      <if test="recoveryType != null">
-        #{recoveryType,jdbcType=VARCHAR},
-      </if>
       <if test="insertTime != null">
         #{insertTime,jdbcType=TIMESTAMP},
       </if>
@@ -256,8 +258,8 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeList">
     update cost_tape_list
     <set>
-      <if test="pid != null">
-        pid = #{pid,jdbcType=VARCHAR},
+      <if test="recoveryType != null">
+        recovery_type = #{recoveryType,jdbcType=VARCHAR},
       </if>
       <if test="partNumber != null">
         part_number = #{partNumber,jdbcType=VARCHAR},
@@ -320,7 +322,7 @@
         bmc_percent = #{bmcPercent,jdbcType=DECIMAL},
       </if>
       <if test="type != null">
-        `type` = #{type,jdbcType=VARCHAR},
+        type = #{type,jdbcType=VARCHAR},
       </if>
       <if test="categoryType != null">
         category_type = #{categoryType,jdbcType=VARCHAR},
@@ -331,19 +333,17 @@
       <if test="warrantyCategoryType != null">
         warranty_category_type = #{warrantyCategoryType,jdbcType=VARCHAR},
       </if>
-      <if test="recoveryType != null">
-        recovery_type = #{recoveryType,jdbcType=VARCHAR},
-      </if>
       <if test="insertTime != null">
         insert_time = #{insertTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where cost_id = #{costId,jdbcType=INTEGER}
       and id = #{id,jdbcType=INTEGER}
+      and pid = #{pid,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeList">
     update cost_tape_list
-    set pid = #{pid,jdbcType=VARCHAR},
+    set recovery_type = #{recoveryType,jdbcType=VARCHAR},
       part_number = #{partNumber,jdbcType=VARCHAR},
       warranty_code = #{warrantyCode,jdbcType=VARCHAR},
       plant = #{plant,jdbcType=VARCHAR},
@@ -364,13 +364,13 @@
       mbg_freight_id = #{mbgFreightId,jdbcType=INTEGER},
       tmc_percent = #{tmcPercent,jdbcType=DECIMAL},
       bmc_percent = #{bmcPercent,jdbcType=DECIMAL},
-      `type` = #{type,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
       category_type = #{categoryType,jdbcType=VARCHAR},
       comment = #{comment,jdbcType=VARCHAR},
       warranty_category_type = #{warrantyCategoryType,jdbcType=VARCHAR},
-      recovery_type = #{recoveryType,jdbcType=VARCHAR},
       insert_time = #{insertTime,jdbcType=TIMESTAMP}
     where cost_id = #{costId,jdbcType=INTEGER}
       and id = #{id,jdbcType=INTEGER}
+      and pid = #{pid,jdbcType=VARCHAR}
   </update>
 </mapper>

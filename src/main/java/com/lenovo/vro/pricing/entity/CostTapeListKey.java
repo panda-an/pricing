@@ -5,6 +5,8 @@ public class CostTapeListKey {
 
     private Integer id;
 
+    private String pid;
+
     public Integer getCostId() {
         return costId;
     }
@@ -19,5 +21,13 @@ public class CostTapeListKey {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public void setPid(String pid) {
+        this.pid = pid == null ? null : pid.trim();
     }
 }

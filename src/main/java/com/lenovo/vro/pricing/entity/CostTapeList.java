@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class CostTapeList extends CostTapeListKey {
-    private String pid;
+    private String recoveryType;
 
     private String partNumber;
 
@@ -54,16 +54,14 @@ public class CostTapeList extends CostTapeListKey {
 
     private String warrantyCategoryType;
 
-    private String recoveryType;
-
     private Date insertTime;
 
-    public String getPid() {
-        return pid;
+    public String getRecoveryType() {
+        return recoveryType;
     }
 
-    public void setPid(String pid) {
-        this.pid = pid == null ? null : pid.trim();
+    public void setRecoveryType(String recoveryType) {
+        this.recoveryType = recoveryType == null ? null : recoveryType.trim();
     }
 
     public String getPartNumber() {
@@ -256,14 +254,6 @@ public class CostTapeList extends CostTapeListKey {
 
     public void setWarrantyCategoryType(String warrantyCategoryType) {
         this.warrantyCategoryType = warrantyCategoryType == null ? null : warrantyCategoryType.trim();
-    }
-
-    public String getRecoveryType() {
-        return recoveryType;
-    }
-
-    public void setRecoveryType(String recoveryType) {
-        this.recoveryType = recoveryType == null ? null : recoveryType.trim();
     }
 
     public Date getInsertTime() {
