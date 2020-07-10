@@ -72,6 +72,9 @@
       <if test="id != null">
         and id = #{id}
       </if>
+      <if test="pid != null">
+        and pid = #{pid}
+      </if>
     </where>
   </delete>
 
