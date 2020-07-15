@@ -43,4 +43,16 @@
   <select id="checkUserName" parameterType="java.lang.String" resultType="java.lang.Integer">
     select count(*) from system_user where user_name = #{userName,jdbcType=VARCHAR}
   </select>
+
+  <select id="getSystemUsers" parameterType="com.lenovo.vro.pricing.entity.SystemUser" resultMap="BaseResultMap">
+    select * from system_user
+    <where>
+      <if test="userName != null and userName.length > 0">
+        and user_name = #{userName,jdbcType=VARCHAR}
+      </if>
+      <if test="country != null and country.length > 0">
+        and country = #{country,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
 </mapper>

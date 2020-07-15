@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/system")
 public class SystemController {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private SystemUserService systemUserService;
@@ -32,6 +32,17 @@ public class SystemController {
             }
 
             return new ResponseBean("查询成功!", count, CodeConfig.OPERATION_SUCCESS);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ResponseBean("查询失败!", CodeConfig.OPERATION_FAILED);
+        }
+    }
+
+    @PostMapping("/getSystemUsers")
+    public ResponseBean getSystemUsers(@RequestBody SystemUser user) {
+        try {
+            List<SystemUser> list = systemUserService.getSystemUsers(user);
+            return new ResponseBean("查询成功!", list, CodeConfig.OPERATION_SUCCESS);
         } catch (Exception e) {
             logger.error(e.getMessage());
             return new ResponseBean("查询失败!", CodeConfig.OPERATION_FAILED);
@@ -54,6 +65,30 @@ public class SystemController {
     public ResponseBean updateUser(@RequestBody SystemUser user) {
         try {
             systemUserService.updateUser(user);
+
+            return new ResponseBean("修改成功!", CodeConfig.OPERATION_SUCCESS);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ResponseBean("修改失败!", CodeConfig.OPERATION_FAILED);
+        }
+    }
+
+    @PostMapping("/deleteUser")
+    public ResponseBean deleteUser(@RequestBody SystemUser user) {
+        try {
+            systemUserService.deleteUser(user);
+
+            return new ResponseBean("删除成功!", CodeConfig.OPERATION_SUCCESS);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ResponseBean("删除失败!", CodeConfig.OPERATION_FAILED);
+        }
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseBean resetPassword(@RequestBody SystemUser user) {
+        try {
+            systemUserService.resetPassword(user);
 
             return new ResponseBean("修改成功!", CodeConfig.OPERATION_SUCCESS);
         } catch (Exception e) {

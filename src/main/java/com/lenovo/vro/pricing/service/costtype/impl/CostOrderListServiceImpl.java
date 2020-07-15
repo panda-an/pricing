@@ -77,7 +77,8 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
                         HashMap<String, List<Warranty>> warrantyMap = getWarrantyDataList(partNumber, country,
                                 costTapeList.getBrand(), redisTemplate, warrantyMapperExt);
                         if (!MapUtils.isEmpty(warrantyMap)) {
-                            costTapeList.setWarrantyList(warrantyMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
+                            /*costTapeList.setWarrantyList(warrantyMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));*/
+                            costTapeList.setWarrantyMap(warrantyMap);
                         }
                     }
                 }

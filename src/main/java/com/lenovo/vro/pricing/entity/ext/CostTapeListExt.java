@@ -3,17 +3,19 @@ package com.lenovo.vro.pricing.entity.ext;
 import com.lenovo.vro.pricing.entity.CostTapeList;
 import com.lenovo.vro.pricing.entity.Warranty;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class CostTapeListExt extends CostTapeList {
 
-    private List<Warranty> warrantyList;
+    private HashMap<String, List<Warranty>> warrantyMap;
 
-    public List<Warranty> getWarrantyList() {
-        return warrantyList;
+
+    public HashMap<String, List<Warranty>> getWarrantyMap() {
+        return warrantyMap;
     }
 
-    public void setWarrantyList(List<Warranty> warrantyList) {
-        this.warrantyList = warrantyList;
+    public void setWarrantyMap(HashMap<String, List<Warranty>> warrantyMap) {
+        this.warrantyMap = warrantyMap;
     }
 }

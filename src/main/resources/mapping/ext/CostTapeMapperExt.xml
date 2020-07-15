@@ -156,9 +156,9 @@
     <if test="country != null">
       AND m.country = #{country}
     </if>
-    <if test="partNumber != null">
+<!--    <if test="partNumber != null">
       AND c.part_number = #{partNumber}
-    </if>
+    </if>-->
 
     union all
 
@@ -173,8 +173,8 @@
       <if test="country != null">
         AND m.country = #{country}
       </if>
-      <if test="partNumber != null">
+<!--      <if test="partNumber != null">
         AND c.part_number = #{partNumber}
-      </if>
+      </if>-->
   </select>
 </mapper>

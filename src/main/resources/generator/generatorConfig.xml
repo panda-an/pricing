@@ -45,8 +45,8 @@
 <!--               selectByExampleQueryId="false"></table>-->
 <!--        <table tableName="cost_tape_list" domainObjectName="CostTapeList" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>-->
-        <table tableName="cost_tape_detail" domainObjectName="CostTapeDetail" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>
+<!--        <table tableName="cost_tape_detail" domainObjectName="CostTapeDetail" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"></table>-->
 <!--        <table tableName="region_country_rebate" domainObjectName="RegionCountryRebate" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>-->
 <!--        <table tableName="machine_type_mapping" domainObjectName="MachineTypeMapping" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"

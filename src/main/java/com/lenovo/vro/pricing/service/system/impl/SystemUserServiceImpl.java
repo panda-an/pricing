@@ -66,4 +66,23 @@ public class SystemUserServiceImpl implements SystemUserService {
     public List<SystemRole> selectSystemRoleList(String del) {
         return systemRoleMapperExt.selectSystemRoleList(del);
     }
+
+    @Override
+    public List<SystemUser> getSystemUsers(SystemUser form) {
+        return systemUserMapperExt.getSystemUsers(form);
+    }
+
+    @Override
+    public void resetPassword(SystemUser systemUser) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        systemUser.setPassword(encoder.encode("123456"));
+        systemUserMapperExt.updateByPrimaryKeySelective(systemUser);
+    }
+
+    @Override
+    public void deleteUser(SystemUser systemUser) {
+        if(systemUser.getId() != null && systemUser.getId() != 0 && systemUser.getId() != 1) {
+            systemUserMapperExt.deleteByPrimaryKey(systemUser.getId());
+        }
+    }
 }
