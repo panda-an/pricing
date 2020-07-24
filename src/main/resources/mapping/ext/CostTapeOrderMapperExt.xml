@@ -12,10 +12,11 @@
     <result column="rebate" jdbcType="INTEGER" property="rebate" />
     <result column="fulfilment" jdbcType="VARCHAR" property="fulfilment" />
     <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
   </resultMap>
   <sql id="Order_Column_List">
     cost.id, cost.order_name, cost.region, cost.country, cost.local_currency, cost.exchange_rates,
-    rebate.value as rebate_value, cost.rebate as rebate, cost.user_id, cost.fulfilment
+    rebate.value as rebate_value, cost.rebate as rebate, cost.user_id, cost.fulfilment, DATE_FORMAT(cost.insert_time,'%Y-%m-%d') as insert_time
   </sql>
 
   <sql id="Base_Column_List">

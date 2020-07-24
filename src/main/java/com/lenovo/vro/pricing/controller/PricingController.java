@@ -7,6 +7,7 @@ import com.lenovo.vro.pricing.entity.ext.CostTapeOrderExt;
 import com.lenovo.vro.pricing.entity.ext.CostTapeOrderForm;
 import com.lenovo.vro.pricing.service.costtype.CostOrderListService;
 import com.lenovo.vro.pricing.service.costtype.CostTypeService;
+import com.lenovo.vro.pricing.service.db.DbService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class PricingController {
 
     @Autowired
     private CostOrderListService costOrderListService;
+
+    @Autowired
+    private DbService dbService;
 
     /**
      * 获取第一层cost tape data
@@ -395,4 +399,23 @@ public class PricingController {
 
         return bean;
     }
+
+    @PostMapping("/updateWarranty")
+    public ResponseBean updateWarranty() {
+        ResponseBean bean = new ResponseBean();
+
+        try{
+            String result = dbService.insertWarranty();
+            bean.setObj(result);
+            bean.setCode(CodeConfig.OPERATION_SUCCESS);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            bean.setCode(CodeConfig.OPERATION_FAILED);
+            bean.setMsg("update warranty has error");
+            e.printStackTrace();
+        }
+
+        return bean;
+    }
+
 }

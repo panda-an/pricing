@@ -21,6 +21,7 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -37,9 +38,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -65,6 +64,9 @@ public class DbServiceImpl extends BaseService implements DbService {
     @Autowired
     private AsyncThreadProcess asyncThreadProcess;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
     @Override
     public String insertWarranty() throws FileNotFoundException {
         logger.info("************ Start load warranty data ************");
@@ -74,8 +76,6 @@ public class DbServiceImpl extends BaseService implements DbService {
             logger.error("Cant not find warranty data directory: {}", FILE_PATH);
             throw new FileNotFoundException("Cant not find warranty data directory!");
         }
-
-        List<String> resultList = new ArrayList<>();
 
         String fileName = "";
         try {
@@ -91,28 +91,32 @@ public class DbServiceImpl extends BaseService implements DbService {
                 logger.info("Start load warranty data file: {}", fileName);
 
                 String resultCode = loadWarrantyFile(p.toFile());
-                resultList.add(resultCode);
 
                 if(resultCode.equals(CodeConfig.OPERATION_SUCCESS)) {
                     //Files.delete(p);
+
                     logger.info("Load warranty data file: {} success", fileName);
                 } else {
+                    rollbackWarrantyData();
+
                     logger.error("Load warranty data file: {} error", fileName);
+                    logger.info("************ End load warranty data ************");
+
+                    return CodeConfig.OPERATION_FAILED;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Load Cost Type File: {} Error", fileName);
-            resultList.add(CodeConfig.OPERATION_FAILED);
-        }
-        
-        if(resultList.stream().anyMatch(n -> n.equals(CodeConfig.OPERATION_FAILED))) {
+
             logger.info("************ End load warranty data ************");
             return CodeConfig.OPERATION_FAILED;
-        } else {
-            logger.info("************ End load warranty data ************");
-            return CodeConfig.OPERATION_SUCCESS;
         }
+
+        redisTemplate.delete("warranty");
+        redisTemplate.delete("warranty-ph");
+        logger.info("************ End load warranty data ************");
+        return CodeConfig.OPERATION_SUCCESS;
     }
 
     private String loadWarrantyFile(File file) {
@@ -135,6 +139,7 @@ public class DbServiceImpl extends BaseService implements DbService {
                 xmlReader.parse(source);
 
                 List<Warranty> dataList = handler.getDataList();
+                dataList = dataList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getWarrantyCode() + ";" + o.getCountry() + ";" + o.getNbmc()))), ArrayList::new));
                 resultCode = insertDb(dataList);
                 in.close();
             }

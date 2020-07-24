@@ -32,6 +32,9 @@ import org.springframework.util.StringUtils;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,9 +68,9 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
     @Override
     public CostTapeOrderExt selectCostTapeOrderDetail(Integer id, String type) {
         CostTapeOrderExt order = costTapeOrderMapperExt.selectById(id);
+
         List<CostTapeDetail> detailList = costTapeDetailMapperExt.selectCostTapeOrderDetail(id);
         List<CostTapeListExt> costTapeListList = costTapeListMapperExt.selectCostTapeList(id);
-
         if(!CollectionUtils.isEmpty(costTapeListList) && order!= null) {
             String country = order.getCountry();
             for (CostTapeListExt costTapeList : costTapeListList) {
@@ -95,6 +98,7 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         if(order != null) {
             order.setCostTapeDetailList(detailList);
             order.setCostTapeListList(costTapeListList);
+            setOrderModify(order);
         }
 
         return order;
@@ -147,7 +151,11 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String updateOrder(CostTapeOrderExt form) {
+    public String updateOrder(CostTapeOrderExt form) throws Exception {
+        if(form.getId() == null) {
+            throw new Exception("Order id is null");
+        }
+
         CostTapeOrder updateDto = new CostTapeOrder();
         BeanUtils.copyProperties(form, updateDto);
         int id = form.getId();
@@ -936,6 +944,20 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
                 return "trunk";
             default:
                 return "";
+        }
+    }
+
+    private void setOrderModify(CostTapeOrderExt order) {
+        if(order.getInsertTime() != null) {
+            LocalDate localDate = LocalDate.now();
+            Date monday = Date.from(localDate.with(DayOfWeek.MONDAY).atStartOfDay(ZoneId.systemDefault()).toInstant());
+            if(order.getInsertTime().after(monday) || order.getInsertTime().equals(monday)) {
+                order.setModify("1");
+            } else {
+                order.setModify("0");
+            }
+        } else {
+            order.setModify("0");
         }
     }
 }

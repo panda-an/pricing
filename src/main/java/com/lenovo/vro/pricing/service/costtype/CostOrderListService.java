@@ -17,7 +17,7 @@ public interface CostOrderListService {
 
     String saveOrder(CostTapeOrderExt form);
 
-    String updateOrder(CostTapeOrderExt form);
+    String updateOrder(CostTapeOrderExt form) throws Exception;
 
     void exportData(CostTapeOrderExt form, HttpServletResponse response);
 

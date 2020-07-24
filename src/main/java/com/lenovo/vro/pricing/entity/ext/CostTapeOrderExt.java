@@ -9,6 +9,8 @@ import java.util.List;
 
 public class CostTapeOrderExt extends CostTapeOrder {
 
+    private String modify;
+
     private BigDecimal rebateValue;
 
     private List<CostTapeListExt> costTapeListList;
@@ -37,5 +39,13 @@ public class CostTapeOrderExt extends CostTapeOrder {
 
     public void setRebateValue(BigDecimal rebateValue) {
         this.rebateValue = rebateValue;
+    }
+
+    public String getModify() {
+        return modify;
+    }
+
+    public void setModify(String modify) {
+        this.modify = modify;
     }
 }

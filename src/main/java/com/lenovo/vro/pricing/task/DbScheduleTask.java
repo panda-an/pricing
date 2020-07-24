@@ -5,7 +5,6 @@ import com.lenovo.vro.pricing.service.db.DbService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,8 +19,6 @@ public class DbScheduleTask {
     @Autowired
     private DbService dbService;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
     @Scheduled(cron = "0 0 1 2 * ? ")
     public void insertWarranty() {
@@ -32,8 +29,6 @@ public class DbScheduleTask {
             if(code1.equals(CodeConfig.OPERATION_FAILED)) {
                 logger.error("Can not load warranty data file!");
             } else {
-                redisTemplate.delete("warranty");
-                redisTemplate.delete("warranty-ph");
                 logger.info("Load warranty data file process success!");
             }
         } catch (FileNotFoundException e) {

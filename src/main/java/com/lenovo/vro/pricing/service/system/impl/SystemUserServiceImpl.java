@@ -11,6 +11,7 @@ import com.lenovo.vro.pricing.service.system.SystemUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -49,6 +50,10 @@ public class SystemUserServiceImpl implements SystemUserService {
 
     @Override
     public void updateUser(SystemUser systemUser) {
+        if(!StringUtils.isEmpty(systemUser.getPassword())) {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            systemUser.setPassword(encoder.encode(systemUser.getPassword()));
+        }
         systemUserMapperExt.updateByPrimaryKeySelective(systemUser);
     }
 
