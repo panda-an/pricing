@@ -257,7 +257,9 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
                 List<CostTapeList> list = new ArrayList<>();
                 if(temp.getPid().contains("*")) {
                     list.add(temp);
-                    list.addAll(costTapeListList.stream().filter(n -> n.getPid().substring(1).equals(temp.getPid())).collect(Collectors.toList()));
+                    list.addAll(costTapeListList.stream().filter(n -> n.getPid().concat("*").equals(temp.getPid())).collect(Collectors.toList()));
+                } else {
+                    continue;
                 }
 
                 dataList.add(list);
@@ -618,9 +620,13 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
                     cellIndex++;
 
                     cell = row.createCell(cellIndex);
-                    cell.setCellValue(data.getTmcPercent()!=null?data.getTmcPercent().multiply(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":BigDecimal.ZERO.doubleValue()+"%");
-                    if(data.getTmcPercent()!=null && data.getTmcPercent().doubleValue() < 0) {
-                        cell.setCellStyle(redStyle);
+                    if(j != 0) {
+                        cell.setCellValue(data.getTmcPercent()!=null?data.getTmcPercent().setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()+"%":BigDecimal.ZERO.doubleValue()+"%");
+                        if(data.getTmcPercent()!=null && data.getTmcPercent().doubleValue() < 0) {
+                            cell.setCellStyle(redStyle);
+                        } else {
+                            cell.setCellStyle(defaultStyle);
+                        }
                     } else {
                         cell.setCellStyle(defaultStyle);
                     }
