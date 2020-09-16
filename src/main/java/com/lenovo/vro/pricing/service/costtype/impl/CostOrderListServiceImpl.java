@@ -850,11 +850,11 @@ public class CostOrderListServiceImpl extends CostTapeBaseService implements Cos
         cell.setCellStyle(titleStyle);
 
         cell = row.createCell(5);
-        cell.setCellValue("Total TMC GP$ (w/o cc)");
+        cell.setCellValue("Total BMC GP% (w/o cc)");
         cell.setCellStyle(titleStyle);
 
         cell = row.createCell(6);
-        cell.setCellValue("Total TMC GP% (w/o cc)");
+        cell.setCellValue("Total TMC GP$ (w/o cc)");
         cell.setCellStyle(titleStyle);
 
         cell = row.createCell(7);

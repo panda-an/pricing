@@ -70,7 +70,7 @@ public class DbServiceImpl extends BaseService implements DbService {
     @Override
     public String insertWarranty() throws FileNotFoundException {
         logger.info("************ Start load warranty data ************");
-        final String FILE_PATH = "C:\\ftp\\data\\warranty\\";
+        final String FILE_PATH = "/Users/pandean/Downloads/warranty";
         Path path = Paths.get(FILE_PATH);
         if(!Files.exists(path) || !Files.isDirectory(path)) {
             logger.error("Cant not find warranty data directory: {}", FILE_PATH);
@@ -139,7 +139,7 @@ public class DbServiceImpl extends BaseService implements DbService {
                 xmlReader.parse(source);
 
                 List<Warranty> dataList = handler.getDataList();
-                dataList = dataList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getWarrantyCode() + ";" + o.getCountry() + ";" + o.getNbmc()))), ArrayList::new));
+                dataList = dataList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getPartNumber() + ";" + o.getWarrantyCode() + ";" + o.getCountry() + ";" + o.getNbmc()))), ArrayList::new));
                 resultCode = insertDb(dataList);
                 in.close();
             }
