@@ -115,7 +115,7 @@
         AND c.part_number = #{partNumber}
       </if>
       <if test="country != null">
-        AND c.country = #{country}
+        AND ( c.country = #{country} or c.country = 'ALL')
       </if>
       <if test="plant != null">
         AND c.plant = #{plant}
@@ -176,5 +176,27 @@
 <!--      <if test="partNumber != null">
         AND c.part_number = #{partNumber}
       </if>-->
+  </select>
+
+  <select id="getReportListMonthly" resultMap="BaseResultMap">
+    select avg(t.`one`) as `one`, t.part_number, t.country, t.subgeo, t.brand
+    from (
+          select `one`,  part_number, country, subgeo, brand
+          from cost_tape
+          where  brand in ('IdeaCentre','IDEAPAD','ThinkCentre','ThinkPad','ThinkStation','VLH')
+          and subgeo in ('ANZ', 'ASEAN', 'CAP', 'HTK', 'INDIA', 'JAPAN')
+    ) t
+    group by t.subgeo, t.brand,t.part_number, t.country
+
+    union all
+
+    select avg(t.`one`) as `one`, t.part_number, t.country, t.subgeo, t.brand
+    from (
+          select `one`,  part_number, country, subgeo, brand
+          from cost_tape
+          where  brand is null
+          and subgeo in ('ANZ', 'ASEAN', 'CAP', 'HTK', 'INDIA', 'JAPAN')
+    ) t
+    group by t.subgeo, t.brand,t.part_number, t.country
   </select>
 </mapper>

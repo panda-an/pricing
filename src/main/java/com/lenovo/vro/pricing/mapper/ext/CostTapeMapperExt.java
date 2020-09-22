@@ -13,4 +13,6 @@ public interface CostTapeMapperExt {
     List<CostTapeExt> getMbgCostTapeData(CostTape costTape);
 
     List<CostTape> getSbbInfo(CostTape costTape);
+
+    List<CostTapeExt> getReportListMonthly();
 }

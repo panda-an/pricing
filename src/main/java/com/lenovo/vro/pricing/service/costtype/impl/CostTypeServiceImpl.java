@@ -1,5 +1,6 @@
 package com.lenovo.vro.pricing.service.costtype.impl;
 
+import com.google.common.collect.Lists;
 import com.lenovo.vro.pricing.common.snowflake.SnowflakeIdWorker;
 import com.lenovo.vro.pricing.configuration.CodeConfig;
 import com.lenovo.vro.pricing.entity.*;
@@ -7,6 +8,9 @@ import com.lenovo.vro.pricing.entity.ext.CostTapeExt;
 import com.lenovo.vro.pricing.mapper.ext.*;
 import com.lenovo.vro.pricing.service.costtype.CostTypeService;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -405,6 +413,35 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
         return list;
     }
 
+    @Override
+    public void getReportListMonthly() {
+        List<CostTapeExt> list = costTapeMapperExt.getReportListMonthly();
+        String path = "C:\\ftp\\target\\costTape_monthly\\";
+        if(!CollectionUtils.isEmpty(list)) {
+            List<List<CostTapeExt>> dataList = Lists.partition(list, 500000);
+            try(XSSFWorkbook wb = new XSSFWorkbook();
+                FileOutputStream o = new FileOutputStream(path)) {
+                XSSFSheet s;
+                for(int i=0;i<dataList.size();i++) {
+                    s = wb.createSheet();
+                    createSheetData(s, dataList.get(i));
+                }
+
+                Path p = Paths.get(path);
+                if(!Files.exists(p)) {
+                    Files.createDirectories(p);
+                }
+                wb.write(o);
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error("Create cost tape monthly error {}", e.getMessage());
+            }
+        } else {
+            logger.error("Monthly cost tape data is empty");
+        }
+
+    }
+
     private void setAirCost(String country, String machineType, CostTapeExt result, String fulfilment) {
         String key = country + "-" + machineType + "-" + fulfilment;
 
@@ -511,5 +548,24 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
     private List<CostTapeExt> filterDataGeo(List<CostTapeExt> dataList) {
         return dataList.stream().
                 filter(n -> n.getGeo().equals(n.getSubGeo()) || n.getSubGeo().equals("ALL")).collect(Collectors.toList());
+    }
+
+    private void createSheetData(XSSFSheet sheet, List<CostTapeExt> list) {
+        XSSFRow row = sheet.createRow(0);
+        row.createCell(0).setCellValue("PART_NUMBER");
+        row.createCell(1).setCellValue("GEO");
+        row.createCell(2).setCellValue("COUNTRY");
+        row.createCell(3).setCellValue("BRAND");
+        row.createCell(4).setCellValue("AVG");
+
+        for(int i=0;i<list.size();i++) {
+            row = sheet.createRow(i + 1);
+            CostTapeExt temp = list.get(i);
+            row.createCell(0).setCellValue(temp.getPartNumber());
+            row.createCell(1).setCellValue(temp.getGeo());
+            row.createCell(2).setCellValue(temp.getCountry());
+            row.createCell(3).setCellValue(temp.getBrand());
+            row.createCell(4).setCellValue(temp.getBmc().longValue());
+        }
     }
 }
