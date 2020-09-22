@@ -20,6 +20,4 @@ public interface CostTypeService {
     List<TransportCost> changeTransportType(List<AirCostForm> list);
 
     List<CostTape> getSbbInfo(CostTape form) throws Exception;
-
-    void getReportListMonthly();
 }
