@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.CostTapeBuMappingMapper">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeBuMapping">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="bu" jdbcType="VARCHAR" property="bu" />
+    <result column="family" jdbcType="VARCHAR" property="family" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, bu, family, insert_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from cost_tape_bu_mapping
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from cost_tape_bu_mapping
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.CostTapeBuMapping">
+    insert into cost_tape_bu_mapping (id, bu, family, 
+      insert_time)
+    values (#{id,jdbcType=INTEGER}, #{bu,jdbcType=VARCHAR}, #{family,jdbcType=VARCHAR}, 
+      #{insertTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeBuMapping">
+    insert into cost_tape_bu_mapping
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="bu != null">
+        bu,
+      </if>
+      <if test="family != null">
+        family,
+      </if>
+      <if test="insertTime != null">
+        insert_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="bu != null">
+        #{bu,jdbcType=VARCHAR},
+      </if>
+      <if test="family != null">
+        #{family,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lenovo.vro.pricing.entity.CostTapeBuMapping">
+    update cost_tape_bu_mapping
+    <set>
+      <if test="bu != null">
+        bu = #{bu,jdbcType=VARCHAR},
+      </if>
+      <if test="family != null">
+        family = #{family,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.CostTapeBuMapping">
+    update cost_tape_bu_mapping
+    set bu = #{bu,jdbcType=VARCHAR},
+      family = #{family,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

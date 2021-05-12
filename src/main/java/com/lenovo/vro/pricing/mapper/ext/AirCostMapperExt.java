@@ -1,12 +1,15 @@
 package com.lenovo.vro.pricing.mapper.ext;
 
 import com.lenovo.vro.pricing.entity.AirCost;
-import com.lenovo.vro.pricing.entity.AirCostForm;
 import com.lenovo.vro.pricing.mapper.AirCostMapper;
+
+import java.util.List;
 
 public interface AirCostMapperExt extends AirCostMapper {
 
-    AirCost getCostTapeAirCost1(AirCostForm form);
+    void insertBatch(List<AirCost> list);
 
-    AirCost getCostTapeAirCost2(AirCost form);
+    void deleteAll();
+
+    AirCost getCostTapeAirCost1(AirCost form);
 }

@@ -3,10 +3,7 @@ package com.lenovo.vro.pricing.service.db.impl;
 import com.google.common.collect.Lists;
 import com.lenovo.vro.pricing.configuration.CodeConfig;
 import com.lenovo.vro.pricing.entity.*;
-import com.lenovo.vro.pricing.mapper.ext.CostTapeEoMapperExt;
-import com.lenovo.vro.pricing.mapper.ext.CostTapeGscMapperExt;
-import com.lenovo.vro.pricing.mapper.ext.MbgFreightCostMapperExt;
-import com.lenovo.vro.pricing.mapper.ext.WarrantyMapperExt;
+import com.lenovo.vro.pricing.mapper.ext.*;
 import com.lenovo.vro.pricing.service.BaseService;
 import com.lenovo.vro.pricing.service.async.AsyncThreadProcess;
 import com.lenovo.vro.pricing.service.db.DbService;
@@ -62,6 +59,12 @@ public class DbServiceImpl extends BaseService implements DbService {
     private MbgFreightCostMapperExt mbgFreightCostMapperExt;
 
     @Autowired
+    private AirCostMapperExt airCostMapperExt;
+
+    @Autowired
+    private CostTapeBuMappingMapperExt costTapeBuMappingMapperExt;
+
+    @Autowired
     private AsyncThreadProcess asyncThreadProcess;
 
     @Autowired
@@ -70,7 +73,7 @@ public class DbServiceImpl extends BaseService implements DbService {
     @Override
     public String insertWarranty() throws FileNotFoundException {
         logger.info("************ Start load warranty data ************");
-        final String FILE_PATH = "C:\\ftp\\data\\warranty";
+        final String FILE_PATH = "C:\\ftp\\data\\pms\\warranty";
         Path path = Paths.get(FILE_PATH);
         if(!Files.exists(path) || !Files.isDirectory(path)) {
             logger.error("Cant not find warranty data directory: {}", FILE_PATH);
@@ -105,6 +108,7 @@ public class DbServiceImpl extends BaseService implements DbService {
                     return CodeConfig.OPERATION_FAILED;
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Load Cost Type File: {} Error", fileName);
@@ -197,14 +201,9 @@ public class DbServiceImpl extends BaseService implements DbService {
     }
 
     @Override
-    public void insertCostTapeFamilyMapping() {
-
-    }
-
-    @Override
     public String insertEo() throws FileNotFoundException {
         logger.info("************ Start load cost tape eo mapping data ************");
-        final String FILE_PATH = "C:\\ftp\\data\\price_mapping\\eo\\";
+        final String FILE_PATH = "C:\\ftp\\data\\pms\\price_mapping\\eo\\";
         Path path = Paths.get(FILE_PATH);
         if(!Files.exists(path) || !Files.isDirectory(path)) {
             logger.error("Cant not find cost tape eo mapping data directory: {}", FILE_PATH);
@@ -330,7 +329,7 @@ public class DbServiceImpl extends BaseService implements DbService {
     @Override
     public String insertGsc() throws FileNotFoundException {
         logger.info("************ Start load cost tape gsc mapping data ************");
-        final String FILE_PATH = "C:\\ftp\\data\\price_mapping\\gsc\\";
+        final String FILE_PATH = "C:\\ftp\\data\\pms\\price_mapping\\gsc\\";
         Path path = Paths.get(FILE_PATH);
         if(!Files.exists(path) || !Files.isDirectory(path)) {
             logger.error("Cant not find cost tape gsc mapping data directory: {}", FILE_PATH);
@@ -380,7 +379,7 @@ public class DbServiceImpl extends BaseService implements DbService {
     @Override
     public String insertMbgFreight() throws FileNotFoundException {
         logger.info("************ Start load mbg freight cost data ************");
-        final String FILE_PATH = "C:\\ftp\\data\\mbg_freight\\";
+        final String FILE_PATH = "C:\\ftp\\data\\pms\\mbg_freight\\";
         Path path = Paths.get(FILE_PATH);
         if(!Files.exists(path) || !Files.isDirectory(path)) {
             logger.error("Cant not find mbg freight cost data directory: {}", FILE_PATH);
@@ -395,7 +394,7 @@ public class DbServiceImpl extends BaseService implements DbService {
             List<Path> list = fileList.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
 
             if(!CollectionUtils.isEmpty(list)) {
-                rollbackCostTapeGscData();
+                rollbackMbgFreightCostData();
             }
 
             for(Path p : list) {
@@ -423,6 +422,58 @@ public class DbServiceImpl extends BaseService implements DbService {
             return CodeConfig.OPERATION_FAILED;
         } else {
             logger.info("************ End load mbg freight cost data ************");
+            return CodeConfig.OPERATION_SUCCESS;
+        }
+    }
+
+    @Override
+    public String insertFreight() throws FileNotFoundException {
+        logger.info("************ Start load freight cost data ************");
+        final String FILE_PATH = "C:\\ftp\\data\\pms\\freight\\";
+        Path path = Paths.get(FILE_PATH);
+        if(!Files.exists(path) || !Files.isDirectory(path)) {
+            logger.error("Cant not find freight cost data directory: {}", FILE_PATH);
+            throw new FileNotFoundException("Cant not find freight cost data directory!");
+        }
+
+        List<String> resultList = new ArrayList<>();
+
+        String fileName = "";
+        try {
+            Stream<Path> fileList = Files.walk(path, 7);
+            List<Path> list = fileList.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
+
+            if(!CollectionUtils.isEmpty(list)) {
+                rollbackFreightData();
+            }
+
+            for(Path p : list) {
+                fileName = p.toFile().getName();
+                logger.info("Start load freight cost data file: {}", fileName);
+
+                String resultCode = loadFreightCostFile(p.toFile());
+                resultList.add(resultCode);
+
+                if(resultCode.equals(CodeConfig.OPERATION_SUCCESS)) {
+                    logger.info("Load freight cost data file: {} success", fileName);
+                } else {
+                    logger.error("Load freight cost data file: {} error", fileName);
+                }
+            }
+
+            redisTemplate.delete("airCost");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Load freight cost data File: {} Error", fileName);
+            resultList.add(CodeConfig.OPERATION_FAILED);
+        }
+
+        if(resultList.stream().anyMatch(n -> n.equals(CodeConfig.OPERATION_FAILED))) {
+            logger.info("************ End load freight cost data ************");
+            return CodeConfig.OPERATION_FAILED;
+        } else {
+            logger.info("************ End load freight cost data ************");
             return CodeConfig.OPERATION_SUCCESS;
         }
     }
@@ -495,6 +546,207 @@ public class DbServiceImpl extends BaseService implements DbService {
 
         if(!allDone) {
             logger.error("Load mbg freight cost file Data Completed But Has Error, Will Roll back, Please Check Log");
+
+            rollbackMbgFreightCostData();
+            return CodeConfig.OPERATION_FAILED;
+        } else {
+            return CodeConfig.OPERATION_SUCCESS;
+        }
+    }
+
+    private String loadFreightCostFile(File file) {
+        String resultCode = "";
+
+        try (OPCPackage opcPackage = OPCPackage.open(file)) {
+
+            XSSFReader reader = new XSSFReader(opcPackage);
+            SharedStringsTable sharedStringsTable = reader.getSharedStringsTable();
+            StylesTable stylesTable = reader.getStylesTable();
+            XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+            FreightSheetHandler handler = new FreightSheetHandler();
+            XSSFSheetXMLHandler xmlHandler = new XSSFSheetXMLHandler(stylesTable, sharedStringsTable, handler, new DataFormatter(), false);
+            xmlReader.setContentHandler(xmlHandler);
+            XSSFReader.SheetIterator sheetIterator = (XSSFReader.SheetIterator) reader.getSheetsData();
+
+            while (sheetIterator.hasNext()) {
+                InputStream in = sheetIterator.next();
+                InputSource source = new InputSource(in);
+                xmlReader.parse(source);
+
+                List<AirCost> dataList = handler.getDataList();
+                resultCode = insertFreightCostDb(dataList);
+                in.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            resultCode = CodeConfig.OPERATION_FAILED;
+            logger.error("Read mbg freight cost data file {} error", file.getName());
+            logger.error(e.getMessage());
+        } catch (OpenXML4JException | SAXException e) {
+            logger.error("Read mbg freight cost data file {} error!", file.getName());
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            resultCode = CodeConfig.OPERATION_FAILED;
+        }
+
+        return resultCode;
+    }
+
+    private String insertFreightCostDb(List<AirCost> dataList) {
+        List<List<AirCost>> freightDataList = Lists.partition(dataList, CodeConfig.LIST_NUMBER);
+
+        List<Future<FutureBean>> futureList = new ArrayList<>();
+        CountDownLatch countDownLatch = new CountDownLatch(freightDataList.size());
+
+        boolean allDone = true;
+
+        try {
+            for (List<AirCost> list : freightDataList) {
+                Future<FutureBean> future = asyncThreadProcess.processFreightCostThread(airCostMapperExt, list, countDownLatch);
+                futureList.add(future);
+            }
+
+            countDownLatch.await();
+
+            for(Future<FutureBean> future : futureList) {
+                FutureBean bean = future.get();
+                String status = bean.getStatus();
+                if(StringUtils.isEmpty(status) || status.equalsIgnoreCase(CodeConfig.OPERATION_FAILED)) {
+                    allDone = false;
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            allDone = false;
+        }
+
+        if(!allDone) {
+            logger.error("Load freight cost file Data Completed But Has Error, Will Roll back, Please Check Log");
+
+            rollbackMbgFreightCostData();
+            return CodeConfig.OPERATION_FAILED;
+        } else {
+            return CodeConfig.OPERATION_SUCCESS;
+        }
+    }
+
+    @Override
+    public String insertCostTapeBuMapping() throws FileNotFoundException {
+        logger.info("************ Start load cost tape bu mapping data ************");
+        final String FILE_PATH = "C:\\ftp\\data\\pms\\price_mapping\\cost tape bu\\";
+        Path path = Paths.get(FILE_PATH);
+        if(!Files.exists(path) || !Files.isDirectory(path)) {
+            logger.error("Cant not find cost tape bu mapping data directory: {}", FILE_PATH);
+            throw new FileNotFoundException("Cant not find cost tape bu mapping data directory!");
+        }
+
+        List<String> resultList = new ArrayList<>();
+
+        String fileName = "";
+        try {
+            Stream<Path> fileList = Files.walk(path, 7);
+            List<Path> list = fileList.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
+
+            if(!CollectionUtils.isEmpty(list)) {
+                rollbackCostTapeBuMappingData();
+            }
+
+            for(Path p : list) {
+                fileName = p.toFile().getName();
+                logger.info("Start load cost tape bu mapping data file: {}", fileName);
+
+                String resultCode = loadCostTapeBuMappingFile(p.toFile());
+                resultList.add(resultCode);
+
+                if(resultCode.equals(CodeConfig.OPERATION_SUCCESS)) {
+                    logger.info("Load cost tape bu mapping data file: {} success", fileName);
+                } else {
+                    logger.error("Load cost tape bu mapping data file: {} error", fileName);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Load cost tape bu mapping data File: {} Error", fileName);
+            resultList.add(CodeConfig.OPERATION_FAILED);
+        }
+
+        if(resultList.stream().anyMatch(n -> n.equals(CodeConfig.OPERATION_FAILED))) {
+            logger.info("************ End load cost tape bu mapping data ************");
+            return CodeConfig.OPERATION_FAILED;
+        } else {
+            logger.info("************ End load cost tape bu mapping data ************");
+            return CodeConfig.OPERATION_SUCCESS;
+        }
+    }
+
+    private String loadCostTapeBuMappingFile(File file) {
+        String resultCode = "";
+
+        try (OPCPackage opcPackage = OPCPackage.open(file)) {
+
+            XSSFReader reader = new XSSFReader(opcPackage);
+            SharedStringsTable sharedStringsTable = reader.getSharedStringsTable();
+            StylesTable stylesTable = reader.getStylesTable();
+            XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+            CostTapeBuMappingSheetHandler handler = new CostTapeBuMappingSheetHandler();
+            XSSFSheetXMLHandler xmlHandler = new XSSFSheetXMLHandler(stylesTable, sharedStringsTable, handler, new DataFormatter(), false);
+            xmlReader.setContentHandler(xmlHandler);
+            XSSFReader.SheetIterator sheetIterator = (XSSFReader.SheetIterator) reader.getSheetsData();
+
+            while (sheetIterator.hasNext()) {
+                InputStream in = sheetIterator.next();
+                InputSource source = new InputSource(in);
+                xmlReader.parse(source);
+
+                List<CostTapeBuMapping> dataList = handler.getDataList();
+                resultCode = insertCostTapeBuMappingDb(dataList);
+                in.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            resultCode = CodeConfig.OPERATION_FAILED;
+            logger.error("Read mbg freight cost data file {} error", file.getName());
+            logger.error(e.getMessage());
+        } catch (OpenXML4JException | SAXException e) {
+            logger.error("Read mbg freight cost data file {} error!", file.getName());
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            resultCode = CodeConfig.OPERATION_FAILED;
+        }
+
+        return resultCode;
+    }
+
+    private String insertCostTapeBuMappingDb(List<CostTapeBuMapping> dataList) {
+        List<List<CostTapeBuMapping>> costTapeBuMappingDataList = Lists.partition(dataList, CodeConfig.LIST_NUMBER);
+
+        List<Future<FutureBean>> futureList = new ArrayList<>();
+        CountDownLatch countDownLatch = new CountDownLatch(costTapeBuMappingDataList.size());
+
+        boolean allDone = true;
+
+        try {
+            for (List<CostTapeBuMapping> list : costTapeBuMappingDataList) {
+                Future<FutureBean> future = asyncThreadProcess.processCostTapeBuMappingThread(costTapeBuMappingMapperExt, list, countDownLatch);
+                futureList.add(future);
+            }
+
+            countDownLatch.await();
+
+            for(Future<FutureBean> future : futureList) {
+                FutureBean bean = future.get();
+                String status = bean.getStatus();
+                if(StringUtils.isEmpty(status) || status.equalsIgnoreCase(CodeConfig.OPERATION_FAILED)) {
+                    allDone = false;
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            allDone = false;
+        }
+
+        if(!allDone) {
+            logger.error("Load cost tape bu mapping file Data Completed But Has Error, Will Roll back, Please Check Log");
 
             rollbackMbgFreightCostData();
             return CodeConfig.OPERATION_FAILED;
@@ -589,6 +841,15 @@ public class DbServiceImpl extends BaseService implements DbService {
 
     private void rollbackCostTapeGscData() {
         costTapeGscMapperExt.deleteAll();
+    }
+
+    private void rollbackFreightData() {
+
+        airCostMapperExt.deleteAll();
+    }
+
+    private void rollbackCostTapeBuMappingData() {
+        costTapeBuMappingMapperExt.deleteAll();
     }
 
     private void rollbackMbgFreightCostData() {
@@ -804,12 +1065,9 @@ public class DbServiceImpl extends BaseService implements DbService {
                         mbgFreightCost.setProductFamily(formattedValue);
                         break;
                     case "B":
-                        mbgFreightCost.setProductNumber(formattedValue);
-                        break;
-                    case "D":
                         mbgFreightCost.setCountry(formattedValue);
                         break;
-                    case "E":
+                    case "C":
                         if(formattedValue.equalsIgnoreCase("air")) {
                             mbgFreightCost.setMot("1");
                         } else if(formattedValue.equalsIgnoreCase("ocean")) {
@@ -820,8 +1078,124 @@ public class DbServiceImpl extends BaseService implements DbService {
                             mbgFreightCost.setMot("");
                         }
                         break;
-                    case "F":
+                    case "D":
                         mbgFreightCost.setFee(StringUtils.isEmpty(formattedValue)?null:new BigDecimal(formattedValue));
+                        break;
+                }
+            }
+        }
+    }
+
+    public class FreightSheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler{
+
+        private AirCost airCost, airCost1, airCost2;
+        private List<AirCost> dataList;
+
+        Date date = getInsertDate();
+
+        private List<AirCost> getDataList() {
+            return dataList;
+        }
+
+        @Override
+        public void startRow(int rowNum) {
+            if(rowNum > 0) {
+                airCost = new AirCost();
+                airCost.setInsertTime(date);
+                airCost.setMot("0");
+                airCost1 = new AirCost();
+                airCost1.setInsertTime(date);
+                airCost1.setMot("1");
+                airCost2 = new AirCost();
+                airCost2.setInsertTime(date);
+                airCost2.setMot("2");
+            }
+        }
+
+        @Override
+        public void endRow(int rowNum) {
+            if(dataList == null) {
+                dataList = new ArrayList<>();
+            }
+
+            if(airCost != null && !StringUtils.isEmpty(airCost.getMot())) {
+                dataList.add(airCost);
+                dataList.add(airCost1);
+                dataList.add(airCost2);
+            }
+        }
+
+        @Override
+        public void cell(String cellReference, String formattedValue, XSSFComment comment) {
+            if(airCost != null) {
+                String prefix = cellReference.replaceAll("\\d+", "");
+
+                switch (prefix) {
+                    case "A":
+                        airCost.setCountry(formattedValue);
+                        airCost1.setCountry(formattedValue);
+                        airCost2.setCountry(formattedValue);
+                        break;
+                    case "B":
+                        airCost.setType(formattedValue);
+                        airCost1.setType(formattedValue);
+                        airCost2.setType(formattedValue);
+                        break;
+                    case "C":
+                        airCost1.setCost(StringUtils.isEmpty(formattedValue)?null:new BigDecimal(formattedValue));
+                        break;
+                    case "D":
+                        airCost.setCost(StringUtils.isEmpty(formattedValue)?null:new BigDecimal(formattedValue));
+                        break;
+                    case "E":
+                        airCost2.setCost(StringUtils.isEmpty(formattedValue)?null:new BigDecimal(formattedValue));
+                        break;
+                }
+            }
+        }
+    }
+
+    public class CostTapeBuMappingSheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler{
+
+        private CostTapeBuMapping costTapeBuMapping;
+        private List<CostTapeBuMapping> dataList;
+
+        Date date = getInsertDate();
+
+        private List<CostTapeBuMapping> getDataList() {
+            return dataList;
+        }
+
+        @Override
+        public void startRow(int rowNum) {
+            if(rowNum > 0) {
+                costTapeBuMapping = new CostTapeBuMapping();
+                costTapeBuMapping.setInsertTime(date);
+            }
+        }
+
+        @Override
+        public void endRow(int rowNum) {
+            if(dataList == null) {
+                dataList = new ArrayList<>();
+            }
+
+            if(costTapeBuMapping != null) {
+                dataList.add(costTapeBuMapping);
+            }
+        }
+
+        @Override
+        public void cell(String cellReference, String formattedValue, XSSFComment comment) {
+            if(costTapeBuMapping != null) {
+                String prefix = cellReference.replaceAll("\\d+", "");
+
+                switch (prefix) {
+                    case "A":
+                        costTapeBuMapping.setBu(formattedValue);
+                        break;
+                    case "B":
+                        costTapeBuMapping.setFamily(formattedValue);
                         break;
                 }
             }

@@ -1,5 +1,6 @@
 package com.lenovo.vro.pricing.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.lenovo.vro.pricing.configuration.CodeConfig;
@@ -17,9 +18,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -53,7 +56,7 @@ public class WebUserService implements UserDetailsService {
         return User.builder().username(user.getUsername()).password(salt).authorities(user.getAuthorities()).build();
     }
 
-    public Map<String, String> saveUserInfo(UserDetails user) {
+    public Map<String, String> saveUserInfo(UserDetails user, WebAuthenticationDetails webAuthenticationDetails) {
         String salt = generateUserSalt();
 
         Algorithm algorithm = Algorithm.HMAC256(salt);
@@ -67,6 +70,10 @@ public class WebUserService implements UserDetailsService {
         map.put("token", token);
         map.put("region", systemUserExt.getCountry());
         map.put("id", systemUserExt.getId().toString());
+        // 活跃人数
+        if(webAuthenticationDetails != null) {
+            updateUser(user.getUsername(), getTime(), webAuthenticationDetails);
+        }
         
         return map;
     }
@@ -98,4 +105,22 @@ public class WebUserService implements UserDetailsService {
     }
 
     public void deleteUserInfo() {}
+
+    private void updateUser(String userName, String time, WebAuthenticationDetails webAuthenticationDetails) {
+        if(StringUtils.isEmpty(time)) {
+            time = getTime();
+        }
+
+        String ip = webAuthenticationDetails.getRemoteAddress();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("userName", userName);
+        jsonObject.put("ip", ip);
+
+        stringRedisTemplate.opsForSet().add(CodeConfig.REDIS_PREFIX + CodeConfig.ACTIVE + time, jsonObject.toString());
+    }
+
+    private String getTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        return sdf.format(new Date());
+    }
 }

@@ -11,31 +11,35 @@
     air.id, air.country, air.`type`, air.cost
   </sql>
 
-  <select id="getCostTapeAirCost1" parameterType="com.lenovo.vro.pricing.entity.AirCostForm" resultMap="BaseResultMap">
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into air_cost (country, `type`,
+                          mot, cost
+    )
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+           (#{item.country,jdbcType=VARCHAR},#{item.type,jdbcType=VARCHAR},
+      #{item.mot,jdbcType=VARCHAR}, #{item.cost,jdbcType=DECIMAL}
+           )
+    </foreach>
+  </insert>
+
+  <update id="deleteAll">
+    truncate air_cost
+  </update>
+
+  <select id="getCostTapeAirCost1" parameterType="com.lenovo.vro.pricing.entity.AirCost" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from air_cost air
-    inner join machine_type_mapping m on air.`type` = m.`type`
     <where>
-      <if test="machineType != null">
-        and m.machine_type = #{machineType}
+      <if test="mot != null">
+        and mot = #{mot}
       </if>
       <if test="country != null">
-        and air.country = #{country}
+        and country = #{country}
       </if>
-    </where>
-  </select>
-
-  <select id="getCostTapeAirCost2" parameterType="com.lenovo.vro.pricing.entity.AirCost" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from air_cost air
-    <where>
       <if test="type != null">
-        and air.`type` = #{type}
-      </if>
-      <if test="country != null">
-        and air.country = #{country}
+        and `type` = #{type}
       </if>
     </where>
   </select>

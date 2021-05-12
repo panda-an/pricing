@@ -1,18 +1,14 @@
 package com.lenovo.vro.pricing.service.costtype.impl;
 
-import com.google.common.collect.Lists;
 import com.lenovo.vro.pricing.common.snowflake.SnowflakeIdWorker;
 import com.lenovo.vro.pricing.configuration.CodeConfig;
 import com.lenovo.vro.pricing.entity.*;
+import com.lenovo.vro.pricing.entity.ext.AirCostExt;
 import com.lenovo.vro.pricing.entity.ext.CostTapeExt;
+import com.lenovo.vro.pricing.mapper.CostTapeBufferMapper;
 import com.lenovo.vro.pricing.mapper.ext.*;
 import com.lenovo.vro.pricing.service.costtype.CostTypeService;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.io.FileOutputStream;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,6 +48,12 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
 
     @Autowired
     private CostTapeCryadMapperExt costTapeCryadMapperExt;
+
+    @Autowired
+    private CostTapeBuMappingMapperExt costTapeBuMappingMapperExt;
+
+    @Autowired
+    private CostTapeBufferMapper costTapeBufferMapper;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -113,7 +110,7 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
                 if(type.equals(CodeConfig.COST_TAPE)) {
                     costTapeExtList = costTapeMapperExt.getCostTapeData(costTape);
 
-                    if(costTapeExtList.stream().filter(n -> !StringUtils.isEmpty(n.getBrand())).map(CostTapeExt::getBrand).distinct().
+                    if(costTapeExtList.stream().map(CostTapeExt::getBrand).filter(brand -> !StringUtils.isEmpty(brand)).distinct().
                             anyMatch(n -> n.equalsIgnoreCase("service") || n.equalsIgnoreCase("option")
                                     || n.equalsIgnoreCase("thinkvision"))) {
                         result = filterSameGeoList(costTapeExtList);
@@ -161,7 +158,25 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
             result.setPid(Long.toString(id));
         }
 
+        // bu
+        String bu = null;
+        if(type.equals(CodeConfig.COST_TAPE) && result != null) {
+            if(operationType.equals("0")) {
+                bu = getBuInfo(result);
+            } else {
+                bu = getMbgBuInfo(result);
+            }
 
+            if(!StringUtils.isEmpty(bu)) {
+                BigDecimal buffer = getBufferByBu(bu);
+                result.setBmc(result.getBmc().add(buffer));
+                result.setBu(bu);
+            } else {
+                result.setBu("");
+            }
+        }
+
+        //非sbb
         if(type.equals(CodeConfig.COST_TAPE) && result != null) {
             // warranty - nbmc, mbg warranty cost has passed the value when the page is initialization
             if(partNumber.length() > 4 && operationType.equals("0")) {
@@ -173,33 +188,23 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
             }
 
             // non-mbg freight
-            if(operationType.equals("0")) {
-                // air cost
-                if(costTape.getFulfilment().equals(CodeConfig.FULFILMENT_AIR)) {
-                    if(partNumber.length() > 4) {
-                        String machineType = partNumber.substring(0, 4);
-                        setAirCost(country, machineType, result, costTape.getFulfilment());
-                    }
-                } else {
-                    // Ocean is all 0
-                    result.setAirCost(BigDecimal.ZERO);
-                }
+            if(operationType.equals("0") && !StringUtils.isEmpty(bu)) {
+                setAirCost(country, bu, result, costTape.getFulfilment());
             } else {
-                // mbg freight
+                // mbg freight only 'za' has value because cost tape don't have 'zg' value
                 MbgFreightCost mbgForm = new MbgFreightCost();
                 mbgForm.setProductFamily(result.getProductFamily());
                 mbgForm.setCountry(country);
                 mbgForm.setMot(costTape.getFulfilment());
-                if(costTape.getPartNumber().startsWith("ZG")) {
-                    mbgForm.setProductNumber(costTape.getPartNumber());
-                }
+                if(!costTape.getPartNumber().startsWith("ZG")) {
+                    //mbgForm.setProductNumber(costTape.getPartNumber());
+                    List<MbgFreightCost> mbgFreightCostList = mbgFreightCostMapperExt.getMbgFreightCost(mbgForm);
+                    MbgFreightCost mbgFreightCost;
+                    if(!CollectionUtils.isEmpty(mbgFreightCostList)) {
+                        mbgFreightCost = mbgFreightCostList.stream().distinct().max(Comparator.comparing(MbgFreightCost::getFee)).orElse(null);
 
-                List<MbgFreightCost> mbgFreightCostList = mbgFreightCostMapperExt.getMbgFreightCost(mbgForm);
-                MbgFreightCost mbgFreightCost;
-                if(!CollectionUtils.isEmpty(mbgFreightCostList)) {
-                    mbgFreightCost = mbgFreightCostList.stream().distinct().max(Comparator.comparing(MbgFreightCost::getFee)).orElse(null);
-
-                    result.setAirCost(mbgFreightCost==null?BigDecimal.ZERO:mbgFreightCost.getFee());
+                        result.setAirCost(mbgFreightCost==null?BigDecimal.ZERO:mbgFreightCost.getFee());
+                    }
                 }
             }
         }
@@ -288,6 +293,9 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
     private CostTapeExt filterResult(List<CostTapeExt> costTapeExtList, String key, String partNumber, String hashKey) throws Exception {
         CostTapeExt result;
         if(!CollectionUtils.isEmpty(costTapeExtList) && costTapeExtList.size() > 1) {
+            if(partNumber.startsWith("ZA") || partNumber.startsWith("ZG") && costTapeExtList.stream().map(CostTapeExt::getProductFamily).distinct().count() > 1) {
+                costTapeExtList = costTapeExtList.stream().filter(n -> !StringUtils.isEmpty(n.getProductFamily())).collect(Collectors.toList());
+            }
             // family same
             if(costTapeExtList.stream().map(CostTapeExt::getProductFamily).distinct().count() == 1) {
                 // priority same
@@ -365,33 +373,24 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
     }
 
     @Override
-    public List<TransportCost> changeTransportType(List<AirCostForm> list) {
+    public List<TransportCost> changeTransportType(List<AirCostExt> list) {
         List<TransportCost> resultList = new ArrayList<>();
 
-        for(AirCostForm form : list) {
+        for(AirCostExt form : list) {
             String country = form.getCountry();
-            String type = form.getType();
+            String mot = form.getMot();
             String partNumber = form.getPartNumber();
-            String brand = form.getBrand();
+            String bu = form.getType();
 
-            if(!StringUtils.isEmpty(country) && !StringUtils.isEmpty(type)
-                    &&!StringUtils.isEmpty(partNumber) &&!StringUtils.isEmpty(brand)) {
-                String machineType = partNumber.substring(0, 4);
-                String key = country + "-" + machineType + "-" + type;
-
+            if(!StringUtils.isEmpty(country) && !StringUtils.isEmpty(mot)
+                    &&!StringUtils.isEmpty(partNumber) &&!StringUtils.isEmpty(bu)) {
+                String key = country + "-" + bu + "-" + mot;
                 TransportCost transportCost = new TransportCost();
                 AirCost cost;
-                if(redisTemplate.opsForHash().hasKey("airCost", key)) {
-                    cost = (AirCost) redisTemplate.opsForHash().get("airCost", key);
-                } else {
-                    if(type.equals(CodeConfig.FULFILMENT_AIR)) {
-                        cost = getAirCost(country, brand, machineType, key);
-                    } else {
-                        cost = null;
-                    }
-                }
+
+                cost = getAirCost(country, bu, mot, key);
                 transportCost.setPartNumber(partNumber);
-                transportCost.setCost(cost!=null?cost.getCost():BigDecimal.ZERO);
+                transportCost.setCost(cost!=null ? cost.getCost() : BigDecimal.ZERO);
                 resultList.add(transportCost);
             }
         }
@@ -416,10 +415,10 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
         return list;
     }
 
-    private void setAirCost(String country, String machineType, CostTapeExt result, String fulfilment) {
-        String key = country + "-" + machineType + "-" + fulfilment;
+    private void setAirCost(String country, String bu, CostTapeExt result, String fulfilment) {
+        String key = country + "-" + bu + "-" + fulfilment;
 
-        AirCost airCost = getAirCost(country, result.getBrand(), machineType, key);
+        AirCost airCost = getAirCost(country, bu, fulfilment, key);
         if(airCost == null) {
             result.setAirCost(BigDecimal.ZERO);
         } else {
@@ -427,78 +426,117 @@ public class CostTypeServiceImpl extends CostTapeBaseService implements CostType
         }
     }
 
-    private AirCost getAirCost(String country, String brand, String machineType, String key) {
+    private AirCost getAirCost(String country, String bu, String mot, String key) {
         if(redisTemplate.opsForHash().hasKey("airCost", key)) {
             return (AirCost) redisTemplate.opsForHash().get("airCost", key);
         }
 
-        AirCostForm form = new AirCostForm();
+        AirCost form = new AirCost();
         form.setCountry(country);
-        form.setMachineType(machineType);
+        form.setType(bu);
+        form.setMot(mot);
 
         AirCost airCost = airCostMapperExt.getCostTapeAirCost1(form);
-        if(airCost == null) {
-            String subType;
-            if (machineType.startsWith("8") || machineType.startsWith("2")) {
-                subType = "NB";
-            } else if(machineType.startsWith("9") || machineType.startsWith("F")) {
-                subType = "DT";
-            } else if(machineType.startsWith("6")) {
-                subType = "Visual";
-            } else {
-                subType = null;
-            }
-
-            AirCost aForm = new AirCost();
-            aForm.setCountry(country);
-
-            if(!StringUtils.isEmpty(subType)) {
-                aForm.setType(subType);
-
-                AirCost subAirCost = airCostMapperExt.getCostTapeAirCost2(aForm);
-
-                if(subAirCost != null) {
-                    redisTemplate.opsForHash().put("airCost", key, subAirCost);
-
-                    return subAirCost;
-                } else {
-                    if(StringUtils.isEmpty(brand)) {
-                        return null;
-                    } else {
-                        String mappingType = getTypeByBrand(brand);
-                        aForm.setCountry(country);
-                        aForm.setType(mappingType);
-
-                        subAirCost = airCostMapperExt.getCostTapeAirCost2(aForm);
-
-                        if(subAirCost != null) {
-                            redisTemplate.opsForHash().put("airCost", key, subAirCost);
-
-                            return subAirCost;
-                        } else {
-                            return null;
-                        }
-                    }
-                }
-            } else {
-                String mappingType = getTypeByBrand(brand);
-                aForm.setType(mappingType);
-
-                AirCost subAirCost = airCostMapperExt.getCostTapeAirCost2(aForm);
-
-                if(subAirCost != null) {
-                    redisTemplate.opsForHash().put("airCost", key, subAirCost);
-
-                    return subAirCost;
-                } else {
-                    return null;
-                }
-            }
-        } else {
+        if(airCost != null) {
             redisTemplate.opsForHash().put("airCost", key, airCost);
-
             return airCost;
         }
+        return null;
+    }
+
+    private String getBuInfo(CostTapeExt result) {
+        List<CostTapeBuMapping> mappingList = costTapeBuMappingMapperExt.getListCostTapeBuMapping();
+        if(!CollectionUtils.isEmpty(mappingList)) {
+            String partNumber = result.getPartNumber();
+            String family = result.getProductFamily() == null ? "" : result.getProductFamily();
+            String brand = result.getBrand() == null ? "" : result.getBrand();
+            String mtm = result.getItemType() == null ? "" : result.getItemType();
+            if(partNumber.startsWith("1") && (brand.equalsIgnoreCase("ThinkCentre") || brand.equalsIgnoreCase("ThinkEdge")) &&
+                    mappingList.stream().noneMatch(n -> n.getFamily().equalsIgnoreCase(family)) &&
+                    mtm.equalsIgnoreCase("mtm")) {
+                return "DT";
+            }
+
+            if(partNumber.startsWith("1") && (brand.equalsIgnoreCase("ThinkCentre") || brand.equalsIgnoreCase("ThinkEdge")) &&
+                    mappingList.stream().anyMatch(n -> n.getFamily().equalsIgnoreCase(family)) &&
+                    mtm.equalsIgnoreCase("mtm")) {
+                return "DT-Tiny";
+            }
+
+            if((partNumber.startsWith("2") || partNumber.startsWith("8")) && (brand.equalsIgnoreCase("ThinkPad") || brand.equalsIgnoreCase("ThinkReality")) &&
+                    mappingList.stream().noneMatch(n -> n.getFamily().equalsIgnoreCase(family)) &&
+                    mtm.equalsIgnoreCase("mtm")) {
+                return "NB-Think";
+            }
+
+            if((partNumber.startsWith("2") || partNumber.startsWith("8")) && brand.equalsIgnoreCase("ThinkPad") &&
+                    mappingList.stream().anyMatch(n -> n.getFamily().equalsIgnoreCase(family)) &&
+                    mtm.equalsIgnoreCase("mtm")) {
+                return "Tablet-Think";
+            }
+
+            if((partNumber.startsWith("1") || partNumber.startsWith("6")) &&
+                    (brand.equalsIgnoreCase("ThinkVision") || brand.equalsIgnoreCase("Visual")) &&
+                    mtm.equalsIgnoreCase("VISUAL")) {
+                return "Visual";
+            }
+
+            if(brand.equalsIgnoreCase("Option") || brand.equalsIgnoreCase("VLH")) {
+                return "Option";
+            }
+
+            if((partNumber.startsWith("9") || partNumber.startsWith("F")) &&
+                    mappingList.stream().noneMatch(n -> n.getFamily().equalsIgnoreCase(family)) &&
+                    brand.equalsIgnoreCase("IdeaCentre") && mtm.equalsIgnoreCase("mtm")) {
+                return "DT-Idea";
+            }
+
+            if((partNumber.startsWith("9") || partNumber.startsWith("F")) &&
+                    mappingList.stream().anyMatch(n -> n.getFamily().equalsIgnoreCase(family)) &&
+                    brand.equalsIgnoreCase("IdeaCentre") && mtm.equalsIgnoreCase("mtm")) {
+                return "DT-Tiny-Idea";
+            }
+
+            if((partNumber.startsWith("2") || partNumber.startsWith("8")) && brand.equalsIgnoreCase("IdeaPad") &&
+                    mappingList.stream().noneMatch(n -> n.getFamily().equalsIgnoreCase(family)) &&
+                    mtm.equalsIgnoreCase("mtm")) {
+                return "NB-Idea";
+            }
+
+            if((partNumber.startsWith("2") || partNumber.startsWith("8")) && brand.equalsIgnoreCase("IdeaPad") &&
+                    mappingList.stream().anyMatch(n -> n.getFamily().equalsIgnoreCase(family)) &&
+                    mtm.equalsIgnoreCase("mtm")) {
+                return "Tablet-Idea";
+            }
+
+            if(partNumber.startsWith("3") && brand.equalsIgnoreCase("ThinkStation") &&
+                    mtm.equalsIgnoreCase("mtm")) {
+                return "WS";
+            }
+
+        }
+        return null;
+    }
+
+    private String getMbgBuInfo(CostTapeExt result) {
+        String description = result.getCostDescription();
+        String partNumber = result.getPartNumber();
+        if(!StringUtils.isEmpty(partNumber)) {
+            if(partNumber.startsWith("ZA") && !description.startsWith("Lenovo CD")) {
+                return "MBG Tablet";
+            }
+
+            if(partNumber.startsWith("ZA") && description.startsWith("Lenovo CD")) {
+                return "MBG Option";
+            }
+        }
+
+        return null;
+    }
+
+    private BigDecimal getBufferByBu(String bu) {
+        CostTapeBuffer costTapeBuffer = costTapeBufferMapper.selectByPrimaryKey(bu);
+        return costTapeBuffer == null ? BigDecimal.ZERO : costTapeBuffer.getBuffer();
     }
 
     private String getTypeByBrand(String brand) {

@@ -10,6 +10,8 @@ public class AirCost {
 
     private String type;
 
+    private String mot;
+
     private BigDecimal cost;
 
     private Date insertTime;
@@ -36,6 +38,14 @@ public class AirCost {
 
     public void setType(String type) {
         this.type = type == null ? null : type.trim();
+    }
+
+    public String getMot() {
+        return mot;
+    }
+
+    public void setMot(String mot) {
+        this.mot = mot == null ? null : mot.trim();
     }
 
     public BigDecimal getCost() {

@@ -1,6 +1,9 @@
 package com.lenovo.vro.pricing.configuration;
 
 public class CodeConfig {
+    public static final String REDIS_PREFIX = "PMS:";
+    public static final String ACTIVE = "ACTIVE:";
+
     public static final String ROLE_PREFIX = "ROLE_";
     // token 有效期
     public static final long TOKEN_CONTINUE_TIME = 60 * 60 * 1000;

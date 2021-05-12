@@ -6,11 +6,13 @@ public interface DbService {
 
     String insertWarranty() throws FileNotFoundException;
 
-    void insertCostTapeFamilyMapping();
-
     String insertEo() throws FileNotFoundException;
 
     String insertGsc() throws FileNotFoundException;
 
     String insertMbgFreight() throws FileNotFoundException;
+
+    String insertFreight() throws FileNotFoundException;
+
+    String insertCostTapeBuMapping() throws FileNotFoundException;
 }

@@ -41,6 +41,10 @@ public class CostTapeExt implements Serializable {
 
     private String brand;
 
+    private String itemType;
+
+    private String bu;
+
     public String getId() {
         return id;
     }
@@ -183,5 +187,21 @@ public class CostTapeExt implements Serializable {
 
     public void setPid(String pid) {
         this.pid = pid;
+    }
+
+    public String getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
+    }
+
+    public String getBu() {
+        return bu;
+    }
+
+    public void setBu(String bu) {
+        this.bu = bu;
     }
 }

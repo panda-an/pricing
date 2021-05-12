@@ -2,10 +2,7 @@ package com.lenovo.vro.pricing.service.async;
 
 import com.lenovo.vro.pricing.configuration.CodeConfig;
 import com.lenovo.vro.pricing.entity.*;
-import com.lenovo.vro.pricing.mapper.ext.CostTapeEoMapperExt;
-import com.lenovo.vro.pricing.mapper.ext.CostTapeGscMapperExt;
-import com.lenovo.vro.pricing.mapper.ext.MbgFreightCostMapperExt;
-import com.lenovo.vro.pricing.mapper.ext.WarrantyMapperExt;
+import com.lenovo.vro.pricing.mapper.ext.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -104,4 +101,47 @@ public class AsyncThreadProcess {
             latch.countDown();
         }
     }
+
+    @Async("asyncServiceExecutor")
+    @Transactional(rollbackFor = Exception.class)
+    public Future<FutureBean> processFreightCostThread(AirCostMapperExt airCostMapperExt, List<AirCost> list, CountDownLatch latch) {
+
+        try {
+            airCostMapperExt.insertBatch(list);
+
+            logger.info("Insert freight cost data success for size {}", list.size());
+            FutureBean bean = new FutureBean();
+            bean.setStatus(CodeConfig.OPERATION_SUCCESS);
+            bean.setMessage("Insert mbg freight cost data For size: " + list.size() + " Success");
+
+            return new AsyncResult<>(bean);
+        } catch (Exception e) {
+            logger.error("Error Insert Into freight cost data Because： {}", e.getMessage());
+            throw e;
+        } finally {
+            latch.countDown();
+        }
+    }
+
+    @Async("asyncServiceExecutor")
+    @Transactional(rollbackFor = Exception.class)
+    public Future<FutureBean> processCostTapeBuMappingThread(CostTapeBuMappingMapperExt costTapeBuMappingMapperExt, List<CostTapeBuMapping> list, CountDownLatch latch) {
+
+        try {
+            costTapeBuMappingMapperExt.insertBatch(list);
+
+            logger.info("Insert cost tape bu mapping data success for size {}", list.size());
+            FutureBean bean = new FutureBean();
+            bean.setStatus(CodeConfig.OPERATION_SUCCESS);
+            bean.setMessage("Insert cost tape bu mapping data For size: " + list.size() + " Success");
+
+            return new AsyncResult<>(bean);
+        } catch (Exception e) {
+            logger.error("Error Insert Into cost tape bu mapping data Because： {}", e.getMessage());
+            throw e;
+        } finally {
+            latch.countDown();
+        }
+    }
+
 }

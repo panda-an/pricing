@@ -77,7 +77,7 @@ public class DbScheduleTask {
         logger.info("End schedule for insertCostTapeGsc");
     }
 
-    //@Scheduled(cron = "0 53 12 * * ? ")
+    @Scheduled(cron = "0 20 2 2 * ? ")
     public void insertMbgFreightCost() {
         logger.info("Start schedule for insertMbgFreightCost");
         String code1 = "";
@@ -94,5 +94,43 @@ public class DbScheduleTask {
         }
 
         logger.info("End schedule for insertMbgFreightCost");
+    }
+
+    @Scheduled(cron = "0 45 10 * * ? ")
+    public void insertFreightCost() {
+        logger.info("Start schedule for insertFreightCost");
+        String code1 = "";
+        try {
+            code1 = dbService.insertFreight();
+            if(code1.equals(CodeConfig.OPERATION_FAILED)) {
+                logger.error("Can not load freight cost data file!");
+            } else {
+                logger.info("Load freight cost data file process success!");
+            }
+        } catch (FileNotFoundException e) {
+            logger.error("Can not load freight cost data file!");
+            e.printStackTrace();
+        }
+
+        logger.info("End schedule for insertFreightCost");
+    }
+
+    @Scheduled(cron = "0 40 2 2 * ? ")
+    public void insertCostTapeBuMapping() {
+        logger.info("Start schedule for insertCostTapeBuMapping");
+        String code1 = "";
+        try {
+            code1 = dbService.insertCostTapeBuMapping();
+            if(code1.equals(CodeConfig.OPERATION_FAILED)) {
+                logger.error("Can not load cost tape bu mapping data file!");
+            } else {
+                logger.info("Load cost tape bu mapping data file process success!");
+            }
+        } catch (FileNotFoundException e) {
+            logger.error("Can not load cost tape bu mapping data file!");
+            e.printStackTrace();
+        }
+
+        logger.info("End schedule for insertCostTapeBuMapping");
     }
 }

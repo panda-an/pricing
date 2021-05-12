@@ -5,11 +5,12 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="country" jdbcType="VARCHAR" property="country" />
     <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="mot" jdbcType="VARCHAR" property="mot" />
     <result column="cost" jdbcType="DECIMAL" property="cost" />
     <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, country, type, cost, insert_time
+    id, country, `type`, mot, cost, insert_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -22,10 +23,12 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.lenovo.vro.pricing.entity.AirCost">
-    insert into air_cost (id, country, type, 
-      cost, insert_time)
+    insert into air_cost (id, country, `type`,
+      mot, cost, insert_time
+      )
     values (#{id,jdbcType=INTEGER}, #{country,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
-      #{cost,jdbcType=DECIMAL}, #{insertTime,jdbcType=TIMESTAMP})
+      #{mot,jdbcType=VARCHAR}, #{cost,jdbcType=DECIMAL}, #{insertTime,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.lenovo.vro.pricing.entity.AirCost">
     insert into air_cost
@@ -37,7 +40,10 @@
         country,
       </if>
       <if test="type != null">
-        type,
+        `type`,
+      </if>
+      <if test="mot != null">
+        mot,
       </if>
       <if test="cost != null">
         cost,
@@ -56,6 +62,9 @@
       <if test="type != null">
         #{type,jdbcType=VARCHAR},
       </if>
+      <if test="mot != null">
+        #{mot,jdbcType=VARCHAR},
+      </if>
       <if test="cost != null">
         #{cost,jdbcType=DECIMAL},
       </if>
@@ -71,7 +80,10 @@
         country = #{country,jdbcType=VARCHAR},
       </if>
       <if test="type != null">
-        type = #{type,jdbcType=VARCHAR},
+        `type` = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="mot != null">
+        mot = #{mot,jdbcType=VARCHAR},
       </if>
       <if test="cost != null">
         cost = #{cost,jdbcType=DECIMAL},
@@ -85,7 +97,8 @@
   <update id="updateByPrimaryKey" parameterType="com.lenovo.vro.pricing.entity.AirCost">
     update air_cost
     set country = #{country,jdbcType=VARCHAR},
-      type = #{type,jdbcType=VARCHAR},
+      `type` = #{type,jdbcType=VARCHAR},
+      mot = #{mot,jdbcType=VARCHAR},
       cost = #{cost,jdbcType=DECIMAL},
       insert_time = #{insertTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

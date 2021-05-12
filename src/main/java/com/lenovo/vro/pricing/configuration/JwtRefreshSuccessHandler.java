@@ -31,7 +31,7 @@ public class JwtRefreshSuccessHandler implements AuthenticationSuccessHandler {
 
         DecodedJWT jwtToken = ((JwtAuthenticationToken) authentication).getToken();
         if(shouldTokenRefresh(jwtToken.getExpiresAt())) {
-            Map<String, String> map = webUserService.saveUserInfo((UserDetails) authentication.getPrincipal());
+            Map<String, String> map = webUserService.saveUserInfo((UserDetails) authentication.getPrincipal(), null);
             response.setHeader("Authorization", map.get("token"));
         }
     }

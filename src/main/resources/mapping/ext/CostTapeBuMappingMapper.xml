@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lenovo.vro.pricing.mapper.ext.CostTapeBuMappingMapperExt">
+  <resultMap id="BaseResultMap" type="com.lenovo.vro.pricing.entity.CostTapeBuMapping">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="bu" jdbcType="VARCHAR" property="bu" />
+    <result column="family" jdbcType="VARCHAR" property="family" />
+    <result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, bu, family
+  </sql>
+  <select id="getListCostTapeBuMapping" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from cost_tape_bu_mapping
+  </select>
+
+  <update id="deleteAll">
+    truncate cost_tape_bu_mapping
+  </update>
+
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into cost_tape_bu_mapping (bu, family)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+        (#{item.bu,jdbcType=VARCHAR}, #{item.family,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+</mapper>

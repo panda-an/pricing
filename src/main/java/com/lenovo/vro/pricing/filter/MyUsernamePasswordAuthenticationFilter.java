@@ -27,8 +27,13 @@ public class MyUsernamePasswordAuthenticationFilter extends AbstractAuthenticati
             throws AuthenticationException, IOException, ServletException {
         String body = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
         SystemUser user = JSONObject.parseObject(body, SystemUser.class);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getUserName()==null?"":user.getUserName().trim(), user.getPassword());
+        setDetails(httpServletRequest, token);
 
-        return this.getAuthenticationManager().authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUserName()==null?"":user.getUserName().trim(), user.getPassword()));
+        return this.getAuthenticationManager().authenticate(token);
+    }
+
+    protected void setDetails(HttpServletRequest request, UsernamePasswordAuthenticationToken authRequest) {
+        authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
     }
 }

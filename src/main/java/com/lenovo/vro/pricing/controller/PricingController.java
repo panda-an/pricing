@@ -3,6 +3,7 @@ package com.lenovo.vro.pricing.controller;
 import com.github.pagehelper.PageInfo;
 import com.lenovo.vro.pricing.configuration.CodeConfig;
 import com.lenovo.vro.pricing.entity.*;
+import com.lenovo.vro.pricing.entity.ext.AirCostExt;
 import com.lenovo.vro.pricing.entity.ext.CostTapeOrderExt;
 import com.lenovo.vro.pricing.entity.ext.CostTapeOrderForm;
 import com.lenovo.vro.pricing.service.costtype.CostOrderListService;
@@ -377,7 +378,7 @@ public class PricingController {
      * @return list for transport cost
      */
     @PostMapping("/changeTransportType")
-    public ResponseBean changeTransportType(@RequestBody List<AirCostForm> list) {
+    public ResponseBean changeTransportType(@RequestBody List<AirCostExt> list) {
         ResponseBean bean = new ResponseBean();
 
         if(CollectionUtils.isEmpty(list)) {

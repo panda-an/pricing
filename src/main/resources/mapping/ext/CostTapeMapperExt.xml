@@ -16,6 +16,7 @@
     <result column="sub_geo" jdbcType="VARCHAR" property="subGeo" />
     <result column="brand" jdbcType="VARCHAR" property="brand" />
     <result column="category_type" jdbcType="VARCHAR" property="categoryType" />
+    <result column="item_type" jdbcType="VARCHAR" property="itemType" />
   </resultMap>
 
   <resultMap id="SbbResultMap" type="com.lenovo.vro.pricing.entity.ext.CostTapeExt">
@@ -38,11 +39,11 @@
     <result column="country" jdbcType="VARCHAR" property="country" />
   </resultMap>
   <sql id="Base_Column_List">
-    c.id, c.part_number, c.brand, c.plant, c.country, c.one, c.description as cost_description, c.subgeo, f.product_family, f.priority, f.sub_geo
+    c.id, c.part_number, c.brand, c.plant, c.country, c.one, c.description as cost_description, c.subgeo, c.item_type, f.product_family, f.priority, f.sub_geo
   </sql>
 
   <sql id="Base_Column_List1">
-    c.id, c.part_number, c.brand, c.plant, c.country, c.one, c.description as cost_description, c.subgeo, c.family as product_family
+    c.id, c.part_number, c.brand, c.plant, c.country, c.one, c.description as cost_description, c.subgeo, c.item_type, c.family as product_family
   </sql>
 
   <sql id="Sbb_Column_List">
@@ -77,6 +78,8 @@
         when 'ThinkStation' then '1'
         when 'ThinkServer' then '1'
         when 'ThinkReality' then '1'
+        when 'IDEAPAD' then '1'
+        when 'IDEACENTRE' then '1'
         else '0' end as category_type,
       case when eo.nbmc is not null then eo.nbmc else 0 end as enbmc,
       case when gsc1.nbmc is not null then gsc1.nbmc else 0 end as gnbmc,
